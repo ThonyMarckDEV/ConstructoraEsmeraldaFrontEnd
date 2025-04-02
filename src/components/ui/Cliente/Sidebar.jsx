@@ -106,16 +106,18 @@ const Sidebar = () => {
           </ul>
         </nav>
 
-        {/* Logout button en la parte inferior */}
+
+       {/* Logout button en la parte inferior */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
           <button
-            onClick={() => {handleLogout}}
+            onClick={handleLogout} // Corrected: Removed arrow function and directly referenced handleLogout
             className="flex items-center space-x-3 w-full p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
           >
             <span className="text-gray-500"><LogOut size={20} /></span>
             <span>Cerrar Sesión</span>
           </button>
         </div>
+
       </div>
     </>
   );
