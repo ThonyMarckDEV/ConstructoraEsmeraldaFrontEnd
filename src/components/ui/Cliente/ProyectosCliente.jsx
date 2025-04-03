@@ -16,7 +16,7 @@ const ProyectoClientes = () => {
       try {
         setLoading(true);
         
-        // Obtener proyectos
+        // Obtener proyectoss
         const proyectosResponse = await fetchWithAuth(`${API_BASE_URL}/api/client/projects`);
         const proyectosData = await proyectosResponse.json();
         
