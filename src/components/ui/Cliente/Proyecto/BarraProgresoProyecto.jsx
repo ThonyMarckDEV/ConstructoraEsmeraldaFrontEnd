@@ -408,10 +408,30 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
           </div>
         </div>
         
-        {/* Text content */}
+        {/* Text content with repositioned AR button */}
         <div className="absolute inset-0 flex flex-col justify-center p-4 md:p-6 text-white">
-          <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">PROYECTO DE CONSTRUCCIÓN</h1>
-          <h2 className="text-lg md:text-xl font-semibold">{proyecto.nombre}</h2>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">PROYECTO DE CONSTRUCCIÓN</h1>
+              <h2 className="text-lg md:text-xl font-semibold">{proyecto.nombre}</h2>
+            </div>
+            
+            {/* Redesigned AR Button - positioned at top right */}
+            <Link 
+              to={`/cliente/proyecto/ar/${proyectoId}`} 
+              className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M5.59961 5.60001L18.3996 18.4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 2V4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 20V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M20 12H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>Ver en AR</span>
+            </Link>
+          </div>
           
           <div className="mt-2 md:mt-4 flex items-center">
             <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white text-blue-700 flex items-center justify-center font-bold text-lg md:text-xl border-2 md:border-4 border-blue-300">
@@ -423,24 +443,25 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
                 Actualizado: {new Date(proyecto.updated_at).toLocaleDateString()}
               </p>
             </div>
-            
-            {/* AR Button */}
-            <Link 
-              to={`/cliente/proyecto/ar/${proyectoId}`} 
-              className="ml-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 flex items-center"
-            >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M5.59961 5.60001L18.3996 18.4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 2V4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 20V22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M20 12H22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 12H4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Ver en AR
-            </Link>
           </div>
         </div>
+      </div>
+
+      {/* Mobile version of the AR button - fixed at bottom of screen */}
+      <div className="fixed bottom-4 right-4 md:hidden z-10">
+        <Link 
+          to={`/cliente/proyecto/ar/${proyectoId}`} 
+          className="flex items-center justify-center bg-blue-600 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-blue-700"
+        >
+          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M5.59961 5.60001L18.3996 18.4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12 2V4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12 20V22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M20 12H22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M2 12H4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </Link>
       </div>
 
       {/* Progress section */}
