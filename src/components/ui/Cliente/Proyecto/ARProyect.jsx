@@ -31,4 +31,3 @@ const ARProyect = () => {
 };
 
 export default ARProyect;
-TE
