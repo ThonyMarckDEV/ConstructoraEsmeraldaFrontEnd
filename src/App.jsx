@@ -15,6 +15,8 @@ import Login from './ui/Auth/Login';
 
 // UIS Cliente
 import Cliente from './ui/Cliente/Cliente';
+import Proyectos from './ui/Cliente/Proyectos';
+import Proyecto from './ui/Cliente/Proyecto';
 
 
 // Components
@@ -41,8 +43,8 @@ function AppContent() {
       {/* Rutas cliente */}
       
       <Route path="/cliente" element={<ProtectedRouteCliente element={<Cliente />} />} />
-      
-      
+      <Route path="/cliente/proyectos" element={<ProtectedRouteCliente element={<Proyectos />} />} />
+      <Route path="/cliente/proyecto/:id" element={<ProtectedRouteCliente element={<Proyecto />} />} />
     
       {/* Ruta de error */}
       <Route path="/404" element={<ErrorPage />} />
