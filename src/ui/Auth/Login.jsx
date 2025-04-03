@@ -46,7 +46,11 @@ const Login = () => {
         setTimeout(() => {
           window.location.href = '/cliente';
         }, 1500);
-      } else {
+      } else if (rol === 'manager') {
+        setTimeout(() => {
+          window.location.href = '/encargado';
+        }, 1500);
+      }else{
         console.error('Rol no reconocido:', rol);
         toast.error(`Rol no reconocido: ${rol}`);
       }

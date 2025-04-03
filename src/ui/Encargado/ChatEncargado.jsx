@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from '../../components/ui/Manager/Sidebar';
-import ChatList from './ChatList';
+import Sidebar from '../../components/ui/Encargado/Sidebar';
+import ChatList from '../../components/ui/Encargado/Chat/ChatList';
 import ChatWindow from '../../components/ui/Cliente/Chat/ChatWindow';
 import { fetchWithAuth } from '../../js/authToken';
 import API_BASE_URL from '../../js/urlHelper';
@@ -63,7 +63,7 @@ const ChatEncargado = () => {
         <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
             <Sidebar username="Encargado" />
             
-            <div className="flex-1 p-4 md:ml-64">
+            <div className="flex-1 p-9 md:ml-84">
                 <div className="bg-white rounded-lg shadow overflow-hidden">
                     <h1 className="text-2xl font-bold p-4 border-b">Chat con Clientes</h1>
                     
