@@ -1,45 +1,115 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchWithAuth } from '../../../../js/authToken';
+import API_BASE_URL from '../../../../js/urlHelper';
 
-const ProgressBar = ({ currentPhase = 2 }) => {
+
+const BarraProgresoProyecto = ({ proyectoId }) => {
+  const [proyecto, setProyecto] = useState(null);
+  const [fases, setFases] = useState([]);
+  const [archivos, setArchivos] = useState([]);
+  const [fotos, setFotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   
-  const phases = [
-    {
-      id: 1,
-      title: "Planificación y Diseño 📝"
-    },
-    {
-      id: 2,
-      title: "Preparación del Terreno 🌍"
-    },
-    {
-      id: 3,
-      title: "Construcción de Cimientos 🏗️"
-    },
-    {
-      id: 4,
-      title: "Estructura y Superestructura 🏢"
-    },
-    {
-      id: 5,
-      title: "Instalaciones ⚡"
-    },
-    {
-      id: 6,
-      title: "Acabados 🎨"
-    },
-    {
-      id: 7,
-      title: "Inspección y Pruebas 🔍"
-    },
-    {
-      id: 8,
-      title: "Entrega 🎉"
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch project details
+        const proyectoResponse = await fetchWithAuth(`${API_BASE_URL}/api/client/projects/${proyectoId}`);
+        const proyectoData = await proyectoResponse.json();
+        
+        if (!proyectoResponse.ok) {
+          throw new Error(proyectoData.message || 'Error al obtener datos del proyecto');
+        }
+        
+        setProyecto(proyectoData);
+        
+        // Fetch project phases
+        const fasesResponse = await fetchWithAuth(`${API_BASE_URL}/api/client/projects/${proyectoId}/phases`);
+        const fasesData = await fasesResponse.json();
+        
+        if (!fasesResponse.ok) {
+          throw new Error(fasesData.message || 'Error al obtener fases del proyecto');
+        }
+        
+        setFases(fasesData);
+        
+      } catch (error) {
+        console.error("Error fetching project data:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (proyectoId) {
+      fetchProjectData();
     }
-  ];
+  }, [proyectoId]);
+  
+  // Find current phase index by name or by number
+  const getCurrentPhaseIndex = () => {
+    if (!proyecto?.fase || proyecto.fase.trim() === "") {
+      return 0; // No phase defined
+    }
+    
+    // If fase is a number, parse it directly
+    if (!isNaN(parseInt(proyecto.fase))) {
+      return parseInt(proyecto.fase);
+    }
+    
+    // If fase is a string, find the corresponding phase by name
+    const phaseIndex = fases.findIndex(
+      fase => fase.nombreFase.toLowerCase() === proyecto.fase.toLowerCase()
+    );
+    
+    // If found, return 1-based index (to match existing logic), otherwise return 0
+    return phaseIndex !== -1 ? phaseIndex + 1 : 0;
+  };
+  
+  const hasFase = proyecto?.fase && proyecto.fase.trim() !== "";
+  const currentPhase = getCurrentPhaseIndex();
+  
+  // Calculate progress percentage - if no phase is defined, progress is 0
+  const progressPercentage = hasFase && fases.length > 0 && currentPhase > 0 ? (currentPhase / fases.length) * 100 : 0;
+  
+  if (loading) {
+    return (
+      <div className="w-full bg-white shadow-lg p-6 flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="w-full bg-white shadow-lg p-6">
+        <div className="bg-red-50 border-l-4 border-red-500 p-4">
+          <p className="text-red-700">Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!proyecto || fases.length === 0) {
+    return (
+      <div className="w-full bg-white shadow-lg p-6">
+        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+          <p className="text-yellow-700">No se encontraron datos del proyecto o sus fases.</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Calculate progress percentage
-  const progressPercentage = (currentPhase / phases.length) * 100;
+  // Get current phase name
+  const currentPhaseName = hasFase ? (
+    currentPhase > 0 && currentPhase <= fases.length 
+      ? fases[currentPhase - 1]?.nombreFase 
+      : proyecto.fase // Use the original phase name from API if no match found
+  ) : '';
 
   return (
     <div className="w-full bg-white shadow-lg">
@@ -62,15 +132,17 @@ const ProgressBar = ({ currentPhase = 2 }) => {
         {/* Text content */}
         <div className="absolute inset-0 flex flex-col justify-center p-4 md:p-6 text-white">
           <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">PROYECTO DE CONSTRUCCIÓN</h1>
-          <h2 className="text-lg md:text-xl font-semibold">Casa en AV H, Los Geranios lote 1 Mz 5</h2>
+          <h2 className="text-lg md:text-xl font-semibold">{proyecto.nombre}</h2>
           
           <div className="mt-2 md:mt-4 flex items-center">
             <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white text-blue-700 flex items-center justify-center font-bold text-lg md:text-xl border-2 md:border-4 border-blue-300">
-              {Math.round(progressPercentage)}%
+              {progressPercentage ? Math.round(progressPercentage) : 0}%
             </div>
             <div className="ml-3 md:ml-4">
-              <p className="text-base md:text-lg font-medium">Estado: En Progreso</p>
-              <p className="text-xs md:text-sm opacity-80">Actualizado: {new Date().toLocaleDateString()}</p>
+              <p className="text-base md:text-lg font-medium">Estado: {proyecto.estado || 'En Progreso'}</p>
+              <p className="text-xs md:text-sm opacity-80">
+                Actualizado: {new Date(proyecto.updated_at).toLocaleDateString()}
+              </p>
             </div>
           </div>
         </div>
@@ -86,24 +158,47 @@ const ProgressBar = ({ currentPhase = 2 }) => {
           />
         </div>
 
-        {/* Current phase highlight box */}
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-3 md:p-4 mb-4 md:mb-6">
-          <div className="flex items-center">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold mr-2 md:mr-3 text-sm md:text-base">
-              {currentPhase}
+        {/* Current phase highlight box - only shown if we have a phase */}
+        {hasFase ? (
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-3 md:p-4 mb-4 md:mb-6">
+            <div className="flex items-center">
+              {currentPhase > 0 && (
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold mr-2 md:mr-3 text-sm md:text-base">
+                  {currentPhase}
+                </div>
+              )}
+              <div className="flex-1">
+                <h3 className="text-base md:text-lg font-semibold text-blue-800">Fase actual:</h3>
+                <p className="text-sm md:text-base text-blue-700">
+                  {currentPhaseName || 'No encontrada'}
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsDetailsOpen(!isDetailsOpen)}
+                className="md:hidden text-blue-600 p-1"
+              >
+                {isDetailsOpen ? '▲' : '▼'}
+              </button>
             </div>
-            <div className="flex-1">
-              <h3 className="text-base md:text-lg font-semibold text-blue-800">Fase actual:</h3>
-              <p className="text-sm md:text-base text-blue-700">{phases[currentPhase-1]?.title}</p>
-            </div>
-            <button 
-              onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-              className="md:hidden text-blue-600 p-1"
-            >
-              {isDetailsOpen ? '▲' : '▼'}
-            </button>
           </div>
-        </div>
+        ) : (
+          <div className="bg-gray-50 border-l-4 border-gray-300 p-3 md:p-4 mb-4 md:mb-6">
+            <div className="flex items-center">
+              <div className="flex-1">
+                <h3 className="text-base md:text-lg font-semibold text-gray-600">Fase actual:</h3>
+                <p className="text-sm md:text-base text-gray-500">
+                  No definida
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsDetailsOpen(!isDetailsOpen)}
+                className="md:hidden text-gray-600 p-1"
+              >
+                {isDetailsOpen ? '▲' : '▼'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Scrollable phase indicators - For desktop */}
         <div className="relative mt-6 mb-4 hidden md:block">
@@ -112,24 +207,27 @@ const ProgressBar = ({ currentPhase = 2 }) => {
           
           {/* Phase points and titles */}
           <div className="flex justify-between relative">
-            {phases.map((phase) => (
+            {fases.map((fase, index) => (
               <div 
-                key={phase.id} 
-                className={`flex flex-col items-center ${phase.id <= currentPhase ? 'text-blue-600' : 'text-gray-400'}`}
+                key={fase.idFase} 
+                className={`flex flex-col items-center ${hasFase && currentPhase > 0 && index + 1 <= currentPhase ? 'text-blue-600' : 'text-gray-400'}`}
               >
                 <div 
                   className={`w-8 h-8 rounded-full flex items-center justify-center font-bold z-10 ${
-                    phase.id < currentPhase 
+                    hasFase && currentPhase > 0 && index + 1 < currentPhase 
                       ? 'bg-blue-600 text-white' 
-                      : phase.id === currentPhase 
+                      : hasFase && currentPhase > 0 && index + 1 === currentPhase 
                         ? 'bg-white border-4 border-blue-600 text-blue-600' 
                         : 'bg-white border-2 border-gray-300 text-gray-400'
                   }`}
                 >
-                  {phase.id}
+                  {index + 1}
                 </div>
                 <div className="mt-2 text-xs font-medium text-center max-w-16 whitespace-normal">
-                  {phase.id === currentPhase ? <strong>{phase.title.split(' ')[0]}</strong> : phase.title.split(' ')[0]}
+                  {hasFase && currentPhase > 0 && index + 1 === currentPhase ? 
+                    <strong>{fase.nombreFase.split(' ')[0]}</strong> : 
+                    fase.nombreFase.split(' ')[0]
+                  }
                 </div>
               </div>
             ))}
@@ -145,24 +243,24 @@ const ProgressBar = ({ currentPhase = 2 }) => {
               
               {/* Phase points and titles */}
               <div className="flex space-x-12 relative">
-                {phases.map((phase) => (
+                {fases.map((fase, index) => (
                   <div 
-                    key={phase.id} 
-                    className={`flex flex-col items-center ${phase.id <= currentPhase ? 'text-blue-600' : 'text-gray-400'}`}
+                    key={fase.idFase} 
+                    className={`flex flex-col items-center ${hasFase && currentPhase > 0 && index + 1 <= currentPhase ? 'text-blue-600' : 'text-gray-400'}`}
                   >
                     <div 
                       className={`w-8 h-8 rounded-full flex items-center justify-center font-bold z-10 ${
-                        phase.id < currentPhase 
+                        hasFase && currentPhase > 0 && index + 1 < currentPhase 
                           ? 'bg-blue-600 text-white' 
-                          : phase.id === currentPhase 
+                          : hasFase && currentPhase > 0 && index + 1 === currentPhase 
                             ? 'bg-white border-4 border-blue-600 text-blue-600' 
                             : 'bg-white border-2 border-gray-300 text-gray-400'
                       }`}
                     >
-                      {phase.id}
+                      {index + 1}
                     </div>
                     <div className="mt-2 text-xs font-medium text-center max-w-20">
-                      {phase.title}
+                      {fase.nombreFase}
                     </div>
                   </div>
                 ))}
@@ -178,4 +276,4 @@ const ProgressBar = ({ currentPhase = 2 }) => {
   );
 };
 
-export default ProgressBar;
+export default BarraProgresoProyecto;
