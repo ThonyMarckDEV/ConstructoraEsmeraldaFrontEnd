@@ -85,19 +85,6 @@ const ARProject = () => {
             </button>
           </model-viewer>
           
-          {/* Controles adicionales para la experiencia */}
-          <div className="absolute bottom-4 right-4 flex space-x-2">
-            <button className="bg-white text-blue-600 hover:bg-blue-50 rounded-full w-12 h-12 flex items-center justify-center shadow-lg border border-blue-200">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
-            <button className="bg-white text-blue-600 hover:bg-blue-50 rounded-full w-12 h-12 flex items-center justify-center shadow-lg border border-blue-200">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </button>
-          </div>
         </div>
         
         {/* Footer con información adicional */}
