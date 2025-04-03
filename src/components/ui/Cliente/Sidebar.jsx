@@ -16,8 +16,8 @@ const Sidebar = () => {
     logout(); // Cierra sesión
   };
 
-  const access_token = jwtUtils.getAccessTokenFromCookie();
-  const username = jwtUtils.getUsername(access_token);
+  const refresh_token = jwtUtils.getRefreshTokenFromCookie();
+  const username = jwtUtils.getUsername(refresh_token);
 
   // Cerrar el sidebar al hacer clic fuera de él
   useEffect(() => {
