@@ -3,12 +3,12 @@ import { fetchWithAuth } from '../../../js/authToken';
 import API_BASE_URL from '../../../js/urlHelper';
 import { useNavigate } from 'react-router-dom';
 import defaultimg from '../../../img/default.jpg';
+import LoadingProyectosClientes from './Proyectos/LoadingProyectosCliente';
 
 const ProyectoClientes = () => {
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [fasesPorProyecto, setFasesPorProyecto] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,27 +16,15 @@ const ProyectoClientes = () => {
       try {
         setLoading(true);
         
-        // Obtener proyectoss
-        const proyectosResponse = await fetchWithAuth(`${API_BASE_URL}/api/client/projects`);
-        const proyectosData = await proyectosResponse.json();
+        // Fetch projects with phases in a single request
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/projects-with-phases`);
+        const data = await response.json();
         
-        if (!proyectosResponse.ok) {
-          throw new Error(proyectosData.message || 'Error al obtener los proyectos');
+        if (!response.ok) {
+          throw new Error(data.message || 'Error al obtener los proyectos');
         }
         
-        setProyectos(proyectosData);
-        
-        // Obtener fases para cada proyecto
-        const fasesData = {};
-        for (const proyecto of proyectosData) {
-          const fasesResponse = await fetchWithAuth(`${API_BASE_URL}/api/client/projects/${proyecto.idProyecto}/phases`);
-          const fases = await fasesResponse.json();
-          if (fasesResponse.ok) {
-            fasesData[proyecto.idProyecto] = fases;
-          }
-        }
-        
-        setFasesPorProyecto(fasesData);
+        setProyectos(data);
         
       } catch (error) {
         console.error("Error al obtener datos:", error);
@@ -58,7 +46,7 @@ const ProyectoClientes = () => {
     // Si no hay fase definida, retornar 0%
     if (!proyecto.fase || proyecto.fase.trim() === "") return 0;
     
-    const fases = fasesPorProyecto[proyecto.idProyecto] || [];
+    const fases = proyecto.fases || [];
     if (fases.length === 0) return 0;
     
     // Encontrar el índice de la fase actual (1-based)
@@ -84,11 +72,7 @@ const ProyectoClientes = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <LoadingProyectosClientes />;
   }
 
   if (error) {
@@ -109,7 +93,7 @@ const ProyectoClientes = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {proyectos.map((proyecto) => {
           const progreso = calcularProgreso(proyecto);
-          const totalFases = fasesPorProyecto[proyecto.idProyecto]?.length || 0;
+          const totalFases = proyecto.fases?.length || 0;
           
           return (
             <div
