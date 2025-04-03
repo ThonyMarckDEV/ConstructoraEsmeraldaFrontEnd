@@ -2,7 +2,7 @@ import React from 'react';
 import Sidebar from '../../../../components/ui/Cliente/Sidebar';
 import edificio from '../../../../glb/building_04.glb';
 
-const ARProject = () => {
+const ARProject = ({ proyectoId }) => {
   return (
     <div>
       <Sidebar username="Cliente" />
