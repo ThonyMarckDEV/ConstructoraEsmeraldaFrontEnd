@@ -42,7 +42,7 @@ function AppContent() {
 
       <Route path="/login"  element={<Login />} />
 
-      <Route path="/ar"  element={<AR />} />
+      <Route path="/cliente/proyecto/ar/:id"  element={<AR />} />
 
       {/* Rutas cliente */}
       

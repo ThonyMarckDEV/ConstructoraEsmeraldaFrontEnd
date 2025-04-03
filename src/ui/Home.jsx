@@ -20,13 +20,6 @@ const Home = () => {
             <span>Módulo Component</span>
 
           </button>
-              {/* Botón para Módulo 1 */}
-              <button 
-            onClick={() => navigateTo('/ar')}
-            className="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
-          >
-            <span>AR TEST</span>
-          </button>
     </div>
   );
 };

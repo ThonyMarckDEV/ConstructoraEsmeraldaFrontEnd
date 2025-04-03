@@ -1,33 +1,42 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import Sidebar from '../../../../components/ui/Cliente/Sidebar';
+import edificio from '../../../../glb/building_04.glb';
 
-const ARProyect = () => {
-  useEffect(() => {
-    console.log('Componente ARProyect montado.');
-  }, []);
-
+const ARProject = () => {
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <a-scene
-        embedded
-        vr-mode-ui="enabled: false"
-        arjs="sourceType: webcam; debugUIEnabled: false;"
-      >
-        {/* Marcador "hiro" para detectar el modelo */}
-        <a-marker preset="hiro">
-          {/* Carga el modelo de astronauta */}
-          <a-entity
-            gltf-model="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
-            scale="0.5 0.5 0.5"
-            rotation="0 180 0"
-            position="0 0 0"
-          ></a-entity>
-        </a-marker>
-
-        {/* Cámara de AR */}
-        <a-entity camera></a-entity>
-      </a-scene>
+    <div>
+      <Sidebar username="Cliente" />
+      <div style={{ width: '100%', height: '100vh' }}>
+        <model-viewer
+          // src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+          src={edificio}
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          camera-controls
+          auto-rotate
+          style={{ width: '100%', height: '100%' }}
+          alt="Astronaut 3D model"
+          environment-image="neutral"
+          shadow-intensity="1"
+        >
+          <button slot="ar-button" style={{
+            position: 'absolute',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            padding: '12px 24px',
+            background: '#007BFF',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}>
+            Ver en AR
+          </button>
+        </model-viewer>
+      </div>
     </div>
   );
 };
 
-export default ARProyect;
+export default ARProject;
