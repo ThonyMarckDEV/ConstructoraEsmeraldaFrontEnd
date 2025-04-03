@@ -5,6 +5,7 @@ import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
 import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from "../../../../js/urlHelper";
+import img from '../../../../img/default.jpg';
 
 const Modulo = ({ proyectoId }) => {
   const [projectData, setProjectData] = useState(null);
@@ -38,7 +39,6 @@ const Modulo = ({ proyectoId }) => {
   const currentPhaseIndex = projectData?.fases?.findIndex(fase => fase.es_actual) ?? -1;
 
   const toggleExpand = (moduleId) => {
-    // Solo permite expandir si la fase es anterior o igual a la actual
     const moduleIndex = projectData.fases.findIndex(f => f.idFase === moduleId);
     if (moduleIndex <= currentPhaseIndex) {
       setExpandedModuleId(currentId => currentId === moduleId ? null : moduleId);
@@ -84,7 +84,7 @@ const Modulo = ({ proyectoId }) => {
               
               return (
                 <div 
-                  key={fase.idFase} 
+                  key={`phase-${fase.idFase}`}  // Clave única para cada fase
                   className={`border rounded p-3 transition-all flex-shrink-0 lg:flex-shrink w-auto lg:w-full ${
                     expandedModuleId === fase.idFase 
                       ? "bg-blue-50 border-blue-200" 
@@ -142,10 +142,10 @@ const Modulo = ({ proyectoId }) => {
       {/* Contenido principal */}
       <div className="w-full lg:w-3/4 mt-6 lg:mt-0">
         {projectData.fases.map((fase) => {
-          // Combinar archivos y fotos
+          // Combinar archivos y fotos con IDs únicos
           const allFiles = [
             ...(fase.archivos || []).map(archivo => ({
-              id: archivo.idArchivo,
+              id: `file-${archivo.idArchivo}`,
               fileName: archivo.ruta ? archivo.ruta.split('/').pop() : 'archivo.pdf',
               fileType: archivo.tipo || 'pdf',
               description: archivo.descripcion || 'Sin descripción',
@@ -153,7 +153,7 @@ const Modulo = ({ proyectoId }) => {
               isPhoto: false
             })),
             ...(fase.fotos || []).map(foto => ({
-              id: foto.idFoto,
+              id: `photo-${foto.idFoto}`,
               fileName: foto.ruta ? foto.ruta.split('/').pop() : 'foto.jpg',
               fileType: foto.tipo || 'jpg',
               description: foto.descripcion || 'Fotografía',
@@ -164,24 +164,22 @@ const Modulo = ({ proyectoId }) => {
           
           return (
             <div 
-              key={fase.idFase} 
+              key={`phase-content-${fase.idFase}`}  // Clave única para el contenido de cada fase
               className={`transition-all duration-300 pb-20 mb-8 ${
                 expandedModuleId === fase.idFase 
                   ? "block" 
                   : "hidden"
               }`}
             >
-              {/* Cabecera del módulo */}
+             {/* Cabecera del módulo */}
               <div className="border rounded-md mb-4">
                 <div className="flex flex-col sm:flex-row items-start p-4 gap-4">
-                  <div className="bg-gray-100 p-2 rounded-md min-w-[120px] flex items-center justify-center mx-auto sm:mx-0">
-                    <div className="relative w-[120px] h-[120px]">
-                      <img
-                        src={fase.fotos?.[0]?.ruta || "/placeholder-image.jpg"}
-                        alt={fase.nombreFase}
-                        className="object-contain w-[120px] h-[120px]"
-                      />
-                    </div>
+                  <div className="bg-gray-100 p-2 rounded-md min-w-[120px] w-[120px] h-[120px] flex items-center justify-center mx-auto sm:mx-0 overflow-hidden">
+                    <img
+                      src={fase.fotos?.[0]?.ruta || img}
+                      alt={fase.nombreFase}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex-1">
                     <h2 className="text-lg font-bold uppercase">{fase.nombreFase}</h2>
@@ -200,7 +198,7 @@ const Modulo = ({ proyectoId }) => {
                 {allFiles.length > 0 ? (
                   allFiles.map((file) => (
                     <FileCard 
-                      key={file.id} 
+                      key={file.id}  // Usamos el ID único que ya generamos
                       file={file} 
                       onView={handleViewFile} 
                       onDownload={handleDownloadFile} 
