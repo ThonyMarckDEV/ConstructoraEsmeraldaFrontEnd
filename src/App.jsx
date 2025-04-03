@@ -8,6 +8,8 @@ import './index.css';
 // Componentes Home
 import Home from './ui/Home';
 
+import AR from './components/ui/Cliente/Proyecto/ARProyect';
+
 // UIS AUTH
 import ErrorPage from './components/ErrorPage';
 import ErrorPage401 from './components/ErrorPage401';
@@ -39,6 +41,8 @@ function AppContent() {
       <Route path="/" element={<ProtectedRouteHome element={<Home />} />} />
 
       <Route path="/login"  element={<Login />} />
+
+      <Route path="/ar"  element={<AR />} />
 
       {/* Rutas cliente */}
       
