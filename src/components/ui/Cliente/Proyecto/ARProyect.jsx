@@ -1,133 +1,4 @@
-// import React, { useState, useEffect, useRef } from 'react';
-// import { useParams, useNavigate } from 'react-router-dom';
-// import * as THREE from 'three';
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-// import { fetchWithAuth } from '../../../../js/authToken';
-// import API_BASE_URL from '../../../../js/urlHelper';
-
-// const ARProyect = () => {
-//   const { proyectoId } = useParams();
-//   const navigate = useNavigate();
-//   const [modelo3D, setModelo3D] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [arSupported, setArSupported] = useState(false);
-//   const mountRef = useRef(null);
-
-//   useEffect(() => {
-//     // Verificar soporte AR
-//     const checkARSupport = async () => {
-//       if ('xr' in navigator) {
-//         try {
-//           const supported = await navigator.xr.isSessionSupported('immersive-ar');
-//           setArSupported(supported);
-//         } catch (e) {
-//           console.error("Error checking AR support:", e);
-//           setArSupported(false);
-//         }
-//       }
-//     };
-
-//     // Cargar modelo
-//     const fetchModel = async () => {
-//       try {
-//         const response = await fetchWithAuth(`${API_BASE_URL}/api/projects/${proyectoId}/ar-model`);
-//         const data = await response.json();
-//         if (!response.ok) throw new Error(data.message || 'Failed to load AR model');
-//         setModelo3D(data.modelUrl);
-//       } catch (err) {
-//         setError(err.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     checkARSupport();
-//     fetchModel();
-
-//     return () => {
-//       if (mountRef.current) {
-//         mountRef.current.innerHTML = '';
-//       }
-//     };
-//   }, [proyectoId]);
-
-//   const startARSession = async () => {
-//     if (!modelo3D || !mountRef.current) return;
-
-//     // Configuración básica de Three.js
-//     const scene = new THREE.Scene();
-//     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-//     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-//     renderer.setSize(window.innerWidth, window.innerHeight);
-//     renderer.xr.enabled = true;
-//     mountRef.current.appendChild(renderer.domElement);
-
-//     // Luz
-//     const light = new THREE.AmbientLight(0xffffff, 1);
-//     scene.add(light);
-
-//     // Cargar modelo
-//     const loader = new GLTFLoader();
-//     loader.load(
-//       modelo3D,
-//       (gltf) => {
-//         scene.add(gltf.scene);
-//       },
-//       undefined,
-//       (error) => {
-//         console.error('Error loading model:', error);
-//         setError('Failed to load 3D model');
-//       }
-//     );
-
-//     // Iniciar sesión AR
-//     try {
-//       const session = await navigator.xr.requestSession('immersive-ar');
-//       renderer.xr.setSession(session);
-
-//       const animate = () => {
-//         renderer.setAnimationLoop(() => {
-//           renderer.render(scene, camera);
-//         });
-//       };
-
-//       animate();
-//     } catch (err) {
-//       console.error('AR session failed:', err);
-//       setError('Failed to start AR session');
-//     }
-//   };
-
-//   if (loading) {
-//     return <div className="loading">Loading...</div>;
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="error">
-//         <p>{error}</p>
-//         <button onClick={() => navigate(-1)}>Back</button>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="ar-container">
-//       <div ref={mountRef} className="ar-viewport" />
-//       <button 
-//         onClick={startARSession} 
-//         disabled={!arSupported}
-//         className={`ar-button ${!arSupported ? 'disabled' : ''}`}
-//       >
-//         {arSupported ? 'Start AR' : 'AR Not Supported'}
-//       </button>
-//     </div>
-//   );
-// };
-
-// export default ARProyect;
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -138,20 +9,22 @@ const ARProyect = () => {
   const [error, setError] = useState(null);
   const [arSupported, setArSupported] = useState(false);
   const mountRef = useRef(null);
-  const sceneRef = useRef();
-  const rendererRef = useRef();
-  const sessionRef = useRef();
+  const sessionRef = useRef(null);
+  const rendererRef = useRef(null);
+  const sceneRef = useRef(null);
+  const cameraRef = useRef(null);
+  const referenceSpaceRef = useRef(null);
 
-  const MODELO_PREDEFINIDO = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf';
+  const MODEL_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF/Duck.gltf';
 
   useEffect(() => {
     const checkARSupport = async () => {
-      if ('xr' in navigator) {
+      if (navigator.xr) {
         try {
           const supported = await navigator.xr.isSessionSupported('immersive-ar');
           setArSupported(supported);
-        } catch (e) {
-          console.error("Error checking AR support:", e);
+        } catch (err) {
+          console.error("Error comprobando compatibilidad AR:", err);
           setArSupported(false);
         }
       }
@@ -174,13 +47,19 @@ const ARProyect = () => {
     if (!mountRef.current || !arSupported) return;
 
     try {
-      // 1. Configurar Three.js
+      // 1. Configurar escena, cámara y renderer
       const scene = new THREE.Scene();
       sceneRef.current = scene;
-      
-      const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
-      
-      const renderer = new THREE.WebGLRenderer({ 
+
+      const camera = new THREE.PerspectiveCamera(
+        70,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      cameraRef.current = camera;
+
+      const renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true,
         preserveDrawingBuffer: true
@@ -190,35 +69,36 @@ const ARProyect = () => {
       renderer.xr.enabled = true;
       rendererRef.current = renderer;
 
-      // 2. Configurar capa de realidad aumentada
+      // 2. Solicitar sesión AR
       const session = await navigator.xr.requestSession('immersive-ar', {
         requiredFeatures: ['local', 'hit-test']
       });
       sessionRef.current = session;
 
-      const glLayer = new XRWebGLLayer(session, renderer.context);
+      // 3. Configurar XRWebGLLayer
+      const glLayer = new XRWebGLLayer(session, renderer.getContext());
       session.updateRenderState({ baseLayer: glLayer });
 
-      // 3. Configurar cámara AR
+      // 4. Solicitar espacio de referencia
       const referenceSpace = await session.requestReferenceSpace('local');
-      const viewerSpace = await session.requestReferenceSpace('viewer');
-      
-      // 4. Agregar luz
-      const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(0, 5, 5);
-      scene.add(light);
+      referenceSpaceRef.current = referenceSpace;
+
+      // 5. Agregar luces a la escena
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(0, 5, 5);
+      scene.add(directionalLight);
       scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
-      // 5. Cargar modelo 3D
+      // 6. Cargar modelo 3D
       const loader = new GLTFLoader();
-      loader.load(MODELO_PREDEFINIDO, (gltf) => {
+      loader.load(MODEL_URL, (gltf) => {
         const model = gltf.scene;
         model.scale.set(0.1, 0.1, 0.1);
         model.position.set(0, 0, -1);
         scene.add(model);
       });
 
-      // 6. Configurar loop de renderizado
+      // 7. Loop de renderizado usando directamente el callback de setAnimationLoop
       renderer.setAnimationLoop((time, frame) => {
         if (frame) {
           const pose = frame.getViewerPose(referenceSpace);
@@ -229,20 +109,19 @@ const ARProyect = () => {
         }
         renderer.render(scene, camera);
       });
-      
-      // 7. Manejar redimensionamiento
-      const onResize = () => {
+
+      // 8. Manejo del redimensionamiento de la ventana
+      window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-      };
-      window.addEventListener('resize', onResize);
+      });
 
-      // 8. Agregar canvas al DOM
+      // 9. Agregar el canvas al DOM
       mountRef.current.appendChild(renderer.domElement);
 
     } catch (err) {
-      console.error('Error starting AR:', err);
+      console.error('Error al iniciar AR:', err);
       setError('Error al iniciar AR. Asegúrate de usar un dispositivo móvil compatible.');
     }
   };
@@ -273,11 +152,7 @@ const ARProyect = () => {
 
   return (
     <div className="relative h-screen w-full bg-black">
-      <div 
-        ref={mountRef} 
-        className="absolute inset-0 w-full h-full"
-      />
-      
+      <div ref={mountRef} className="absolute inset-0 w-full h-full" />
       <div className="absolute bottom-8 left-0 right-0 flex justify-center">
         <button
           onClick={startARSession}
@@ -301,7 +176,6 @@ const ARProyect = () => {
           )}
         </button>
       </div>
-
       {!arSupported && (
         <div className="absolute top-4 left-4 right-4 bg-yellow-100 border-l-4 border-yellow-500 p-4">
           <p className="text-yellow-700">
