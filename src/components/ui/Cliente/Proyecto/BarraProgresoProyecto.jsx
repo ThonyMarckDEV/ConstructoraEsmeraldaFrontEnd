@@ -412,8 +412,8 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         <div className="absolute inset-0 flex flex-col justify-center p-4 md:p-6 text-white">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">PROYECTO DE CONSTRUCCIÓN</h1>
-              <h2 className="text-lg md:text-xl font-semibold">{proyecto.nombre}</h2>
+              {/* <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">PROYECTO DE CONSTRUCCIÓN</h1> */}
+              <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Proyecto: {proyecto.nombre}</h1>
             </div>
             
             {/* Redesigned AR Button - positioned at top right */}
