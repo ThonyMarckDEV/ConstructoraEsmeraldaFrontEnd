@@ -219,20 +219,17 @@ const ARProyect = () => {
       });
 
       // 6. Configurar loop de renderizado
-      renderer.setAnimationLoop(() => {
-        // Obtener pose de la cámara
-        const pose = sessionRef.current.requestAnimationFrame((time, frame) => {
+      renderer.setAnimationLoop((time, frame) => {
+        if (frame) {
           const pose = frame.getViewerPose(referenceSpace);
           if (pose) {
             const view = pose.views[0];
             camera.projectionMatrix.fromArray(view.projectionMatrix);
           }
-        });
-
-        // Renderizar escena
+        }
         renderer.render(scene, camera);
       });
-
+      
       // 7. Manejar redimensionamiento
       const onResize = () => {
         camera.aspect = window.innerWidth / window.innerHeight;
