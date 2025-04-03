@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from '../../../../js/urlHelper';
 import { Link } from 'react-router-dom';
+import LoadingBarraProgresoProyecto from './LoadingBarraProgresoProyecto';
 
 const BarraProgresoProyecto = ({ proyectoId }) => {
   const [proyecto, setProyecto] = useState(null);
   const [fases, setFases] = useState([]);
-  const [archivos, setArchivos] = useState([]);
-  const [fotos, setFotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -17,25 +16,17 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
       try {
         setLoading(true);
         
-        // Fetch project details
-        const proyectoResponse = await fetchWithAuth(`${API_BASE_URL}/api/client/projects/${proyectoId}`);
-        const proyectoData = await proyectoResponse.json();
+        // Fetch combined project and phases data with a single API call
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/projects/${proyectoId}/with-phases`);
+        const data = await response.json();
         
-        if (!proyectoResponse.ok) {
-          throw new Error(proyectoData.message || 'Error al obtener datos del proyecto');
+        if (!response.ok) {
+          throw new Error(data.message || 'Error al obtener datos del proyecto');
         }
         
-        setProyecto(proyectoData);
-        
-        // Fetch project phases
-        const fasesResponse = await fetchWithAuth(`${API_BASE_URL}/api/client/projects/${proyectoId}/phases`);
-        const fasesData = await fasesResponse.json();
-        
-        if (!fasesResponse.ok) {
-          throw new Error(fasesData.message || 'Error al obtener fases del proyecto');
-        }
-        
-        setFases(fasesData);
+        // Set state with the combined data
+        setProyecto(data.proyecto);
+        setFases(data.fases);
         
       } catch (error) {
         console.error("Error fetching project data:", error);
@@ -76,12 +67,9 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
   // Calculate progress percentage - if no phase is defined, progress is 0
   const progressPercentage = hasFase && fases.length > 0 && currentPhase > 0 ? (currentPhase / fases.length) * 100 : 0;
   
+  // Use the separated loading component
   if (loading) {
-    return (
-      <div className="w-full bg-white shadow-lg p-6 flex justify-center items-center h-40">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <LoadingBarraProgresoProyecto />;
   }
   
   if (error) {
@@ -129,18 +117,17 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
           </div>
         </div>
         
-        {/* Text content with repositioned AR button */}
+        {/* Text content with AR button (only visible on desktop) */}
         <div className="absolute inset-0 flex flex-col justify-center p-4 md:p-6 text-white">
           <div className="flex justify-between items-start">
             <div>
-              {/* <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">PROYECTO DE CONSTRUCCIÓN</h1> */}
               <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Proyecto: {proyecto.nombre}</h1>
             </div>
             
-            {/* Redesigned AR Button - positioned at top right */}
+            {/* AR Button - only visible on desktop */}
             <Link 
               to={`/cliente/proyecto/ar/${proyectoId}`} 
-              className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
+              className="hidden md:flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
             >
               <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

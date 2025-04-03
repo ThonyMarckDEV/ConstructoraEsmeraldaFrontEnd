@@ -7,12 +7,12 @@ import Sidebar from '../../components/ui/Cliente/Sidebar';
 // Componente Proyecto principal
 const Proyecto = () => {
   const { id } = useParams(); // Extrae el ID del proyecto de la URL
-
+  
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-white">
-      <Sidebar username="Cliente" />
-      {/* Contenido principal con margen izquierdo para compensar la sidebar fija */}
-      <div className="flex-1 p-4 md:ml-64">
+    <div className="min-h-screen bg-white">
+      <Sidebar />
+      {/* Contenido principal sin margen izquierdo ya que el sidebar está oculto por defecto */}
+      <div className="flex-1 p-9 md:ml-84">
         <div className="mb-4">
           <BarraProgresoProyecto proyectoId={id} />
         </div>
