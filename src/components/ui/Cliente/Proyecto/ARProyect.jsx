@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import edificio from '../../../../glb/old_building.glb';
+import edificio from '../../../../glb/building_04.glb';
 
 const ARProject = () => {
   // Obtener el ID del proyecto directamente de los parámetros de la URL
