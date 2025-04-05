@@ -56,6 +56,7 @@ function AppContent() {
       {/* Rutas Managaer / encargado */}
       
       <Route path="/encargado"  element={<Encargado />} />
+      <Route path="/encargado/proyecto/chat/:id"  element={<ChatWindows />} />
 
 
       {/* Ruta de error */}

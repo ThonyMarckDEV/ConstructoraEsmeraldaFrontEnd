@@ -61,7 +61,7 @@ const Sidebar = () => {
   const menuItems = [
     { name: "Inicio", icon: <Home size={20} />, path: "/encargado" },
     { name: "Proyectos", icon: <FileText size={20} />, path: "/encargado/proyectos" },
-    { name: "Chats", icon: <ChartBarIcon size={20} />, path: "/encargado/chat" },
+    { name: "Chats", icon: <ChartBarIcon size={20} />, path: "/encargado/proyecto/chat/1" },
     { name: "Configuración", icon: <Settings size={20} />, path: "/cliente/configuracion" }
   ];
 
