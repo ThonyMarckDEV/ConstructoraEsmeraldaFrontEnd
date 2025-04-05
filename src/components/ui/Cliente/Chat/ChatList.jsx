@@ -34,54 +34,57 @@ const ChatList = ({ chats, onSelectChat, selectedChatId, loading, userRole }) =>
   }
 
   return (
-    <div className="overflow-y-auto divide-y divide-gray-200">
-      {chats.map(chat => {
-        const isSelected = selectedChatId === chat.idChat;
-        const contactName = userRole === 'manager'
-          ? `${chat.cliente?.nombre || ''} ${chat.cliente?.apellido || ''}`
-          : `${chat.encargado?.nombre || ''} ${chat.encargado?.apellido || ''}`;
-          
-        return (
-          <div
-            key={chat.idChat}
-            onClick={() => onSelectChat(chat.idChat)}
-            className={`cursor-pointer p-3 hover:bg-gray-50 transition-colors duration-150 ${
-              isSelected ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-            }`}
-          >
-            <div className="flex justify-between items-start">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {chat.proyecto.nombre}
-                </p>
-                <p className="text-sm text-gray-600 truncate">
-                  {userRole === 'manager' ? 'Cliente: ' : 'Encargado: '}
-                  {contactName}
-                </p>
-                {chat.ultimo_mensaje && (
-                  <p className="mt-1 text-sm text-gray-500 truncate">
-                    {chat.ultimo_mensaje}
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col items-end">
-                {chat.fecha_ultimo_mensaje && (
-                  <span className="text-xs text-gray-500">
-                    {formatDate(chat.fecha_ultimo_mensaje)}
-                  </span>
-                )}
-                {chat.mensajes_no_leidos > 0 && (
-                  <span className="mt-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 bg-blue-600 rounded-full">
-                    {chat.mensajes_no_leidos}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })}
+    <div className="overflow-y-auto divide-y divide-gray-200 divide-opacity-20 h-full bg-gradient-to-b from-white to-blue-50">
+        {chats.map(chat => {
+            const isSelected = selectedChatId === chat.idChat;
+            const contactName = userRole === 'manager'
+                ? `${chat.cliente?.nombre || ''} ${chat.cliente?.apellido || ''}`
+                : `${chat.encargado?.nombre || ''} ${chat.encargado?.apellido || ''}`;
+                
+            return (
+                <div
+                    key={chat.idChat}
+                    onClick={() => onSelectChat(chat.idChat)}
+                    className={`cursor-pointer p-4 transition-all duration-300 hover:bg-white group ${
+                        isSelected 
+                            ? 'bg-white border-l-4 border-blue-500 md:border-l-0 md:bg-gradient-to-r md:from-blue-50 md:to-indigo-50' 
+                            : ''
+                    }`}
+                >
+                    <div className="flex justify-between items-start">
+                        <div className="flex-1 min-w-0 space-y-1">
+                            <p className="text-sm font-medium text-gray-900 truncate flex items-center">
+                                <span className="text-blue-600 mr-2">•</span>
+                                {chat.proyecto.nombre}
+                            </p>
+                            <p className="text-sm text-gray-600 truncate font-light">
+                                {userRole === 'manager' ? 'Cliente: ' : 'Encargado: '}
+                                <span className="font-medium">{contactName}</span>
+                            </p>
+                            {chat.ultimo_mensaje && (
+                                <p className="text-sm text-gray-500 truncate italic">
+                                    "{chat.ultimo_mensaje}"
+                                </p>
+                            )}
+                        </div>
+                        <div className="flex flex-col items-end space-y-1">
+                            {chat.fecha_ultimo_mensaje && (
+                                <span className="text-xs text-gray-400">
+                                    {formatDate(chat.fecha_ultimo_mensaje)}
+                                </span>
+                            )}
+                            {chat.mensajes_no_leidos > 0 && (
+                                <span className="inline-flex items-center justify-center px-2.5 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-full shadow-md transform transition-all group-hover:scale-110">
+                                    {chat.mensajes_no_leidos}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        })}
     </div>
-  );
+);
 };
 
 ChatList.propTypes = {

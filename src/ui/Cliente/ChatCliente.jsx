@@ -83,7 +83,7 @@ const ChatApp = () => {
                     userRole={userRole}
                 />
             </div>
-            <div className="w-2/3">
+            <div className="flex-1 p-9 md:ml-84">
                 {selectedChat ? (
                     <ChatWindow 
                         chat={selectedChat}

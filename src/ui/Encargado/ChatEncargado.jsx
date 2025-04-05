@@ -3,7 +3,7 @@ import ChatList from '../../components/ui/Cliente/Chat/ChatList';
 import ChatWindow from '../../components/ui/Cliente/Chat/ChatWindow';
 import jwtUtils from '../../utilities/jwtUtils'; // Assuming you have a utility to decode JWT
 import { fetchWithAuth } from '../../js/authToken';
-import  Sidebar  from '../../components/ui/Encargado/Sidebar';
+import  Sidebar  from '../../components/ui/Cliente/Sidebar';
 
 const ChatApp = () => {
     const [chats, setChats] = useState([]);
@@ -83,7 +83,7 @@ const ChatApp = () => {
                     userRole={userRole}
                 />
             </div>
-            <div className="w-2/3">
+            <div className="flex-1 p-9 md:ml-84">
                 {selectedChat ? (
                     <ChatWindow 
                         chat={selectedChat}
