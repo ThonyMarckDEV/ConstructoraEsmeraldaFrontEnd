@@ -16,8 +16,6 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole, token }) => {
     
     // Get socket.io server URL from environment or use default
     const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
-
-    const API_BASE_URL_EXPRESS = 'http://localhost:3001'; // Replace with your actual API base URL
     
     // Connect to socket.io server
     useEffect(() => {
@@ -215,7 +213,7 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole, token }) => {
     // Fallback HTTP method to send messages
     const sendMessageHttp = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL_EXPRESS}/api/chats/message`, {
+            const response = await fetch(`${SOCKET_URL}/api/chats/message`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -242,7 +240,7 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole, token }) => {
     // Mark message as read
     const markMessageAsRead = async (messageId) => {
         try {
-            const response = await fetch(`${API_BASE_URL_EXPRESS}/api/chats/message/read/${messageId}`, {
+            const response = await fetch(`${SOCKET_URL}/api/chats/message/read/${messageId}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`
