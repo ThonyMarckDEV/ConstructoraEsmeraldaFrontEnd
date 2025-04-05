@@ -19,11 +19,10 @@ import Login from './ui/Auth/Login';
 import Cliente from './ui/Cliente/Cliente';
 import Proyectos from './ui/Cliente/Proyectos';
 import Proyecto from './ui/Cliente/Proyecto';
-import ChatCliente from './ui/Chat/Chat';
+import ChatWindows from './components/ui/Chat/ChatWindows';
 
 // UIS Encargado
 import Encargado from './ui/Encargado/Encargado';
-import ChatEncargado from './ui/Chat/Chat';
 
 // Components
 
@@ -52,12 +51,12 @@ function AppContent() {
       <Route path="/cliente/proyectos" element={<ProtectedRouteCliente element={<Proyectos />} />} />
       <Route path="/cliente/proyecto/:id" element={<ProtectedRouteCliente element={<Proyecto />} />} />
       <Route path="/cliente/proyecto/ar/:id"  element={<ProtectedRouteCliente element={<AR />} />} />
-      <Route path="/cliente/chat"  element={<ProtectedRouteCliente element={<ChatCliente />} />} />
+      <Route path="/cliente/proyecto/chat/:id"  element={<ChatWindows />} />
 
       {/* Rutas Managaer / encargado */}
       
       <Route path="/encargado"  element={<Encargado />} />
-      <Route path="/encargado/chat" element={<ChatEncargado />} />
+
 
       {/* Ruta de error */}
       <Route path="/404" element={<ErrorPage />} />

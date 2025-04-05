@@ -49,6 +49,10 @@ export const getUserRole = (refresh_token) => jwtDecode(refresh_token)?.rol ?? n
 // Función para obtener el rol del usuario
 export const getEmail= (refresh_token) => jwtDecode(refresh_token)?.email ?? null;
 
+// Función para obtener el rol del usuario
+export const getUserID = (refresh_token) => jwtDecode(refresh_token)?.sub ?? null;
+
+
 // // Función para verificar si el token está expirado
 export const isTokenExpired = (refresh_token) => {
   const decodedToken = jwtDecode(refresh_token);
@@ -114,6 +118,8 @@ export const removeTokensFromCookie = () => {
 };
 
 
+
+
 // New function to get the created at date
 export const getCreatedAt = (refresh_token) => {
   try {
@@ -156,5 +162,6 @@ export default {
   getCreatedAt,
   getAccessTokenFromCookie,
   getRefreshTokenFromCookie,
-  setAccessTokenInCookie
+  setAccessTokenInCookie,
+  getUserID
 };

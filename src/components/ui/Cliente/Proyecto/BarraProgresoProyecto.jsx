@@ -124,21 +124,33 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
               <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Proyecto: {proyecto.nombre}</h1>
             </div>
             
-            {/* AR Button - only visible on desktop */}
-            <Link 
-              to={`/cliente/proyecto/ar/${proyectoId}`} 
-              className="hidden md:flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
-            >
-              <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M5.59961 5.60001L18.3996 18.4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 2V4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 20V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M20 12H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 12H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span>Ver en AR</span>
-            </Link>
+            {/* AR and Chat Buttons - only visible on desktop */}
+            <div className="hidden md:flex space-x-2">
+              <Link 
+                to={`/cliente/proyecto/chat/${proyectoId}`} 
+                className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
+              >
+                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                <span>Chat</span>
+              </Link>
+              
+              <Link 
+                to={`/cliente/proyecto/ar/${proyectoId}`} 
+                className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
+              >
+                <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M5.59961 5.60001L18.3996 18.4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M12 2V4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M12 20V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M20 12H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span>Ver en AR</span>
+              </Link>
+            </div>
           </div>
           
           <div className="mt-2 md:mt-4 flex items-center">
@@ -155,8 +167,17 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         </div>
       </div>
 
-      {/* Mobile version of the AR button - fixed at bottom of screen */}
-      <div className="fixed bottom-4 right-4 md:hidden z-10">
+      {/* Mobile version of the AR and Chat buttons - fixed at bottom of screen */}
+      <div className="fixed bottom-4 right-4 md:hidden z-10 flex flex-col space-y-2">
+        <Link 
+          to={`/cliente/proyecto/chat/${proyectoId}`} 
+          className="flex items-center justify-center bg-blue-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-blue-600"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+        </Link>
+        
         <Link 
           to={`/cliente/proyecto/ar/${proyectoId}`} 
           className="flex items-center justify-center bg-blue-600 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-blue-700"
