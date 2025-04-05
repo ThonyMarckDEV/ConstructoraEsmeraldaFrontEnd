@@ -1,50 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from '../../components/ui/Cliente/Sidebar';
 import ChatList from '../../components/ui/Cliente/Chat/ChatList';
 import ChatWindow from '../../components/ui/Cliente/Chat/ChatWindow';
+import jwtUtils from '../../utilities/jwtUtils'; // Assuming you have a utility to decode JWT
 import { fetchWithAuth } from '../../js/authToken';
-import API_BASE_URL from '../../js/urlHelper';
-import jwtUtils from '../../utilities/jwtUtils';
+import  Sidebar  from '../../components/ui/Cliente/Sidebar';
 
-const ChatCliente = () => {
+const ChatApp = () => {
     const [chats, setChats] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+    // Get user role and token from your authentication system
+    const token = jwtUtils.getAccessTokenFromCookie();  // Replace with actual token
+    const userRole = jwtUtils.getUserRole(token); // Assuming you have a utility to decode JWT
 
-    const token = jwtUtils.getRefreshTokenFromCookie();
-    const role = jwtUtils.getUserRole(token);
-
-    // Cargar lista de chats
+    const API_BASE_URL_EXPRESS = 'http://localhost:3001'; // Replace with your actual API base URL
+    
+    // Fetch chats on component mount
     useEffect(() => {
-        const loadChats = async () => {
+        const fetchChats = async () => {
             try {
-                const response = await fetchWithAuth(`${API_BASE_URL}/api/chats`);
-                if (!response.ok) throw new Error('Error al cargar los chats');
+                const response = await fetchWithAuth(`${API_BASE_URL_EXPRESS}/api/chats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch chats');
                 
                 const data = await response.json();
                 setChats(data);
-                setLoading(false);
             } catch (err) {
                 setError(err.message);
+            } finally {
                 setLoading(false);
             }
         };
-
-        loadChats();
-    }, []);
-
-    // Seleccionar un chat
+        
+        fetchChats();
+    }, [token]);
+    
+    // Handle chat selection
     const handleSelectChat = async (chatId) => {
         try {
             setLoading(true);
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/chats/${chatId}`);
-            if (!response.ok) throw new Error('Error al cargar el chat');
+            const response = await fetchWithAuth(`${API_BASE_URL_EXPRESS}/api/chats/${chatId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch chat details');
             
             const data = await response.json();
             setSelectedChat(data);
             
-            // Actualizar el contador de mensajes no leídos en la lista de chats
+            // Reset unread count for selected chat
             setChats(prevChats => 
                 prevChats.map(chat => 
                     chat.idChat === chatId 
@@ -52,59 +64,42 @@ const ChatCliente = () => {
                         : chat
                 )
             );
-            
-            setLoading(false);
         } catch (err) {
             setError(err.message);
+        } finally {
             setLoading(false);
         }
     };
-
+    
     return (
-        <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-            <Sidebar username="Cliente" />
-            
+        <div className="flex h-screen">
+            <Sidebar />
             <div className="flex-1 p-9 md:ml-84">
-                <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <h1 className="text-2xl font-bold p-4 border-b">Chat con Encargados de Proyectos</h1>
-                    
-                    {error && (
-                        <div className="p-4 bg-red-100 text-red-700">
-                            {error}
-                        </div>
-                    )}
-                    
-                    <div className="flex flex-col md:flex-row h-[calc(100vh-200px)]">
-                        {/* Lista de chats */}
-                        <div className="w-full md:w-1/3 border-r">
-                            <ChatList 
-                                chats={chats} 
-                                onSelectChat={handleSelectChat}
-                                selectedChatId={selectedChat?.idChat}
-                                loading={loading}
-                            />
-                        </div>
-                        
-                        {/* Ventana de chat */}
-                        <div className="w-full md:w-2/3">
-                            {selectedChat ? (
-                                <ChatWindow 
-                                    chat={selectedChat}
-                                    setChats={setChats}
-                                    setSelectedChat={setSelectedChat}
-                                    userRole={role}
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center h-full text-gray-500">
-                                    Selecciona un chat para comenzar
-                                </div>
-                            )}
-                        </div>
+                <ChatList 
+                    chats={chats}
+                    onSelectChat={handleSelectChat}
+                    selectedChatId={selectedChat?.idChat}
+                    loading={loading}
+                    userRole={userRole}
+                />
+            </div>
+            <div className="w-2/3">
+                {selectedChat ? (
+                    <ChatWindow 
+                        chat={selectedChat}
+                        setChats={setChats}
+                        setSelectedChat={setSelectedChat}
+                        userRole={userRole}
+                        token={token}
+                    />
+                ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                        Selecciona un chat para comenzar
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
 };
 
-export default ChatCliente;
+export default ChatApp;

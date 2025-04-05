@@ -1,127 +1,225 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Pusher from 'pusher-js';
-import { fetchWithAuth } from '../../../../js/authToken';
-import API_BASE_URL from '../../../../js/urlHelper';
+import { io } from 'socket.io-client';
 
-const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
+const ChatWindow = ({ chat, setChats, setSelectedChat, userRole, token }) => {
     const [messages, setMessages] = useState(chat.mensajes || []);
     const [newMessage, setNewMessage] = useState('');
     const [sending, setSending] = useState(false);
+    const [typing, setTyping] = useState(false);
+    const [otherUserTyping, setOtherUserTyping] = useState(false);
+    const [connected, setConnected] = useState(false);
     const messagesEndRef = useRef(null);
-    const messageContainerRef = useRef(null);
-
-    // Determinar el ID del usuario actual basado en el rol
+    const socketRef = useRef(null);
+    
+    // Determine the current user id based on role
     const currentUserId = userRole === 'manager' ? chat.idEncargado : chat.idCliente;
+    
+    // Get socket.io server URL from environment or use default
+    const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
 
-    // Obtener mensajes al cargar el componente
+    const API_BASE_URL_EXPRESS = 'http://localhost:3001'; // Replace with your actual API base URL
+    
+    // Connect to socket.io server
     useEffect(() => {
-        // Actualizar mensajes con los del chat actual
-        setMessages(chat.mensajes || []);
-        
-        // Marcar todos los mensajes no leídos como leídos
-        if (chat.mensajes && chat.mensajes.length > 0) {
-            chat.mensajes.forEach(message => {
-                if (message.leido === 0 && message.idUsuario !== currentUserId) {
-                    markMessageAsRead(message.idMensaje);
-                }
-            });
+        // Clean up any existing socket connection
+        if (socketRef.current) {
+            socketRef.current.disconnect();
         }
-    }, [chat.idChat]);
-
-    // Scrollear hacia abajo cuando llegan nuevos mensajes
+        
+        // Create a new socket connection with authentication
+        socketRef.current = io(SOCKET_URL, {
+            auth: {
+                token: token
+            }
+        });
+        
+        // Socket connection event handlers
+        socketRef.current.on('connect', () => {
+            console.log('Connected to socket server');
+            setConnected(true);
+            
+            // Join specific chat room
+            socketRef.current.emit('join-chat', chat.idChat);
+        });
+        
+        socketRef.current.on('disconnect', () => {
+            console.log('Disconnected from socket server');
+            setConnected(false);
+        });
+        
+        socketRef.current.on('connect_error', (err) => {
+            console.error('Socket connection error:', err.message);
+            setConnected(false);
+        });
+        
+        // Listen for new messages
+        socketRef.current.on('new-message', (messageData) => {
+            console.log('New message received:', messageData);
+            
+            // Update messages state
+            setMessages(prevMessages => {
+                // Check if message already exists
+                const exists = prevMessages.some(msg => msg.idMensaje === messageData.idMensaje);
+                if (exists) return prevMessages;
+                
+                return [...prevMessages, messageData];
+            });
+            
+            // Mark as read if the message is from another user and window is in focus
+            if (messageData.idUsuario !== currentUserId && document.hasFocus()) {
+                markMessageAsRead(messageData.idMensaje);
+            }
+            
+            // Update chat list
+            updateChatList(messageData);
+        });
+        
+        // Listen for typing indicators
+        socketRef.current.on('user-typing', (data) => {
+            if (data.idUsuario !== currentUserId) {
+                setOtherUserTyping(true);
+            }
+        });
+        
+        socketRef.current.on('user-stop-typing', (data) => {
+            if (data.idUsuario !== currentUserId) {
+                setOtherUserTyping(false);
+            }
+        });
+        
+        // Listen for read receipts
+        socketRef.current.on('message-read', (data) => {
+            if (data.idChat === chat.idChat) {
+                setMessages(prevMessages => 
+                    prevMessages.map(msg => 
+                        msg.idMensaje === data.idMensaje ? { ...msg, leido: 1 } : msg
+                    )
+                );
+            }
+        });
+        
+        // Clean up function
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
+        };
+    }, [chat.idChat, currentUserId, token, SOCKET_URL]);
+    
+    // Mark messages as read when component mounts or gets focus
+    useEffect(() => {
+        const markUnreadMessages = () => {
+            if (messages.length > 0) {
+                messages.forEach(message => {
+                    if (message.idUsuario !== currentUserId && message.leido === 0) {
+                        markMessageAsRead(message.idMensaje);
+                    }
+                });
+            }
+        };
+        
+        markUnreadMessages();
+        
+        // Set up window focus listener
+        window.addEventListener('focus', markUnreadMessages);
+        return () => {
+            window.removeEventListener('focus', markUnreadMessages);
+        };
+    }, [messages, currentUserId]);
+    
+    // Auto-scroll to bottom when messages change
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
-
-    // Configurar Pusher para escuchar nuevos mensajes
+    
+    // Handle typing indicators with debounce
     useEffect(() => {
-        // Configurar Pusher con los valores directamente
-        const pusher = new Pusher('153aef1a510da30a26ad', {
-            cluster: 'sa1',
-            forceTLS: true
-        });
-
-        // Suscribirse al canal del chat actual
-        const channel = pusher.subscribe(`chat.${chat.idChat}`);
-        
-        // Escuchar por nuevos mensajes
-        channel.bind('App\\Events\\NewMessageEvent', data => {
-            console.log('Nuevo mensaje recibido via Pusher:', data);
+        if (typing && socketRef.current) {
+            socketRef.current.emit('typing', chat.idChat);
             
-            // Añadir el nuevo mensaje al estado
-            setMessages(prev => {
-                // Verificar si el mensaje ya existe para evitar duplicados
-                const messageExists = prev.some(msg => msg.idMensaje === data.idMensaje);
-                if (messageExists) return prev;
-                return [...prev, data];
-            });
+            const timeout = setTimeout(() => {
+                setTyping(false);
+                socketRef.current.emit('stop-typing', chat.idChat);
+            }, 2000);
             
-            // Si el mensaje no es del usuario actual, marcarlo como leído
-            if (data.idUsuario !== currentUserId && document.hasFocus()) {
-                markMessageAsRead(data.idMensaje);
-            }
-            
-            // Actualizar la lista de chats
-            setChats(prevChats => 
-                prevChats.map(c => {
-                    if (c.idChat === chat.idChat) {
-                        // Si el mensaje no es del usuario actual, incrementar mensajes no leídos
-                        if (data.idUsuario !== currentUserId) {
-                            return { 
-                                ...c, 
-                                mensajes_no_leidos: (c.mensajes_no_leidos || 0) + 1,
-                                ultimo_mensaje: data.contenido,
-                                fecha_ultimo_mensaje: data.created_at
-                            };
-                        }
-                        // Si es del usuario actual, solo actualizar último mensaje
-                        return { 
-                            ...c, 
-                            ultimo_mensaje: data.contenido,
-                            fecha_ultimo_mensaje: data.created_at
-                        };
+            return () => clearTimeout(timeout);
+        }
+    }, [typing, chat.idChat]);
+    
+    // Update chat list with new message info
+    const updateChatList = (messageData) => {
+        setChats(prevChats => 
+            prevChats.map(c => {
+                if (c.idChat === chat.idChat) {
+                    const updatedChat = { 
+                        ...c,
+                        ultimo_mensaje: messageData.contenido,
+                        fecha_ultimo_mensaje: messageData.created_at
+                    };
+                    
+                    // Increment unread count if message is from other user and window not focused
+                    if (messageData.idUsuario !== currentUserId && !document.hasFocus()) {
+                        updatedChat.mensajes_no_leidos = (c.mensajes_no_leidos || 0) + 1;
                     }
-                    return c;
-                })
-            );
-        });
-
-        // Limpiar la suscripción cuando se desmonta el componente
-        return () => {
-            channel.unbind_all();
-            pusher.unsubscribe(`chat.${chat.idChat}`);
-        };
-    }, [chat.idChat, currentUserId, setChats]);
-
-    // Añadir un efecto para marcar mensajes como leídos cuando la pestaña recibe foco
-    useEffect(() => {
-        const handleFocus = () => {
-            messages.forEach(message => {
-                if (message.leido === 0 && message.idUsuario !== currentUserId) {
-                    markMessageAsRead(message.idMensaje);
+                    
+                    return updatedChat;
                 }
-            });
-        };
-
-        window.addEventListener('focus', handleFocus);
-        return () => {
-            window.removeEventListener('focus', handleFocus);
-        };
-    }, [messages, currentUserId]);
-
-    // Enviar mensaje
+                return c;
+            })
+        );
+    };
+    
+    // Handle message input change
+    const handleMessageChange = (e) => {
+        setNewMessage(e.target.value);
+        
+        // Indicate typing if not already typing
+        if (!typing && e.target.value.trim() !== '') {
+            setTyping(true);
+        }
+    };
+    
+    // Send message function
     const handleSendMessage = async (e) => {
         e.preventDefault();
         
-        if (!newMessage.trim() || sending) return;
+        if (!newMessage.trim() || sending || !socketRef.current || !connected) return;
         
         try {
             setSending(true);
             
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/chats/message`, {
+            // Emit the message through Socket.IO
+            socketRef.current.emit('send-message', {
+                idChat: chat.idChat,
+                contenido: newMessage
+            }, (error, response) => {
+                if (error) {
+                    console.error('Error sending message:', error);
+                    alert('Error al enviar el mensaje');
+                } else {
+                    // Clear input field
+                    setNewMessage('');
+                }
+                setSending(false);
+            });
+            
+            // Send HTTP request as fallback
+            sendMessageHttp();
+        } catch (error) {
+            console.error('Error sending message:', error);
+            setSending(false);
+        }
+    };
+    
+    // Fallback HTTP method to send messages
+    const sendMessageHttp = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL_EXPRESS}/api/chats/message`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     idChat: chat.idChat,
@@ -129,83 +227,100 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
                 })
             });
             
-            if (!response.ok) throw new Error('Error al enviar el mensaje');
+            if (!response.ok) {
+                throw new Error('HTTP send error');
+            }
             
-            const data = await response.json();
-            
-            // No necesitamos añadir el mensaje aquí ya que Pusher lo hará
-            // pero lo mantenemos como respaldo en caso de que Pusher falle
-            setMessages(prev => {
-                // Verificar si el mensaje ya existe para evitar duplicados
-                const messageExists = prev.some(msg => msg.idMensaje === data.idMensaje);
-                if (messageExists) return prev;
-                return [...prev, data];
-            });
-            
+            // Clear input regardless of websocket success
             setNewMessage('');
         } catch (error) {
-            console.error('Error:', error);
-            alert('Error al enviar el mensaje');
-        } finally {
-            setSending(false);
+            console.error('HTTP fallback error:', error);
+            // Already handled in the main send function
         }
     };
-
-    // Marcar mensaje como leído
-    const markMessageAsRead = async (idMensaje) => {
+    
+    // Mark message as read
+    const markMessageAsRead = async (messageId) => {
         try {
-            await fetchWithAuth(`${API_BASE_URL}/api/chats/message/read/${idMensaje}`, {
-                method: 'PUT'
+            const response = await fetch(`${API_BASE_URL_EXPRESS}/api/chats/message/read/${messageId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
             
-            // Actualizar el estado local para reflejar que el mensaje fue leído
-            setMessages(prev => 
-                prev.map(msg => 
-                    msg.idMensaje === idMensaje ? { ...msg, leido: 1 } : msg
-                )
-            );
-            
-            // Actualizar la lista de chats para reflejar los mensajes leídos
-            setChats(prevChats => 
-                prevChats.map(c => {
-                    if (c.idChat === chat.idChat) {
-                        return { 
-                            ...c, 
-                            mensajes_no_leidos: Math.max(0, (c.mensajes_no_leidos || 0) - 1)
-                        };
-                    }
-                    return c;
-                })
-            );
+            if (response.ok) {
+                // Update local state to show message as read
+                setMessages(prevMessages => 
+                    prevMessages.map(msg => 
+                        msg.idMensaje === messageId ? { ...msg, leido: 1 } : msg
+                    )
+                );
+                
+                // Update chats list
+                setChats(prevChats => 
+                    prevChats.map(c => {
+                        if (c.idChat === chat.idChat && c.mensajes_no_leidos > 0) {
+                            return {
+                                ...c,
+                                mensajes_no_leidos: c.mensajes_no_leidos - 1
+                            };
+                        }
+                        return c;
+                    })
+                );
+            }
         } catch (error) {
-            console.error('Error marcando mensaje como leído:', error);
+            console.error('Error marking message as read:', error);
         }
     };
-
-    // Determinar la información del encabezado basado en el rol
-    const headerInfo = userRole === 'manager' 
-        ? { title: 'Chat con Cliente', person: chat.cliente, project: chat.proyecto }
-        : { title: 'Chat con Encargado', person: chat.encargado, project: chat.proyecto };
+    
+    // Manually reconnect socket
+    const handleReconnect = () => {
+        if (socketRef.current) {
+            socketRef.current.disconnect();
+            socketRef.current.connect();
+        }
+    };
+    
+    // Set header title based on user role
+    const headerTitle = userRole === 'manager' ? 'Chat con Cliente' : 'Chat con Encargado';
+    const contactPerson = userRole === 'manager' ? chat.cliente : chat.encargado;
 
     return (
         <div className="flex flex-col h-full">
-            {/* Encabezado del chat */}
+            {/* Chat header */}
             <div className="p-4 border-b bg-gray-50">
-                <h2 className="font-bold">{headerInfo.title}</h2>
-                <div className="text-sm">
-                    <p>
-                        {userRole === 'manager' ? 'Cliente: ' : 'Encargado: '}
-                        {headerInfo.person.nombre} {headerInfo.person.apellido}
-                    </p>
-                    <p>Proyecto: {headerInfo.project.nombre}</p>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h2 className="font-bold">{headerTitle}</h2>
+                        <p className="text-sm">
+                            {userRole === 'manager' ? 'Cliente: ' : 'Encargado: '}
+                            {contactPerson?.nombre} {contactPerson?.apellido}
+                        </p>
+                        <p className="text-sm">Proyecto: {chat.proyecto?.nombre}</p>
+                    </div>
+                    <div className="text-xs">
+                        Estado: 
+                        <span className={`ml-1 ${connected ? 'text-green-600' : 'text-red-600'}`}>
+                            {connected ? 'Conectado' : 'Desconectado'}
+                        </span>
+                        {!connected && (
+                            <button 
+                                onClick={handleReconnect}
+                                className="ml-2 text-blue-500 hover:underline"
+                            >
+                                Reconectar
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
             
-            {/* Contenedor de mensajes */}
+            {/* Messages container */}
             <div 
-                ref={messageContainerRef}
                 className="flex-1 p-4 overflow-y-auto"
-                style={{ maxHeight: 'calc(100vh - 350px)' }}
+                style={{ maxHeight: 'calc(100vh - 250px)' }}
             >
                 {messages.length === 0 ? (
                     <div className="text-center text-gray-500 py-20">
@@ -236,7 +351,7 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
                                             hour: '2-digit',
                                             minute: '2-digit'
                                         })}
-                                        {!isOwnMessage && (
+                                        {isOwnMessage && (
                                             <span className="ml-2">
                                                 {message.leido ? '✓✓' : '✓'}
                                             </span>
@@ -247,24 +362,35 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
                         );
                     })
                 )}
+                
+                {otherUserTyping && (
+                    <div className="text-gray-500 text-sm ml-4">
+                        Escribiendo...
+                    </div>
+                )}
+                
                 <div ref={messagesEndRef} />
             </div>
             
-            {/* Formulario para enviar mensajes */}
-            <form onSubmit={handleSendMessage} className="p-4 border-t">
-                <div className="flex">
+            {/* Message input form */}
+            <div className="p-4 border-t mt-auto">
+                <form onSubmit={handleSendMessage} className="flex">
                     <input
                         type="text"
                         value={newMessage}
-                        onChange={e => setNewMessage(e.target.value)}
+                        onChange={handleMessageChange}
                         placeholder="Escribe tu mensaje..."
                         className="flex-1 p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        disabled={sending}
+                        disabled={sending || !connected}
                     />
                     <button
                         type="submit"
-                        disabled={sending}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={sending || !connected}
+                        className={`text-white px-4 py-2 rounded-r-lg ${
+                            sending || !connected 
+                                ? 'bg-gray-400' 
+                                : 'bg-blue-500 hover:bg-blue-600'
+                        }`}
                     >
                         {sending ? (
                             <span className="flex items-center">
@@ -288,8 +414,8 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
                             </span>
                         ) : 'Enviar'}
                     </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     );
 };

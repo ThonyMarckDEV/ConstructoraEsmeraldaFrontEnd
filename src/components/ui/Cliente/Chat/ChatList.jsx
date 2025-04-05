@@ -1,6 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const ChatList = ({ chats, onSelectChat, selectedChatId, loading }) => {
+const ChatList = ({ chats, onSelectChat, selectedChatId, loading, userRole }) => {
     if (loading && chats.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-full p-4">
@@ -33,7 +34,15 @@ const ChatList = ({ chats, onSelectChat, selectedChatId, loading }) => {
                             {chat.proyecto.nombre}
                         </h3>
                         <p className="text-sm text-gray-600">
-                            Encargado: {chat.encargado.nombre} {chat.encargado.apellido}
+                            {/* Texto dinámico según rol */}
+                            {userRole === 'manager' ? 'Cliente: ' : 'Encargado: '}
+                            
+                            {/* Mostrar información correspondiente al rol */}
+                            {userRole === 'manager' ? (
+                                `${chat.cliente?.nombre || ''} ${chat.cliente?.apellido || ''}`
+                            ) : (
+                                `${chat.encargado?.nombre || ''} ${chat.encargado?.apellido || ''}`
+                            )}
                         </p>
                     </div>
                     
@@ -46,6 +55,14 @@ const ChatList = ({ chats, onSelectChat, selectedChatId, loading }) => {
             ))}
         </div>
     );
+};
+
+ChatList.propTypes = {
+    chats: PropTypes.array.isRequired,
+    onSelectChat: PropTypes.func.isRequired,
+    selectedChatId: PropTypes.number,
+    loading: PropTypes.bool,
+    userRole: PropTypes.oneOf(['cliente', 'manager']).isRequired
 };
 
 export default ChatList;
