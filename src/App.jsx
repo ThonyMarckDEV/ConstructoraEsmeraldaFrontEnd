@@ -34,9 +34,6 @@ import ProtectedRouteCliente from './utilities/ProtectedRouteCliente';
 
 //import ProtectedRouteToken from './utilities/ProtectedRouteToken';
 
-// Scripts
-//import { updateLastActivity } from './js/lastActivity';
-
 
 function AppContent() {
 
