@@ -297,15 +297,6 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole, token }) => {
                 <div className="flex justify-between items-center">
                     <div className="space-y-1">
                         <h2 className="font-bold text-2xl text-gray-800 font-serif">{headerTitle}</h2>
-                        <div className="flex items-center space-x-3">
-                            <span className="text-sm text-gray-600 bg-white px-3 py-1 rounded-full shadow-sm">
-                                {userRole === 'manager' ? 'Cliente: ' : 'Encargado: '}
-                                <span className="font-medium">{contactPerson?.nombre} {contactPerson?.apellido}</span>
-                            </span>
-                            <span className="text-sm text-gray-600 bg-white px-3 py-1 rounded-full shadow-sm">
-                                Proyecto: <span className="font-medium">{chat.proyecto?.nombre}</span>
-                            </span>
-                        </div>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="text-xs bg-white px-3 py-2 rounded-full shadow-sm">
