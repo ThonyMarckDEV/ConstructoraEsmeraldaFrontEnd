@@ -19,11 +19,11 @@ import Login from './ui/Auth/Login';
 import Cliente from './ui/Cliente/Cliente';
 import Proyectos from './ui/Cliente/Proyectos';
 import Proyecto from './ui/Cliente/Proyecto';
-import ChatCliente from './ui/Cliente/ChatCliente';
+import ChatCliente from './ui/Chat/Chat';
 
 // UIS Encargado
 import Encargado from './ui/Encargado/Encargado';
-import ChatEncargado from './ui/Encargado/ChatEncargado';
+import ChatEncargado from './ui/Chat/Chat';
 
 // Components
 

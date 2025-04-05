@@ -15,13 +15,13 @@ const ChatApp = () => {
     const token = jwtUtils.getAccessTokenFromCookie();  // Replace with actual token
     const userRole = jwtUtils.getUserRole(token); // Assuming you have a utility to decode JWT
 
-    const API_BASE_URL_EXPRESS = 'http://localhost:3001'; // Replace with your actual API base URL
+    const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001';
     
     // Fetch chats on component mount
     useEffect(() => {
         const fetchChats = async () => {
             try {
-                const response = await fetchWithAuth(`${API_BASE_URL_EXPRESS}/api/chats`, {
+                const response = await fetchWithAuth(`${SOCKET_URL}/api/chats`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -45,7 +45,7 @@ const ChatApp = () => {
     const handleSelectChat = async (chatId) => {
         try {
             setLoading(true);
-            const response = await fetchWithAuth(`${API_BASE_URL_EXPRESS}/api/chats/${chatId}`, {
+            const response = await fetchWithAuth(`${SOCKET_URL}/api/chats/${chatId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
