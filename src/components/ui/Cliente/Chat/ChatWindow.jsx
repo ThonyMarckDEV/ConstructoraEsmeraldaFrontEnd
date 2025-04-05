@@ -13,6 +13,21 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
     // Determinar el ID del usuario actual basado en el rol
     const currentUserId = userRole === 'manager' ? chat.idEncargado : chat.idCliente;
 
+    // Obtener mensajes al cargar el componente
+    useEffect(() => {
+        // Actualizar mensajes con los del chat actual
+        setMessages(chat.mensajes || []);
+        
+        // Marcar todos los mensajes no leídos como leídos
+        if (chat.mensajes && chat.mensajes.length > 0) {
+            chat.mensajes.forEach(message => {
+                if (message.leido === 0 && message.idUsuario !== currentUserId) {
+                    markMessageAsRead(message.idMensaje);
+                }
+            });
+        }
+    }, [chat.idChat]);
+
     // Scrollear hacia abajo cuando llegan nuevos mensajes
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -21,7 +36,6 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
     // Configurar Pusher para escuchar nuevos mensajes
     useEffect(() => {
         // Configurar Pusher con los valores directamente
-        // Nota: En producción, es mejor usar variables de entorno correctamente configuradas
         const pusher = new Pusher('153aef1a510da30a26ad', {
             cluster: 'sa1',
             forceTLS: true
@@ -32,29 +46,68 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
         
         // Escuchar por nuevos mensajes
         channel.bind('App\\Events\\NewMessageEvent', data => {
-            setMessages(prev => [...prev, data]);
+            console.log('Nuevo mensaje recibido via Pusher:', data);
             
-            // Actualizar el contador de mensajes no leídos en la lista de chats
+            // Añadir el nuevo mensaje al estado
+            setMessages(prev => {
+                // Verificar si el mensaje ya existe para evitar duplicados
+                const messageExists = prev.some(msg => msg.idMensaje === data.idMensaje);
+                if (messageExists) return prev;
+                return [...prev, data];
+            });
+            
+            // Si el mensaje no es del usuario actual, marcarlo como leído
+            if (data.idUsuario !== currentUserId && document.hasFocus()) {
+                markMessageAsRead(data.idMensaje);
+            }
+            
+            // Actualizar la lista de chats
             setChats(prevChats => 
                 prevChats.map(c => {
                     if (c.idChat === chat.idChat) {
-                        return { ...c, mensajes_no_leidos: c.mensajes_no_leidos + 1 };
+                        // Si el mensaje no es del usuario actual, incrementar mensajes no leídos
+                        if (data.idUsuario !== currentUserId) {
+                            return { 
+                                ...c, 
+                                mensajes_no_leidos: (c.mensajes_no_leidos || 0) + 1,
+                                ultimo_mensaje: data.contenido,
+                                fecha_ultimo_mensaje: data.created_at
+                            };
+                        }
+                        // Si es del usuario actual, solo actualizar último mensaje
+                        return { 
+                            ...c, 
+                            ultimo_mensaje: data.contenido,
+                            fecha_ultimo_mensaje: data.created_at
+                        };
                     }
                     return c;
                 })
             );
-            
-            // Marcar como leído el mensaje si la ventana está activa
-            if (document.hasFocus()) {
-                markMessageAsRead(data.idMensaje);
-            }
         });
 
         // Limpiar la suscripción cuando se desmonta el componente
         return () => {
+            channel.unbind_all();
             pusher.unsubscribe(`chat.${chat.idChat}`);
         };
-    }, [chat.idChat, setChats]);
+    }, [chat.idChat, currentUserId, setChats]);
+
+    // Añadir un efecto para marcar mensajes como leídos cuando la pestaña recibe foco
+    useEffect(() => {
+        const handleFocus = () => {
+            messages.forEach(message => {
+                if (message.leido === 0 && message.idUsuario !== currentUserId) {
+                    markMessageAsRead(message.idMensaje);
+                }
+            });
+        };
+
+        window.addEventListener('focus', handleFocus);
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [messages, currentUserId]);
 
     // Enviar mensaje
     const handleSendMessage = async (e) => {
@@ -79,7 +132,16 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
             if (!response.ok) throw new Error('Error al enviar el mensaje');
             
             const data = await response.json();
-            setMessages(prev => [...prev, data]);
+            
+            // No necesitamos añadir el mensaje aquí ya que Pusher lo hará
+            // pero lo mantenemos como respaldo en caso de que Pusher falle
+            setMessages(prev => {
+                // Verificar si el mensaje ya existe para evitar duplicados
+                const messageExists = prev.some(msg => msg.idMensaje === data.idMensaje);
+                if (messageExists) return prev;
+                return [...prev, data];
+            });
+            
             setNewMessage('');
         } catch (error) {
             console.error('Error:', error);
@@ -95,6 +157,26 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
             await fetchWithAuth(`${API_BASE_URL}/api/chats/message/read/${idMensaje}`, {
                 method: 'PUT'
             });
+            
+            // Actualizar el estado local para reflejar que el mensaje fue leído
+            setMessages(prev => 
+                prev.map(msg => 
+                    msg.idMensaje === idMensaje ? { ...msg, leido: 1 } : msg
+                )
+            );
+            
+            // Actualizar la lista de chats para reflejar los mensajes leídos
+            setChats(prevChats => 
+                prevChats.map(c => {
+                    if (c.idChat === chat.idChat) {
+                        return { 
+                            ...c, 
+                            mensajes_no_leidos: Math.max(0, (c.mensajes_no_leidos || 0) - 1)
+                        };
+                    }
+                    return c;
+                })
+            );
         } catch (error) {
             console.error('Error marcando mensaje como leído:', error);
         }
@@ -154,6 +236,11 @@ const ChatWindow = ({ chat, setChats, setSelectedChat, userRole }) => {
                                             hour: '2-digit',
                                             minute: '2-digit'
                                         })}
+                                        {!isOwnMessage && (
+                                            <span className="ml-2">
+                                                {message.leido ? '✓✓' : '✓'}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
