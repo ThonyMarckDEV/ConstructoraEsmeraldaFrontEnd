@@ -17,7 +17,7 @@ const ProyectoClientes = () => {
         setLoading(true);
         
         // Fetch projects with phases in a single request
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/projects-with-phases-client`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/projects-with-phases`);
         const data = await response.json();
         
         if (!response.ok) {

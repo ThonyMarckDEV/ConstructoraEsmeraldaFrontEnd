@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link , useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../../../js/authToken';
 import jwtUtils from '../../../utilities/jwtUtils';
 import io from 'socket.io-client';
@@ -19,6 +19,23 @@ const ChatWindow = () => {
   const token = jwtUtils.getAccessTokenFromCookie();
   const currentUserRole = jwtUtils.getUserRole(token);
   const currentUserId = jwtUtils.getUserID(token);
+
+  // Obtener y normalizar el rol del usuario
+  const getUserRoleNormalized = () => {
+    const role = jwtUtils.getUserRole(token);
+    
+    // Mapear roles equivalentes (manager -> encargado)
+    if (role === 'manager') return 'encargado';
+    if (role === 'admin') return 'admin'; // Opcional: si admins deben ver vista encargado
+    
+    return role || 'cliente'; // Default a cliente si no hay rol
+  };
+
+  const role = getUserRoleNormalized();
+
+  // Construir URL de retorno basada en el rol normalizado
+  const backUrl = id ? `/${role}/proyecto/${id}` : `/${role}/proyectos`;
+
 
   // Obtener datos iniciales del chat
   useEffect(() => {
@@ -195,6 +212,15 @@ useEffect(() => {
           <div className="text-xs text-white">
             <p>Creado: {new Date(chatData.chat.created_at).toLocaleDateString()}</p>
           </div>
+          <Link 
+            to={backUrl}
+            className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+            <span>Volver</span>
+          </Link>
         </div>
       </div>
 

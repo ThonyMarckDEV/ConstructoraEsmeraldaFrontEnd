@@ -17,7 +17,7 @@ const ProyectoEncargado = () => {
         setLoading(true);
         
         // Fetch projects with phases in a single request
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/projects-with-phases-manager`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/projects-with-phases`);
         const data = await response.json();
         
         if (!response.ok) {
@@ -38,7 +38,7 @@ const ProyectoEncargado = () => {
   }, []);
 
   const handleProyectoClick = (idProyecto) => {
-    navigate(`/manager/proyecto/${idProyecto}`);
+    navigate(`/encargado/proyecto/${idProyecto}`);
   };
 
   // Función para calcular el progreso basado en la fase actual

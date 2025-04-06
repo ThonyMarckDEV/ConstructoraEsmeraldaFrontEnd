@@ -1,36 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import edificio from '../../../../glb/modernhouse.glb';
+import edificio from '../../../glb/modernhouse.glb';
+import jwtUtils from '../../../utilities/jwtUtils'; // Asegúrate de usar la ruta correcta
 
 const ARProject = () => {
-  // Obtener el ID del proyecto directamente de los parámetros de la URL
   const { id } = useParams();
-  
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  
-  // Detectar cambios en el tamaño de pantalla
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+
+  const token = jwtUtils.getRefreshTokenFromCookie();
+
+  // Obtener y normalizar el rol del usuario
+  const getUserRoleNormalized = () => {
+    const role = jwtUtils.getUserRole(token);
     
+    // Mapear roles equivalentes (manager -> encargado)
+    if (role === 'manager') return 'encargado';
+    if (role === 'admin') return 'admin'; // Opcional: si admins deben ver vista encargado
+    
+    return role || 'cliente'; // Default a cliente si no hay rol
+  };
+
+  const role = getUserRoleNormalized();
+
+  // Construir URL de retorno basada en el rol normalizado
+  const backUrl = id ? `/${role}/proyecto/${id}` : `/${role}/proyectos`;
+
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Verificar que tengamos un ID válido para la navegación
-  const backUrl = id ? `/cliente/proyecto/${id}` : '/cliente/proyectos';
-
-  useEffect(() => {
-    // Registrar el ID del proyecto cuando el componente se monta
-    console.log('ID del proyecto:', id);
-  }, [id]);
-
   return (
     <div className="flex flex-row h-screen bg-gray-50">
-      {/* Main content container */}
       <div className="flex-1 flex flex-col">
-        {/* Header con botón para volver */}
+        {/* Header */}
         <div className="bg-gradient-to-r from-blue-800 to-blue-600 text-white p-4 shadow-md flex justify-between items-center">
           <h1 className="text-xl font-bold">Visualización AR del Proyecto</h1>
           <Link 
@@ -43,8 +48,8 @@ const ARProject = () => {
             <span>Volver</span>
           </Link>
         </div>
-        
-        {/* Instrucciones para el usuario */}
+
+        {/* Contenido restante igual... */}
         <div className="bg-blue-50 border-l-4 border-blue-500 p-3 mx-4 mt-4 text-blue-700">
           <p className="font-medium">Instrucciones:</p>
           <ol className="list-decimal pl-5 text-sm mt-1">
@@ -54,7 +59,6 @@ const ARProject = () => {
           </ol>
         </div>
         
-        {/* Contenedor principal del modelo */}
         <div className="flex-1 relative overflow-hidden m-4 bg-white rounded-lg shadow-lg">
           <model-viewer
             src={edificio}
@@ -68,7 +72,6 @@ const ARProject = () => {
             shadow-intensity="1"
             exposure="0.8"
           >
-            {/* Botón AR personalizado para mantener consistencia con el diseño */}
             <button 
               slot="ar-button" 
               className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg shadow-lg border-2 border-white font-medium transition duration-300 ease-in-out flex items-center"
@@ -84,10 +87,8 @@ const ARProject = () => {
               Ver en AR
             </button>
           </model-viewer>
-          
         </div>
         
-        {/* Footer con información adicional */}
         <div className="bg-gray-100 p-3 text-center text-gray-500 text-sm">
           Mueve, rota y escala el modelo utilizando gestos. Para una mejor experiencia AR, asegúrate de estar en una zona bien iluminada.
         </div>

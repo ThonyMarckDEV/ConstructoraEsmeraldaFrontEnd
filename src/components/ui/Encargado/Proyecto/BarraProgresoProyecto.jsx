@@ -17,7 +17,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         setLoading(true);
         
         // Fetch combined project and phases data with a single API call
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/project/${proyectoId}/with-phases`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/${proyectoId}/with-phases`);
         const data = await response.json();
         
         if (!response.ok) {
@@ -137,7 +137,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
               </Link>
               
               <Link 
-                to={`/cliente/proyecto/ar/${proyectoId}`} 
+                to={`/encargado/proyecto/ar/${proyectoId}`} 
                 className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
               >
                 <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
