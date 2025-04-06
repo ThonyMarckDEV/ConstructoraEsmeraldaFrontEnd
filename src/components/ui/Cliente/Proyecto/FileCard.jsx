@@ -53,6 +53,7 @@ const FileCard = ({ file, onView, onDownload }) => {
                 <FileMenu 
                   onView={handleView} 
                   onDownload={handleDownload} 
+                  fileType={file.fileType.toLowerCase()}
                 />
                 <div 
                   className="fixed inset-0 z-0"

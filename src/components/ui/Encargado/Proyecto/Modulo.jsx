@@ -371,11 +371,6 @@ const Modulo = ({ proyectoId }) => {
               <div className="border rounded-md mb-4">
                 <div className="flex flex-col sm:flex-row items-start p-4 gap-4">
                   <div className="bg-gray-100 p-2 rounded-md min-w-[120px] w-[120px] h-[120px] flex items-center justify-center mx-auto sm:mx-0 overflow-hidden">
-                    {/* <img
-                      src={imgxd}
-                      alt={fase.nombreFase}
-                      className="w-full h-full object-cover"
-                    /> */}
                     <img
                       src={phaseImages[fase.nombreFase] || defaultImage}
                       alt={fase.nombreFase}
