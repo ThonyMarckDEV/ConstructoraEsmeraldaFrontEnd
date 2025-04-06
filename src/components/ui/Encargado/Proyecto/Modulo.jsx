@@ -14,6 +14,8 @@ const Modulo = ({ proyectoId }) => {
   const [error, setError] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
@@ -68,6 +70,118 @@ const Modulo = ({ proyectoId }) => {
     setSelectedFile(null);
   };
 
+  const handleFileUpload = async (faseId, event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Verificar el tipo de archivo
+    const allowedTypes = ['application/pdf', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/acad'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    const allowedExtensions = ['pdf', 'xls', 'xlsx', 'doc', 'docx', 'dwg'];
+    
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+      alert('Tipo de archivo no permitido. Se permiten: PDF, XLS, DOCX, DWG');
+      return;
+    }
+    
+    // Verificar tamaño (20MB máximo)
+    if (file.size > 20 * 1024 * 1024) {
+      alert('El archivo es demasiado grande. El tamaño máximo es 20MB');
+      return;
+    }
+    
+    try {
+      setUploadingFile(true);
+      
+      const formData = new FormData();
+      formData.append('archivo', file);
+      formData.append('descripcion', 'Archivo subido: ' + file.name);
+      formData.append('idFase', faseId);
+      formData.append('idProyecto', proyectoId);
+      
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/fase/upload-file`, {
+        method: 'POST',
+        body: formData,
+        // No se establece Content-Type para que el navegador establezca automáticamente el boundary correcto
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error al subir el archivo');
+      }
+      
+      // Recargar los datos del proyecto para mostrar el nuevo archivo
+      const projectResponse = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/${proyectoId}/details`);
+      if (!projectResponse.ok) throw new Error('Error al recargar los detalles del proyecto');
+      const data = await projectResponse.json();
+      setProjectData(data);
+      
+      alert('Archivo subido correctamente');
+    } catch (err) {
+      console.error("Error uploading file:", err);
+      alert('Error al subir el archivo: ' + err.message);
+    } finally {
+      setUploadingFile(false);
+      // Resetear el input de archivo
+      event.target.value = '';
+    }
+  };
+  
+  const handlePhotoUpload = async (faseId, event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Verificar el tipo de imagen
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/avif', 'image/webp'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'avif', 'webp'];
+    
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+      alert('Tipo de imagen no permitido. Se permiten: JPG, JPEG, PNG, AVIF, WEBP');
+      return;
+    }
+    
+    // Verificar tamaño (5MB máximo para imágenes)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen es demasiado grande. El tamaño máximo es 5MB');
+      return;
+    }
+    
+    try {
+      setUploadingPhoto(true);
+      
+      const formData = new FormData();
+      formData.append('foto', file);
+      formData.append('descripcion', 'Foto subida: ' + file.name);
+      formData.append('idFase', faseId);
+      formData.append('idProyecto', proyectoId);
+      
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/fase/upload-photo`, {
+        method: 'POST',
+        body: formData,
+        // No se establece Content-Type para que el navegador establezca automáticamente el boundary correcto
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error al subir la imagen');
+      }
+      
+      // Recargar los datos del proyecto para mostrar la nueva foto
+      const projectResponse = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/${proyectoId}/details`);
+      if (!projectResponse.ok) throw new Error('Error al recargar los detalles del proyecto');
+      const data = await projectResponse.json();
+      setProjectData(data);
+      
+      alert('Imagen subida correctamente');
+    } catch (err) {
+      console.error("Error uploading photo:", err);
+      alert('Error al subir la imagen: ' + err.message);
+    } finally {
+      setUploadingPhoto(false);
+      // Resetear el input de archivo
+      event.target.value = '';
+    }
+  };
+
   if (isLoading) return <LoadingState />;
   if (error || !projectData) return <ErrorState error={error} />;
 
@@ -84,7 +198,7 @@ const Modulo = ({ proyectoId }) => {
               
               return (
                 <div 
-                  key={`phase-${fase.idFase}`}  // Clave única para cada fase
+                  key={`phase-${fase.idFase}`}
                   className={`border rounded p-3 transition-all flex-shrink-0 lg:flex-shrink w-auto lg:w-full ${
                     expandedModuleId === fase.idFase 
                       ? "bg-blue-50 border-blue-200" 
@@ -164,14 +278,14 @@ const Modulo = ({ proyectoId }) => {
           
           return (
             <div 
-              key={`phase-content-${fase.idFase}`}  // Clave única para el contenido de cada fase
+              key={`phase-content-${fase.idFase}`}
               className={`transition-all duration-300 pb-20 mb-8 ${
                 expandedModuleId === fase.idFase 
                   ? "block" 
                   : "hidden"
               }`}
             >
-             {/* Cabecera del módulo */}
+              {/* Cabecera del módulo con botones de subida */}
               <div className="border rounded-md mb-4">
                 <div className="flex flex-col sm:flex-row items-start p-4 gap-4">
                   <div className="bg-gray-100 p-2 rounded-md min-w-[120px] w-[120px] h-[120px] flex items-center justify-center mx-auto sm:mx-0 overflow-hidden">
@@ -182,13 +296,73 @@ const Modulo = ({ proyectoId }) => {
                     />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-lg font-bold uppercase">{fase.nombreFase}</h2>
-                    <p className="text-sm mt-1">{fase.descripcion}</p>
-                    {fase.es_actual && (
-                      <span className="inline-block mt-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                        Fase actual del proyecto
-                      </span>
-                    )}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+                      <div>
+                        <h2 className="text-lg font-bold uppercase">{fase.nombreFase}</h2>
+                        <p className="text-sm mt-1">{fase.descripcion}</p>
+                        {fase.es_actual && (
+                          <span className="inline-block mt-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                            Fase actual del proyecto
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Botones de subida */}
+                      <div className="flex gap-2 mt-4 sm:mt-0">
+                        <div className="relative">
+                          <input
+                            type="file"
+                            id={`upload-file-${fase.idFase}`}
+                            className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                            onChange={(e) => handleFileUpload(fase.idFase, e)}
+                            accept=".pdf,.xls,.xlsx,.doc,.docx,.dwg"
+                            disabled={uploadingFile}
+                          />
+                          <button
+                            className="flex items-center gap-1 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+                            disabled={uploadingFile}
+                          >
+                            {uploadingFile ? (
+                              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <line x1="9" y1="15" x2="15" y2="15"></line>
+                              </svg>
+                            )}
+                            Subir Archivo
+                          </button>
+                        </div>
+                        
+                        <div className="relative">
+                          <input
+                            type="file"
+                            id={`upload-photo-${fase.idFase}`}
+                            className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                            onChange={(e) => handlePhotoUpload(fase.idFase, e)}
+                            accept=".jpg,.jpeg,.png,.avif,.webp"
+                            disabled={uploadingPhoto}
+                          />
+                          <button
+                            className="flex items-center gap-1 px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm"
+                            disabled={uploadingPhoto}
+                          >
+                            {uploadingPhoto ? (
+                              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                              </svg>
+                            )}
+                            Subir Foto
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -198,7 +372,7 @@ const Modulo = ({ proyectoId }) => {
                 {allFiles.length > 0 ? (
                   allFiles.map((file) => (
                     <FileCard 
-                      key={file.id}  // Usamos el ID único que ya generamos
+                      key={file.id}
                       file={file} 
                       onView={handleViewFile} 
                       onDownload={handleDownloadFile} 

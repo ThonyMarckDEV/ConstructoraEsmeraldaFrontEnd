@@ -1,3 +1,4 @@
+//./FIleModal.jsx
 import React from "react";
 import FileIcon from "./FileIcon";
 
