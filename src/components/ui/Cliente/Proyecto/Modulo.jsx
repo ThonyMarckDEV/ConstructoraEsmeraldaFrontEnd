@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import FileCard from "./FileCard";
+import { FilesSection } from "./FileCard";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
@@ -126,7 +126,7 @@ const Modulo = ({ proyectoId }) => {
               
               return (
                 <div 
-                  key={`phase-${fase.idFase}`}  // Clave única para cada fase
+                  key={`phase-${fase.idFase}`}
                   className={`border rounded p-3 transition-all flex-shrink-0 lg:flex-shrink w-auto lg:w-full ${
                     expandedModuleId === fase.idFase 
                       ? "bg-blue-50 border-blue-200" 
@@ -206,14 +206,14 @@ const Modulo = ({ proyectoId }) => {
           
           return (
             <div 
-              key={`phase-content-${fase.idFase}`}  // Clave única para el contenido de cada fase
+              key={`phase-content-${fase.idFase}`}
               className={`transition-all duration-300 pb-20 mb-8 ${
                 expandedModuleId === fase.idFase 
                   ? "block" 
                   : "hidden"
               }`}
             >
-             {/* Cabecera del módulo */}
+              {/* Cabecera del módulo */}
               <div className="border rounded-md mb-4">
                 <div className="flex flex-col sm:flex-row items-start p-4 gap-4">
                   <div className="bg-gray-100 p-2 rounded-md min-w-[120px] w-[120px] h-[120px] flex items-center justify-center mx-auto sm:mx-0 overflow-hidden">
@@ -235,23 +235,18 @@ const Modulo = ({ proyectoId }) => {
                 </div>
               </div>
 
-              {/* Lista de archivos */}
-              <div className="space-y-4 pb-10">
-                {allFiles.length > 0 ? (
-                  allFiles.map((file) => (
-                    <FileCard 
-                      key={file.id}  // Usamos el ID único que ya generamos
-                      file={file} 
-                      onView={handleViewFile} 
-                      onDownload={handleDownloadFile} 
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    No hay archivos disponibles para esta fase
-                  </div>
-                )}
-              </div>
+              {/* Lista de archivos - CORREGIDO: No mapear el componente FilesSection */}
+              {allFiles.length > 0 ? (
+                <FilesSection 
+                  allFiles={allFiles}
+                  handleViewFile={handleViewFile}
+                  handleDownloadFile={handleDownloadFile}
+                />
+              ) : (
+                <div className="text-center py-8 text-gray-500 border rounded-lg bg-white shadow">
+                  No hay archivos disponibles para esta fase
+                </div>
+              )}
             </div>
           );
         })}

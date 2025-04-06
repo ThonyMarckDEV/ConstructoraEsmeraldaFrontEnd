@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import FileCard from "./FileCard";
+import { FileCard, FilesSection } from "./FileCard";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
@@ -68,7 +68,6 @@ const Modulo = ({ proyectoId }) => {
       setExpandedModuleId(currentId => currentId === moduleId ? null : moduleId);
     }
   };
-
 
   const closeModal = () => {
     setModalOpen(false);
@@ -227,7 +226,6 @@ const Modulo = ({ proyectoId }) => {
       alert('Error al eliminar el archivo: ' + err.message);
     }
   };
-
 
   const handleViewFile = (file) => {
     // Verificar si es una imagen o un PDF para mostrar vista previa
@@ -449,24 +447,13 @@ const Modulo = ({ proyectoId }) => {
                 </div>
               </div>
 
-              {/* Lista de archivos */}
-              <div className="space-y-4 pb-10">
-                {allFiles.length > 0 ? (
-                  allFiles.map((file) => (
-                    <FileCard 
-                      key={file.id}
-                      file={file} 
-                      onView={handleViewFile} 
-                      onDownload={handleDownloadFile} 
-                      onDelete={handleDeleteFile}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    No hay archivos disponibles para esta fase
-                  </div>
-                )}
-              </div>
+              {/* Reemplazar la lista individual de archivos por el componente FilesSection */}
+              <FilesSection 
+                allFiles={allFiles}
+                handleViewFile={handleViewFile}
+                handleDownloadFile={handleDownloadFile}
+                handleDelete={handleDeleteFile}
+              />
             </div>
           );
         })}
