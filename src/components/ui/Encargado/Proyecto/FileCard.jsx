@@ -1,3 +1,4 @@
+// export default FileCard;
 import React, { useState } from "react";
 import FileIcon from "./FileIcon";
 import FileMenu from "./FileMenu";
@@ -29,12 +30,19 @@ const FileCard = ({ file, onView, onDownload, onDelete }) => {
     if (!window.confirm(`¿Estás seguro de querer eliminar ${file.fileName}?`)) {
       return;
     }
-    onDelete(file.id); // Solo notificamos al padre
-    closeMenu();
+    setIsDeleting(true);
+    try {
+      await onDelete(file.id);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+    } finally {
+      setIsDeleting(false);
+      closeMenu();
+    }
   };
 
   return (
-    <div className="border rounded-md">
+    <div className="border rounded-md relative">
       <div className="p-4">
         <div className="flex items-start sm:items-center justify-between">
           <div className="flex items-start sm:items-center gap-3 flex-1 pr-2">
@@ -67,6 +75,7 @@ const FileCard = ({ file, onView, onDownload, onDelete }) => {
                   onDownload={handleDownload} 
                   onDelete={handleDelete}
                   isDeleting={isDeleting}
+                  fileType={file.fileType.toLowerCase()}
                 />
                 <div 
                   className="fixed inset-0 z-0"
