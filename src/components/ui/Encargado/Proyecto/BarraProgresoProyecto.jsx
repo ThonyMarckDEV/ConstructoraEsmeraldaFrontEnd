@@ -188,7 +188,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         </Link>
         
         <Link 
-          to={`/cliente/proyecto/ar/${proyectoId}`} 
+          to={`/encargado/proyecto/ar/${proyectoId}`} 
           className="flex items-center justify-center bg-blue-600 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-blue-700"
         >
           <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

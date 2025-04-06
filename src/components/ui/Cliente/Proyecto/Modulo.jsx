@@ -79,9 +79,6 @@ const Modulo = ({ proyectoId }) => {
     const isImage = ['jpg', 'jpeg', 'png', 'avif', 'webp'].includes(file.fileType.toLowerCase());
     const isPDF = file.fileType.toLowerCase() === 'pdf';
 
-    console.log("File type:", file.fileType, "Is image:", isImage, "Is PDF:", isPDF);
-
-  
     if (isImage || isPDF) {
       setSelectedFile(file);
       setModalOpen(true); // Abrir el modal para vista previa
