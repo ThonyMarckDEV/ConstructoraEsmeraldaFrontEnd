@@ -44,17 +44,21 @@ const FileCard = ({ file, onView, onDownload, onDelete }) => {
   return (
     <div className="border rounded-md relative">
       <div className="p-4">
-        <div className="flex items-start sm:items-center justify-between">
-          <div className="flex items-start sm:items-center gap-3 flex-1 pr-2">
-            <div className="text-gray-700 pt-1 sm:pt-0">
+        <div className="flex items-start sm:items-center justify-between gap-2">
+          <div className="flex items-start sm:items-center gap-3 flex-1 min-w-0"> {/* Added min-w-0 */}
+            <div className="text-gray-700 pt-1 sm:pt-0 flex-shrink-0"> {/* Added flex-shrink-0 */}
               {fileTypeInfo.icon}
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-              <span className={`${fileTypeInfo.color} mb-1 sm:mb-0`}>{fileTypeInfo.emoji}</span>
-              <span className="font-medium break-words">{file.fileName}</span>
-              {isDeleting && (
-                <span className="text-xs text-gray-500">Eliminando...</span>
-              )}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0 flex-1"> {/* Added min-w-0 and flex-1 */}
+              <span className={`${fileTypeInfo.color} mb-1 sm:mb-0 flex-shrink-0`}>{fileTypeInfo.emoji}</span>
+              <div className="min-w-0"> {/* New container with min-w-0 */}
+                <span className="font-medium truncate block w-full"> {/* Added truncate and block */}
+                  {file.fileName}
+                </span>
+                {isDeleting && (
+                  <span className="text-xs text-gray-500 block">Eliminando...</span>
+                )}
+              </div>
             </div>
           </div>
           <div className="relative flex-shrink-0">
