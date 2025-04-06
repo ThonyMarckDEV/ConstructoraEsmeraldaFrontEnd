@@ -5,7 +5,17 @@ import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
 import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from "../../../../js/urlHelper";
-import imgxd from '../../../../img/default.jpg';
+
+//Para fases
+import defaultImage from '../../../../img/default.jpg';
+import planningImg from '../../../../img/planning.jpg';
+import terrainPrepImg from '../../../../img/terrainPrep.jpg';
+import foundationImg from '../../../../img/foundation.jpg';
+import structureImg from '../../../../img/structure.jpg';
+import installationsImg from '../../../../img/installations.jpg';
+import finishesImg from '../../../../img/finishes.jpg';
+import inspectionImg from '../../../../img/inspection.jpg';
+import deliveryImg from '../../../../img/delivery.jpg';
 
 const Modulo = ({ proyectoId }) => {
   const [projectData, setProjectData] = useState(null);
@@ -16,6 +26,18 @@ const Modulo = ({ proyectoId }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  // Objeto que asocia el nombre de la fase con su imagen correspondiente
+  const phaseImages = {
+    'Planificación': planningImg,
+    'Preparación del Terreno': terrainPrepImg,
+    'Construcción de Cimientos': foundationImg,
+    'Estructura y Superestructura': structureImg,
+    'Instalaciones': installationsImg,
+    'Acabados': finishesImg,
+    'Inspección y Pruebas': inspectionImg,
+    'Entrega': deliveryImg,
+  };
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
@@ -349,8 +371,13 @@ const Modulo = ({ proyectoId }) => {
               <div className="border rounded-md mb-4">
                 <div className="flex flex-col sm:flex-row items-start p-4 gap-4">
                   <div className="bg-gray-100 p-2 rounded-md min-w-[120px] w-[120px] h-[120px] flex items-center justify-center mx-auto sm:mx-0 overflow-hidden">
+                    {/* <img
+                      src={imgxd}
+                      alt={fase.nombreFase}
+                      className="w-full h-full object-cover"
+                    /> */}
                     <img
-                      src={fase.fotos?.[0]?.ruta || {imgxd}}
+                      src={phaseImages[fase.nombreFase] || defaultImage}
                       alt={fase.nombreFase}
                       className="w-full h-full object-cover"
                     />
