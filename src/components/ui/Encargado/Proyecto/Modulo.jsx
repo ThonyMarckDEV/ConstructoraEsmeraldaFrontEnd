@@ -5,7 +5,7 @@ import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
 import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from "../../../../js/urlHelper";
-import img from '../../../../img/default.jpg';
+import imgxd from '../../../../img/default.jpg';
 
 const Modulo = ({ proyectoId }) => {
   const [projectData, setProjectData] = useState(null);
@@ -350,7 +350,7 @@ const Modulo = ({ proyectoId }) => {
                 <div className="flex flex-col sm:flex-row items-start p-4 gap-4">
                   <div className="bg-gray-100 p-2 rounded-md min-w-[120px] w-[120px] h-[120px] flex items-center justify-center mx-auto sm:mx-0 overflow-hidden">
                     <img
-                      src={fase.fotos?.[0]?.ruta || img}
+                      src={fase.fotos?.[0]?.ruta || {imgxd}}
                       alt={fase.nombreFase}
                       className="w-full h-full object-cover"
                     />
