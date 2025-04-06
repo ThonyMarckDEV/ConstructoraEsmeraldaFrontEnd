@@ -32,6 +32,7 @@ import ProyectoEncargado from './ui/Encargado/Proyecto';
 // Utilities
 import ProtectedRouteHome from './utilities/ProtectedRouteHome';
 import ProtectedRouteCliente from './utilities/ProtectedRouteCliente';
+import ProtectedRouteManager from './utilities/ProtectedRouteManager';
 
 //import ProtectedRouteToken from './utilities/ProtectedRouteToken';
 
@@ -45,8 +46,6 @@ function AppContent() {
 
       <Route path="/login"  element={<ProtectedRouteHome element={<Login />}  />} />
 
-
-
       {/* Rutas cliente */}
       
       <Route path="/cliente" element={<ProtectedRouteCliente element={<Cliente />} />} />
@@ -57,11 +56,11 @@ function AppContent() {
 
       {/* Rutas Managaer / encargado */}
       
-      <Route path="/encargado"  element={<Encargado />} />
-      <Route path="/encargado/proyectos" element={<ProyectosEncargado />} />
-      <Route path="/encargado/proyecto/:id"  element={<ProyectoEncargado />}  />
-      <Route path="/encargado/proyecto/ar/:id"   element={<AR />}  />
-      <Route path="/encargado/proyecto/chat/:id"  element={<ChatWindows />} />
+      <Route path="/encargado"  element={<ProtectedRouteManager element={<Encargado />}  />} />
+      <Route path="/encargado/proyectos"  element={<ProtectedRouteManager element={<ProyectosEncargado />} />} />
+      <Route path="/encargado/proyecto/:id"   element={<ProtectedRouteManager element={<ProyectoEncargado />}  />} />
+      <Route path="/encargado/proyecto/ar/:id"    element={<ProtectedRouteManager element={<AR />} />} />
+      <Route path="/encargado/proyecto/chat/:id"   element={<ProtectedRouteManager element={<ChatWindows />} />} />
 
       {/* Ruta de error */}
       <Route path="/*" element={<ErrorPage />} />
