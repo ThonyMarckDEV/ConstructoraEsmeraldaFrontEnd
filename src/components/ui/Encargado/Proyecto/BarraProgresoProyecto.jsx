@@ -3,6 +3,7 @@ import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from '../../../../js/urlHelper';
 import { Link } from 'react-router-dom';
 import LoadingBarraProgresoProyecto from './LoadingBarraProgresoProyecto';
+import SelectorFasesProyecto from './SelectorFasesProyecto';
 
 const BarraProgresoProyecto = ({ proyectoId }) => {
   const [proyecto, setProyecto] = useState(null);
@@ -59,6 +60,14 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
     
     // If found, return 1-based index (to match existing logic), otherwise return 0
     return phaseIndex !== -1 ? phaseIndex + 1 : 0;
+  };
+  
+  const handleFaseChange = (nuevaFase) => {
+    // Actualizar el estado local del proyecto con la nueva fase
+    setProyecto({
+      ...proyecto,
+      fase: nuevaFase
+    });
   };
   
   const hasFase = proyecto?.fase && proyecto.fase.trim() !== "";
@@ -195,6 +204,14 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
 
       {/* Progress section */}
       <div className="p-4 md:p-6">
+        {/* Selector de Fases */}
+        <SelectorFasesProyecto 
+          proyectoId={proyectoId}
+          fase={proyecto.fase}
+          fases={fases}
+          onFaseChange={handleFaseChange}
+        />
+      
         {/* Main progress bar */}
         <div className="w-full bg-gray-200 rounded-full h-3 md:h-4 mb-4 md:mb-6">
           <div 
