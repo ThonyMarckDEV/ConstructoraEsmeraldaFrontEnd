@@ -19,7 +19,7 @@ const Modulo = ({ proyectoId }) => {
     const fetchProjectDetails = async () => {
       try {
         setIsLoading(true);
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/projects/${proyectoId}/details`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/project/${proyectoId}/details`);
         if (!response.ok) throw new Error('Error al cargar los detalles del proyecto');
         const data = await response.json();
         

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, Home, FileText, ChartBarIcon, Settings, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import jwtUtils from '../../../utilities/jwtUtils';
-import { logout } from '../../../js/logout';
+import jwtUtils from '../../utilities/jwtUtils';
+import { logout } from '../../js/logout';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [userRole, setUserRole] = useState(null);
   const sidebarRef = useRef(null);
   const hoverAreaRef = useRef(null);
   const isMobile = useRef(window.innerWidth < 768);
@@ -16,11 +17,68 @@ const Sidebar = () => {
   };
 
   const handleLogout = () => {
-    logout(); // Cierra sesión
+    logout();
   };
 
-  const refresh_token = jwtUtils.getRefreshTokenFromCookie();
-  const username = jwtUtils.getUsername(refresh_token);
+  useEffect(() => {
+    const refresh_token = jwtUtils.getRefreshTokenFromCookie();
+    if (refresh_token) {
+      const username = jwtUtils.getUsername(refresh_token);
+      const role = jwtUtils.getUserRole(refresh_token);
+      setUserRole(role);
+    }
+  }, []);
+
+  // Definir los menús primero
+  const menuItemsCliente = [
+    { name: "Inicio", icon: <Home size={20} />, path: "/cliente" },
+    { name: "Proyectos", icon: <FileText size={20} />, path: "/cliente/proyectos" },
+    { name: "Chats", icon: <ChartBarIcon size={20} />, path: "/cliente/chat" },
+    { name: "Configuración", icon: <Settings size={20} />, path: "/cliente/configuracion" }
+  ];
+
+  const menuItemsManager = [
+    { name: "Inicio", icon: <Home size={20} />, path: "/encargado" },
+    { name: "Proyectos", icon: <FileText size={20} />, path: "/encargado/proyectos" },
+    { name: "Chats", icon: <ChartBarIcon size={20} />, path: "/encargado/proyecto/chat/1" },
+    { name: "Configuración", icon: <Settings size={20} />, path: "/encargado/configuracion" }
+  ];
+
+  const menuItemsAdmin = [
+    { name: "Inicio", icon: <Home size={20} />, path: "/admin" },
+    { name: "Usuarios", icon: <FileText size={20} />, path: "/admin/usuarios" },
+    { name: "Configuración", icon: <Settings size={20} />, path: "/admin/configuracion" }
+  ];
+
+  const getMenuItems = () => {
+    switch(userRole?.toLowerCase()) { // Usar toLowerCase para hacer coincidir sin importar mayúsculas
+      case 'cliente':
+        return menuItemsCliente;
+      case 'manager':
+        return menuItemsManager;
+      case 'admin':
+        return menuItemsAdmin;
+      default:
+        return [];
+    }
+  };
+
+  const getRoleText = () => {
+    switch(userRole?.toUpperCase()) {
+      case 'cliente':
+        return "Cliente";
+      case 'manager':
+        return "Encargado";
+      case 'admin':
+        return "Administrador";
+      default:
+        return "";
+    }
+  };
+
+    const refresh_token = jwtUtils.getRefreshTokenFromCookie();
+    const username = jwtUtils.getUsername(refresh_token);
+    const menuItems = getMenuItems(); // Definir menuItems aquí, después de todas las dependencias
 
   // Detectar si es dispositivo móvil o PC
   useEffect(() => {
@@ -58,13 +116,6 @@ const Sidebar = () => {
     };
   }, [isOpen]);
 
-  const menuItems = [
-    { name: "Inicio", icon: <Home size={20} />, path: "/cliente" },
-    { name: "Proyectos", icon: <FileText size={20} />, path: "/cliente/proyectos" },
-    { name: "Chats", icon: <ChartBarIcon size={20} />, path: "/cliente/chat" },
-    { name: "Configuración", icon: <Settings size={20} />, path: "/cliente/configuracion" }
-  ];
-
   return (
     <>
       {/* Área de hover en toda la parte izquierda (solo visible en PC) */}
@@ -92,7 +143,7 @@ const Sidebar = () => {
         />
       )}
 
-      {/* Sidebar - Oculto por defecto en todos los dispositivos */}
+      {/* Sidebar */}
       <div 
         ref={sidebarRef}
         className={`fixed h-full w-64 bg-white border-r border-gray-200 shadow-lg z-40 transition-all duration-300 ease-in-out ${
@@ -121,11 +172,11 @@ const Sidebar = () => {
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-black font-bold">
-              {username.charAt(0).toUpperCase()}
+              {username?.charAt(0).toUpperCase()}
             </div>
             <div>
               <p className="font-medium text-black">{username}</p>
-              <p className="text-sm text-gray-500">Cliente</p>
+              <p className="text-sm text-gray-500">{getRoleText()}</p>
             </div>
           </div>
         </div>
@@ -138,7 +189,7 @@ const Sidebar = () => {
                 <Link
                   to={item.path}
                   className="flex items-center space-x-3 p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-                  onClick={() => setIsOpen(false)} // Cierra el sidebar al hacer clic en un elemento del menú
+                  onClick={() => setIsOpen(false)}
                 >
                   <span className="text-gray-500">{item.icon}</span>
                   <span>{item.name}</span>

@@ -4,6 +4,7 @@ import { fetchWithAuth } from '../../../js/authToken';
 import jwtUtils from '../../../utilities/jwtUtils';
 import io from 'socket.io-client';
 import SOCKET_URL from '../../../js/socketUrl';
+import  Sidebar  from '../Sidebar';
 
 const ChatWindow = () => {
   const { id } = useParams();
@@ -18,8 +19,6 @@ const ChatWindow = () => {
   const token = jwtUtils.getAccessTokenFromCookie();
   const currentUserRole = jwtUtils.getUserRole(token);
   const currentUserId = jwtUtils.getUserID(token);
-
-  console.log('ID Usuario:', currentUserId);
 
   // Obtener datos iniciales del chat
   useEffect(() => {
@@ -174,8 +173,9 @@ useEffect(() => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
+        <Sidebar />
       {/* Header con toda la información */}
-      <div className="bg-green-600 text-white p-4">
+      <div className="bg-blue-600 text-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-10 h-10 rounded-full bg-gray-300 mr-3 flex items-center justify-center text-gray-600">
@@ -192,7 +192,7 @@ useEffect(() => {
               <p className="text-xs">Proyecto: {chatData.proyecto.nombre}</p>
             </div>
           </div>
-          <div className="text-xs text-green-200">
+          <div className="text-xs text-white">
             <p>Creado: {new Date(chatData.chat.created_at).toLocaleDateString()}</p>
           </div>
         </div>
@@ -216,7 +216,7 @@ useEffect(() => {
             <div 
                 className={`flex max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl p-3 rounded-lg ${
                 isCurrentUserMessage 
-                    ? 'bg-green-100 rounded-tr-none' 
+                    ? 'bg-blue-100 rounded-tr-none' 
                     : 'bg-white rounded-tl-none'
                 }`}
             >
@@ -254,12 +254,12 @@ useEffect(() => {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Escribe un mensaje..."
-          className="flex-1 p-2 mx-2 border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-green-500"
+          className="flex-1 p-2 mx-2 border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500"
           disabled={!socket}
         />
         <button 
           type="submit" 
-          className="p-2 bg-green-600 text-white rounded-full hover:bg-green-700 disabled:bg-gray-400 transition-colors"
+          className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
           disabled={!socket || !newMessage.trim()}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

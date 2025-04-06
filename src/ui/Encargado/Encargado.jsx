@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Sidebar from '../../components/ui/Encargado/Sidebar';
+import Sidebar from '../../components/ui/Sidebar';
 
 const Encargado = () => {
     

@@ -17,7 +17,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         setLoading(true);
         
         // Fetch combined project and phases data with a single API call
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/projects/${proyectoId}/with-phases`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/project/${proyectoId}/with-phases`);
         const data = await response.json();
         
         if (!response.ok) {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Sidebar from '../../components/ui/Cliente/Sidebar';
+import Sidebar from '../../components/ui/Sidebar';
 
 const Cliente = () => {
     

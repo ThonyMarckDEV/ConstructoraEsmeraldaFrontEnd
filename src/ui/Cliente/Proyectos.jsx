@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from '../../components/ui/Cliente/Sidebar';
+import Sidebar from '../../components/ui/Sidebar';
 import ProyectoClientes from '../../components/ui/Cliente/ProyectosCliente';
 
 const Proyectos = () => {
