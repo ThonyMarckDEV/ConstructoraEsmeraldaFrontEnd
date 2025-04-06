@@ -206,55 +206,6 @@ const Modulo = ({ proyectoId }) => {
     }
   };
 
-  // const handleViewFile = (file) => {
-  //   // Verificar si es una imagen o un PDF para mostrar vista previa
-  //   const isImage = ['jpg', 'jpeg', 'png', 'avif', 'webp'].includes(file.fileType.toLowerCase());
-  //   const isPDF = file.fileType.toLowerCase() === 'pdf';
-    
-  //   if (isImage || isPDF) {
-  //     setSelectedFile(file);
-  //     setModalOpen(true);
-  //   } else {
-  //     // Para otros tipos de archivo, directamente descargar
-  //     handleDownloadFile(file);
-  //   }
-  // };
-  
-  // const handleDownloadFile = (file) => {
-  //   if (!file.path || file.path === '#' || file.path === '/placeholder-image.jpg') {
-  //     alert('No se puede descargar este archivo: Ruta no disponible');
-  //     return;
-  //   }
-  
-  //   // Crear un enlace temporal para la descarga
-  //   const linkElement = document.createElement('a'); // Usar linkElement como el objeto <a>
-    
-  //   console.log(file); // Verifica que file esté definido
-  //   console.log(file?.path); // Verifica que file.path esté disponible
-  
-  //   if (file.path.startsWith('http')) {
-  //     // Si la ruta ya es absoluta, solo asignar
-  //     linkElement.href = file.path;
-  //   } else {
-  //     // Si es una ruta relativa, construir la URL completa
-  //     const fileURL = `${API_BASE_URL}/storage/${file.path}`;  // Usar una variable separada para la URL
-  //     linkElement.href = fileURL;
-  //     console.log(fileURL);  // Imprime la URL completa
-  //   }
-    
-  //   // Forzar la descarga con el nombre original del archivo
-  //   linkElement.download = file.fileName;
-  //   linkElement.target = '_blank';
-  //   linkElement.rel = 'noopener noreferrer';
-  
-  //   // Añadir al DOM y hacer click
-  //   document.body.appendChild(linkElement);
-  //   linkElement.click();
-  
-  //   // Limpiar
-  //   document.body.removeChild(linkElement);
-  // };
-
 
   const handleViewFile = (file) => {
     // Verificar si es una imagen o un PDF para mostrar vista previa
@@ -270,42 +221,27 @@ const Modulo = ({ proyectoId }) => {
     }
   };
   
-  const handleDownloadFile = (file) => {
-    if (!file.path || file.path === '#' || file.path === '/placeholder-image.jpg') {
-      alert('No se puede descargar este archivo: Ruta no disponible');
-      return;
+  const handleDownloadFile = async (file) => {
+    try {
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/files/download/${file.path}`);
+      if (!response.ok) {
+        throw new Error("Error en la descarga");
+      }
+      // Convierte la respuesta a blob para generar un URL de descarga
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Error descargando el archivo", err);
     }
-  
-    // Crear un enlace temporal para la descarga
-    const linkElement = document.createElement('a'); // Usar linkElement como el objeto <a>
-  
-    console.log(file); // Verifica que file esté definido
-    console.log(file?.path); // Verifica que file.path esté disponible
-  
-    let fileURL = file.path; // Default to file.path
-  
-    if (!file.path.startsWith('http')) {
-      // Si es una ruta relativa, construir la URL completa
-      fileURL = `${API_BASE_URL}/storage/${file.path}`;  // Usar una variable separada para la URL
-      console.log(fileURL);  // Imprime la URL completa
-    }
-  
-    // Asignar la URL de descarga
-    linkElement.href = fileURL;
-  
-    // Forzar la descarga con el nombre original del archivo
-    linkElement.download = file.fileName;
-    linkElement.target = '_blank';
-    linkElement.rel = 'noopener noreferrer';
-  
-    // Añadir al DOM y hacer click
-    document.body.appendChild(linkElement);
-    linkElement.click();
-  
-    // Limpiar
-    document.body.removeChild(linkElement);
   };
-  
+
   if (isLoading) return <LoadingState />;
   if (error || !projectData) return <ErrorState error={error} />;
 
