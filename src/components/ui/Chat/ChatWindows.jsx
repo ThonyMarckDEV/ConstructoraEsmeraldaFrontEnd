@@ -19,6 +19,8 @@ const ChatWindow = () => {
   const currentUserRole = jwtUtils.getUserRole(token);
   const currentUserId = jwtUtils.getUserID(token);
 
+  console.log('ID Usuario:', currentUserId);
+
   // Obtener datos iniciales del chat
   useEffect(() => {
     const fetchChatData = async () => {
@@ -43,22 +45,53 @@ const ChatWindow = () => {
     fetchChatData();
   }, [id]);
 
-  // Marcar mensajes como leídos
-  const markMessagesAsRead = async () => {
+// Modify your markMessagesAsRead function
+const markMessagesAsRead = async () => {
     try {
-      await fetchWithAuth(`${SOCKET_URL}/api/chats/${id}/mark-as-read`, {
+      const response = await fetchWithAuth(`${SOCKET_URL}/api/chats/${id}/mark-as-read`, {
         method: 'POST'
       });
+      
+      if (response.ok) {
+        // Update local messages state to reflect read status
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            // Only update messages from the other user
+            msg.idUsuario !== currentUserId ? { ...msg, leido: true } : msg
+          )
+        );
+      }
     } catch (err) {
       console.error('Error al marcar mensajes como leídos:', err);
     }
   };
 
-  
-  // Configurar WebSocket
-  useEffect(() => {
-    if (!chatData) return;
+  // Add these new hooks to track when the user is actually viewing the chat
+useEffect(() => {
+    let isVisible = true;
+    
+    // Función para manejar cuando el usuario cambia de pestaña o minimiza
+    const handleVisibilityChange = () => {
+      isVisible = document.visibilityState === 'visible';
+      
+      // Si el usuario vuelve a la página, marcar mensajes como leídos
+      if (isVisible && chatData) {
+        markMessagesAsRead();
+      }
+    };
+    
+    // Detectar cuando el usuario está activo en la página
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Limpiar event listener
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [chatData, id]);
 
+useEffect(() => {
+    if (!chatData) return;
+  
     const newSocket = io(SOCKET_URL, {
       auth: { token },
       transports: ['websocket']
@@ -72,8 +105,8 @@ const ChatWindow = () => {
     newSocket.on('new_message', (message) => {
       setMessages(prev => [...prev, message]);
       
-      // Si el mensaje es para el usuario actual, marcarlo como leído
-      if (message.idUsuario !== currentUserId) {
+      // Si el mensaje es para el usuario actual Y el documento está visible, marcarlo como leído
+      if (message.idUsuario !== currentUserId && document.visibilityState === 'visible') {
         markMessagesAsRead();
       }
     });
@@ -167,42 +200,47 @@ const ChatWindow = () => {
 
       {/* Área de mensajes */}
       <div className="flex-1 p-4 overflow-y-auto bg-gray-100 bg-opacity-50">
-        {messages.map((message) => (
-          <div 
+      {messages.map((message) => {
+        // Explicitly determine if this message is from the current user
+        const isCurrentUserMessage = parseInt(message.idUsuario) === parseInt(currentUserId);
+        
+        return (
+            <div 
             key={message.idMensaje} 
             className={`flex mb-4 ${
-              message.rolUsuario === 'cliente' 
-                ? 'justify-end'  // Cliente a la derecha
-                : 'justify-start' // Manager a la izquierda
+                isCurrentUserMessage 
+                ? 'justify-end'  // Current user's messages go to the right
+                : 'justify-start' // Other user's messages go to the left
             }`}
-          >
-            <div 
-              className={`flex max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl p-3 rounded-lg ${
-                message.rolUsuario === 'cliente' 
-                  ? 'bg-green-100 rounded-tr-none' 
-                  : 'bg-white rounded-tl-none'
-              }`}
             >
-              <div>
+            <div 
+                className={`flex max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl p-3 rounded-lg ${
+                isCurrentUserMessage 
+                    ? 'bg-green-100 rounded-tr-none' 
+                    : 'bg-white rounded-tl-none'
+                }`}
+            >
+                <div>
                 <p className="break-words">{message.contenido}</p>
                 <div className={`flex items-center mt-1 text-xs ${
-                  message.rolUsuario === 'cliente' ? 'justify-end' : 'justify-start'
+                    isCurrentUserMessage ? 'justify-end' : 'justify-start'
                 }`}>
-                  <span className="text-gray-500">{formatTime(message.created_at)}</span>
-                  {message.rolUsuario === 'cliente' && (
+                    <span className="text-gray-500">{formatTime(message.created_at)}</span>
+                    {isCurrentUserMessage && (
                     <span className="ml-1">
-                      {message.leido ? (
+                        {message.leido ? (
                         <span className="text-blue-500">✓✓</span>
-                      ) : (
+                        ) : (
                         <span className="text-gray-500">✓</span>
-                      )}
+                        )}
                     </span>
-                  )}
+                    )}
                 </div>
-              </div>
+                </div>
             </div>
-          </div>
-        ))}
+            </div>
+        );
+        })}
         <div ref={messagesEndRef} />
       </div>
 
