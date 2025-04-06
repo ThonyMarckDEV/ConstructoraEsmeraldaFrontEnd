@@ -182,6 +182,47 @@ const Modulo = ({ proyectoId }) => {
     }
   };
 
+  const handleDeleteFile = async (fileId) => {
+    try {
+      // Determinar si es un archivo o foto (basado en el prefijo del ID)
+      const isPhoto = fileId.startsWith('photo-');
+      const realId = fileId.replace(isPhoto ? 'photo-' : 'file-', '');
+  
+      // Hacer la llamada API para eliminar
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/files/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: realId,
+          type: isPhoto ? 'foto' : 'archivo'
+        })
+      });
+  
+      if (!response.ok) throw new Error('Error al eliminar el archivo');
+  
+      // Actualizar el estado local
+      setProjectData(prevData => {
+        const updatedFases = prevData.fases.map(fase => {
+          if (isPhoto) {
+            const updatedFotos = fase.fotos?.filter(foto => `photo-${foto.idFoto}` !== fileId) || [];
+            return { ...fase, fotos: updatedFotos };
+          } else {
+            const updatedArchivos = fase.archivos?.filter(archivo => `file-${archivo.idArchivo}` !== fileId) || [];
+            return { ...fase, archivos: updatedArchivos };
+          }
+        });
+        
+        return { ...prevData, fases: updatedFases };
+      });
+  
+    } catch (err) {
+      console.error("Error deleting file:", err);
+      alert('Error al eliminar el archivo: ' + err.message);
+    }
+  };
+
   if (isLoading) return <LoadingState />;
   if (error || !projectData) return <ErrorState error={error} />;
 
@@ -376,6 +417,7 @@ const Modulo = ({ proyectoId }) => {
                       file={file} 
                       onView={handleViewFile} 
                       onDownload={handleDownloadFile} 
+                      onDelete={handleDeleteFile}
                     />
                   ))
                 ) : (
