@@ -33,7 +33,6 @@ const Sidebar = () => {
   const menuItemsCliente = [
     { name: "Inicio", icon: <Home size={20} />, path: "/cliente" },
     { name: "Proyectos", icon: <FileText size={20} />, path: "/cliente/proyectos" },
-    { name: "Chats", icon: <ChartBarIcon size={20} />, path: "/cliente/chat" },
     { name: "Configuración", icon: <Settings size={20} />, path: "/cliente/configuracion" }
   ];
 
