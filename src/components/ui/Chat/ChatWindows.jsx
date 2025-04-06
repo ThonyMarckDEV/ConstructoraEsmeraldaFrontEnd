@@ -54,6 +54,7 @@ const ChatWindow = () => {
     }
   };
 
+  
   // Configurar WebSocket
   useEffect(() => {
     if (!chatData) return;
