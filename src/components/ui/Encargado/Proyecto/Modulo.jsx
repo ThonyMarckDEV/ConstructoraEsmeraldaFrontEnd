@@ -425,7 +425,7 @@ const Modulo = ({ proyectoId }) => {
                             type="file"
                             id={`upload-photo-${fase.faseId}`}
                             className="hidden"
-                            onChange={handlePhotoUpload}
+                            onChange={(e) => handlePhotoUpload(fase.idFase, e)}  // <-- Fix here
                             accept=".jpg,.jpeg,.png,.avif,.webp"
                             disabled={uploadingPhoto}
                           />
