@@ -3,6 +3,7 @@ import { Menu, X, Home, FileText, ChartBarIcon, Settings, LogOut } from 'lucide-
 import { Link } from 'react-router-dom';
 import jwtUtils from '../../utilities/jwtUtils';
 import { logout } from '../../js/logout';
+import logo from '../../img/logo/logoconstructora.jpg';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,12 +22,6 @@ const Sidebar = () => {
 
   const refresh_token = jwtUtils.getRefreshTokenFromCookie();
   const role = jwtUtils.getUserRole(refresh_token);
-  // useEffect(() => {
-  //   const refresh_token = jwtUtils.getRefreshTokenFromCookie();
-  //   if (refresh_token) {
-  //     const username = jwtUtils.getUsername(refresh_token);
-  //   }
-  // }, []);
 
   // Definir los menús primero
   const menuItemsCliente = [
@@ -154,7 +149,13 @@ const Sidebar = () => {
       >
         {/* Header del sidebar */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-black">Dashboard</h2>
+          <div className="flex items-center">
+            <img 
+              src={logo}
+              alt="Logo de la empresa" 
+              className="h-12" // Cambiado de h-8 a h-12 para un logo más grande
+            />
+          </div>
           <button 
             onClick={toggleSidebar} 
             className="text-black"
