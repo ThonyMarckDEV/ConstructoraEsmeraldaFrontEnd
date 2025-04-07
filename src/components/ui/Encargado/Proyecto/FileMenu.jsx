@@ -4,7 +4,7 @@ const FileMenu = ({ onView, onDownload, onDelete, isDeleting, fileType }) => {
   const canPreview = ['pdf', 'jpg', 'jpeg', 'png', 'avif', 'webp'].includes(fileType);
   
   return (
-    <div className="absolute right-0 mt-1 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-[20]">
+    <div className="absolute right-0 mt-1 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
       <div className="py-1">
         {canPreview && (
           <button

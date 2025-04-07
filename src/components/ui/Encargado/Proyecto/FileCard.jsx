@@ -45,7 +45,7 @@ const FileCard = ({ file, onView, onDownload, onDelete }) => {
   return (
     <div className="col-span-1">
       <div 
-        className="relative w-full bg-white rounded-lg shadow-sm border border-gray-200 p-3 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+        className="relative w-full bg-white rounded-lg shadow-sm border border-gray-200 p-3 transition-all duration-200"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
