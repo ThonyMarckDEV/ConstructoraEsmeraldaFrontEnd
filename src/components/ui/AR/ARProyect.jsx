@@ -32,6 +32,55 @@ const ARProject = () => {
   // Fetch del modelo 3D
   useEffect(() => {
 
+    // const fetchModel = async () => {
+    //   if (!id) return;
+      
+    //   try {
+    //     setLoading(true);
+    //     setError(null);
+    
+    //     // 1. Obtener metadatos del modelo
+    //     const metaResponse = await fetchWithAuth(`${API_BASE_URL}/api/project/${id}/modelo`);
+        
+    //     if (!metaResponse.ok) {
+    //       throw new Error(`Error ${metaResponse.status} al obtener modelo`);
+    //     }
+    
+    //     const metaData = await metaResponse.json();
+        
+    //     if (!metaData.success || !metaData.data.modelo_url) {
+    //       throw new Error('Datos de modelo incompletos');
+    //     }
+    
+    //     // 2. Descargar el modelo directamente
+    //     // const modelResponse = await fetch(metaData.data.modelo_url, {
+    //     //   credentials: 'include'
+    //     // });
+
+    //     const modelResponse = await fetch(metaData.data.modelo_url);
+        
+    //     if (!modelResponse.ok) {
+    //       throw new Error(`Error ${modelResponse.status} al descargar modelo`);
+    //     }
+    
+    //     // 3. Crear URL local para el visor 3D
+    //     const blob = await modelResponse.blob();
+    //     const objectUrl = URL.createObjectURL(blob);
+    //     setModelPath(objectUrl);
+    
+    //   } catch (err) {
+    //     setError(`Error: ${err.message}`);
+    //     console.error('Error:', err);
+        
+    //     // Sugerencia para errores CORS
+    //     if (err.message.includes('CORS') || err.message.includes('403')) {
+    //       setError(prev => `${prev} - Verifica la configuración del servidor`);
+    //     }
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+
     const fetchModel = async () => {
       if (!id) return;
       
@@ -39,42 +88,52 @@ const ARProject = () => {
         setLoading(true);
         setError(null);
     
-        // 1. Obtener metadatos del modelo
+        // 1. Obtain model metadata
         const metaResponse = await fetchWithAuth(`${API_BASE_URL}/api/project/${id}/modelo`);
         
         if (!metaResponse.ok) {
-          throw new Error(`Error ${metaResponse.status} al obtener modelo`);
+          throw new Error(`Error ${metaResponse.status} al obtener metadatos del modelo`);
         }
     
         const metaData = await metaResponse.json();
         
-        if (!metaData.success || !metaData.data.modelo_url) {
-          throw new Error('Datos de modelo incompletos');
+        if (!metaData.success) {
+          throw new Error('No se pudo obtener información del modelo');
         }
     
-        // 2. Descargar el modelo directamente
-        // const modelResponse = await fetch(metaData.data.modelo_url, {
-        //   credentials: 'include'
-        // });
-
-        const modelResponse = await fetch(metaData.data.modelo_url);
+        // Check if modelo_url exists in the response
+        if (!metaData.data.modelo_url) {
+          throw new Error('URL del modelo no encontrada en la respuesta');
+        }
+    
+        // 2. Download the model with authentication
+        const modelResponse = await fetchWithAuth(metaData.data.modelo_url);
         
         if (!modelResponse.ok) {
           throw new Error(`Error ${modelResponse.status} al descargar modelo`);
         }
     
-        // 3. Crear URL local para el visor 3D
+        // 3. Create local URL for the 3D viewer
         const blob = await modelResponse.blob();
+        
+        // Validate that we have a binary file with some content
+        if (blob.size < 100) {  // Sanity check: a valid GLB file should be larger
+          throw new Error('El archivo del modelo parece estar corrupto o vacío');
+        }
+        
         const objectUrl = URL.createObjectURL(blob);
         setModelPath(objectUrl);
     
       } catch (err) {
+        console.error('Error fetching model:', err);
         setError(`Error: ${err.message}`);
-        console.error('Error:', err);
         
-        // Sugerencia para errores CORS
-        if (err.message.includes('CORS') || err.message.includes('403')) {
-          setError(prev => `${prev} - Verifica la configuración del servidor`);
+        if (err.message.includes('401') || err.message.includes('403')) {
+          setError('Error de autenticación. Intente iniciar sesión nuevamente.');
+        } else if (err.message.includes('404')) {
+          setError('Modelo 3D no encontrado para este proyecto.');
+        } else {
+          setError('Error al cargar el modelo 3D. Inténtelo nuevamente.');
         }
       } finally {
         setLoading(false);
