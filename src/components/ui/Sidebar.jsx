@@ -125,7 +125,7 @@ const Sidebar = () => {
       {/* Botón de hamburguesa para móviles y PC */}
       <button 
         onClick={toggleSidebar} 
-        className="fixed z-20 top-4 left-4 p-2 rounded-md bg-black text-white"
+        className="fixed z-20 top-4 left-4 p-2 rounded-md bg-black text-white md:hidden"
         aria-label="Abrir menú"
       >
         <Menu size={24} />

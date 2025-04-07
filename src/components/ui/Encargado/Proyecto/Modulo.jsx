@@ -5,6 +5,7 @@ import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
 import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from "../../../../js/urlHelper";
+import { FileText, Image } from 'lucide-react';
 
 //Para fases
 import defaultImage from '../../../../img/default.jpg';
@@ -387,61 +388,52 @@ const Modulo = ({ proyectoId }) => {
                         )}
                       </div>
                       
-                      {/* Botones de subida */}
-                      <div className="flex gap-2 mt-4 sm:mt-0">
-                        <div className="relative">
-                          <input
-                            type="file"
-                            id={`upload-file-${fase.idFase}`}
-                            className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-                            onChange={(e) => handleFileUpload(fase.idFase, e)}
-                            accept=".pdf,.xls,.xlsx,.doc,.docx,.dwg"
-                            disabled={uploadingFile}
-                          />
-                          <button
-                            className="flex items-center gap-1 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
-                            disabled={uploadingFile}
-                          >
-                            {uploadingFile ? (
-                              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                            ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="12" y1="18" x2="12" y2="12"></line>
-                                <line x1="9" y1="15" x2="15" y2="15"></line>
-                              </svg>
-                            )}
-                            Subir Archivo
-                          </button>
-                        </div>
-                        
-                        <div className="relative">
-                          <input
-                            type="file"
-                            id={`upload-photo-${fase.idFase}`}
-                            className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-                            onChange={(e) => handlePhotoUpload(fase.idFase, e)}
-                            accept=".jpg,.jpeg,.png,.avif,.webp"
-                            disabled={uploadingPhoto}
-                          />
-                          <button
-                            className="flex items-center gap-1 px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm"
-                            disabled={uploadingPhoto}
-                          >
-                            {uploadingPhoto ? (
-                              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                            ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                <polyline points="21 15 16 10 5 21"></polyline>
-                              </svg>
-                            )}
-                            Subir Foto
-                          </button>
-                        </div>
-                      </div>
+                      <div className="flex gap-4">
+  {/* Botón para subir archivo */}
+  <div className="relative">
+    <label htmlFor={`upload-file-${fase.faseId}`} className="cursor-pointer">
+      <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-6 active:scale-95 active:rotate-0">
+        {uploadingFile ? (
+          <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <FileText size={20} className="transition-transform duration-300 hover:scale-110" />
+        )}
+      </div>
+    </label>
+    <input
+      type="file"
+      id={`upload-file-${fase.faseId}`}
+      className="hidden"
+      onChange={(e) => handleFileUpload(fase.idFase, e)}
+      accept=".pdf,.xls,.xlsx,.doc,.docx,.dwg"
+      disabled={uploadingFile}
+    />
+  </div>
+  
+  {/* Botón para subir foto */}
+  <div className="relative">
+    <label htmlFor={`upload-photo-${fase.faseId}`} className="cursor-pointer">
+      <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-6 active:scale-95 active:rotate-0">
+        {uploadingPhoto ? (
+          <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <Image size={20} className="transition-transform duration-300 hover:scale-110" />
+        )}
+      </div>
+    </label>
+    <input
+      type="file"
+      id={`upload-photo-${fase.faseId}`}
+      className="hidden"
+      onChange={handlePhotoUpload}
+      accept=".jpg,.jpeg,.png,.avif,.webp"
+      disabled={uploadingPhoto}
+    />
+  </div>
+</div>
+
+              
+
                     </div>
                   </div>
                 </div>

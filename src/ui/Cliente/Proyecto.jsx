@@ -12,7 +12,7 @@ const Proyecto = () => {
     <div className="min-h-screen bg-white">
       <Sidebar />
       {/* Contenido principal sin margen izquierdo ya que el sidebar está oculto por defecto */}
-      <div className="flex-1 p-9 md:ml-84">
+      <div className="flex-1  md:ml-84">
         <div className="mb-4">
           <BarraProgresoProyecto proyectoId={id} />
         </div>
