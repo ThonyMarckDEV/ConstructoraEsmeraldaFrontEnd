@@ -153,7 +153,7 @@ const Sidebar = () => {
             <img 
               src={logo}
               alt="Logo de la empresa" 
-              className="h-12" // Cambiado de h-8 a h-12 para un logo más grande
+              className="h-12" 
             />
           </div>
           <button 
