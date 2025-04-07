@@ -11,7 +11,7 @@ const Proyectos = () => {
       <div className="flex-1 p-9 md:ml-84">
         <div className="p-4 bg-white rounded-lg shadow mb-6">
           <h1 className="text-2xl font-bold mb-4 font-serif text-gray-800">Dashboard</h1>
-          <p className="text-gray-600">Bienvenido a tu panel de control de proyectos.</p>
+          <p className="text-gray-600">Bienvenido a tu panel de control de proyectos encargados.</p>
         </div>
         
         {/* Componente de proyectos */}

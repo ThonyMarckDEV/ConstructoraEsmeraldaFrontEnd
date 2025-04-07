@@ -8,14 +8,14 @@ import API_BASE_URL from "../../../../js/urlHelper";
 
 //Para fases
 import defaultImage from '../../../../img/default.jpg';
-import planningImg from '../../../../img/planning.jpg';
-import terrainPrepImg from '../../../../img/terrainPrep.jpg';
-import foundationImg from '../../../../img/foundation.jpg';
-import structureImg from '../../../../img/structure.jpg';
-import installationsImg from '../../../../img/installations.jpg';
-import finishesImg from '../../../../img/finishes.jpg';
-import inspectionImg from '../../../../img/inspection.jpg';
-import deliveryImg from '../../../../img/delivery.jpg';
+import planningImg from '../../../../img/Fases/planning.jpg';
+import terrainPrepImg from '../../../../img/Fases/terrainPrep.jpg';
+import foundationImg from '../../../../img/Fases/foundation.jpg';
+import structureImg from '../../../../img/Fases/structure.jpg';
+import installationsImg from '../../../../img/Fases/installations.jpg';
+import finishesImg from '../../../../img/Fases/finishes.jpg';
+import inspectionImg from '../../../../img/Fases/inspection.jpg';
+import deliveryImg from '../../../../img/Fases/delivery.jpg';
 
 const Modulo = ({ proyectoId }) => {
   const [projectData, setProjectData] = useState(null);
