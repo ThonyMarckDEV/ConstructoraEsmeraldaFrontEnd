@@ -40,7 +40,7 @@ const ARProject = () => {
         setError(null);
     
         // 1. Obtener metadatos del modelo
-        const metaResponse = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/${id}/modelo`);
+        const metaResponse = await fetchWithAuth(`${API_BASE_URL}/api/project/${id}/modelo`);
         
         if (!metaResponse.ok) {
           throw new Error(`Error ${metaResponse.status} al obtener modelo`);
