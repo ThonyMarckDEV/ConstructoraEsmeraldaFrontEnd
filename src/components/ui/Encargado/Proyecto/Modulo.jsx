@@ -389,48 +389,48 @@ const Modulo = ({ proyectoId }) => {
                       </div>
                       
                       <div className="flex gap-4">
-  {/* Botón para subir archivo */}
-  <div className="relative">
-    <label htmlFor={`upload-file-${fase.faseId}`} className="cursor-pointer">
-      <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-6 active:scale-95 active:rotate-0">
-        {uploadingFile ? (
-          <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-        ) : (
-          <FileText size={20} className="transition-transform duration-300 hover:scale-110" />
-        )}
-      </div>
-    </label>
-    <input
-      type="file"
-      id={`upload-file-${fase.faseId}`}
-      className="hidden"
-      onChange={(e) => handleFileUpload(fase.idFase, e)}
-      accept=".pdf,.xls,.xlsx,.doc,.docx,.dwg"
-      disabled={uploadingFile}
-    />
-  </div>
-  
-  {/* Botón para subir foto */}
-  <div className="relative">
-    <label htmlFor={`upload-photo-${fase.faseId}`} className="cursor-pointer">
-      <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-6 active:scale-95 active:rotate-0">
-        {uploadingPhoto ? (
-          <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-        ) : (
-          <Image size={20} className="transition-transform duration-300 hover:scale-110" />
-        )}
-      </div>
-    </label>
-    <input
-      type="file"
-      id={`upload-photo-${fase.faseId}`}
-      className="hidden"
-      onChange={handlePhotoUpload}
-      accept=".jpg,.jpeg,.png,.avif,.webp"
-      disabled={uploadingPhoto}
-    />
-  </div>
-</div>
+                        {/* Botón para subir archivo */}
+                        <div className="relative">
+                          <label htmlFor={`upload-file-${fase.faseId}`} className="cursor-pointer">
+                            <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-6 active:scale-95 active:rotate-0">
+                              {uploadingFile ? (
+                                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <FileText size={20} className="transition-transform duration-300 hover:scale-110" />
+                              )}
+                            </div>
+                          </label>
+                          <input
+                            type="file"
+                            id={`upload-file-${fase.faseId}`}
+                            className="hidden"
+                            onChange={(e) => handleFileUpload(fase.idFase, e)}
+                            accept=".pdf,.xls,.xlsx,.doc,.docx,.dwg"
+                            disabled={uploadingFile}
+                          />
+                        </div>
+                        
+                        {/* Botón para subir foto */}
+                        <div className="relative">
+                          <label htmlFor={`upload-photo-${fase.faseId}`} className="cursor-pointer">
+                            <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-6 active:scale-95 active:rotate-0">
+                              {uploadingPhoto ? (
+                                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Image size={20} className="transition-transform duration-300 hover:scale-110" />
+                              )}
+                            </div>
+                          </label>
+                          <input
+                            type="file"
+                            id={`upload-photo-${fase.faseId}`}
+                            className="hidden"
+                            onChange={handlePhotoUpload}
+                            accept=".jpg,.jpeg,.png,.avif,.webp"
+                            disabled={uploadingPhoto}
+                          />
+                        </div>
+                      </div>
 
               
 
