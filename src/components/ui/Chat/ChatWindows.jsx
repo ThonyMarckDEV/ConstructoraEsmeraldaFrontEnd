@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link , useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../../../js/authToken';
 import jwtUtils from '../../../utilities/jwtUtils';
 import io from 'socket.io-client';
 import SOCKET_URL from '../../../js/socketUrl';
-import  Sidebar  from '../Sidebar';
+import Sidebar from '../Sidebar';
 
 const ChatWindow = () => {
   const { id } = useParams();
@@ -15,6 +15,7 @@ const ChatWindow = () => {
   const [error, setError] = useState(null);
   const [socket, setSocket] = useState(null);
   const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
   
   const token = jwtUtils.getAccessTokenFromCookie();
   const currentUserRole = jwtUtils.getUserRole(token);
@@ -24,18 +25,14 @@ const ChatWindow = () => {
   const getUserRoleNormalized = () => {
     const role = jwtUtils.getUserRole(token);
     
-    // Mapear roles equivalentes (manager -> encargado)
     if (role === 'manager') return 'encargado';
-    if (role === 'admin') return 'admin'; // Opcional: si admins deben ver vista encargado
+    if (role === 'admin') return 'admin';
     
-    return role || 'cliente'; // Default a cliente si no hay rol
+    return role || 'cliente';
   };
 
   const role = getUserRoleNormalized();
-
-  // Construir URL de retorno basada en el rol normalizado
   const backUrl = id ? `/${role}/proyecto/${id}` : `/${role}/proyectos`;
-
 
   // Obtener datos iniciales del chat
   useEffect(() => {
@@ -61,18 +58,15 @@ const ChatWindow = () => {
     fetchChatData();
   }, [id]);
 
-// Modify your markMessagesAsRead function
-const markMessagesAsRead = async () => {
+  const markMessagesAsRead = async () => {
     try {
       const response = await fetchWithAuth(`${SOCKET_URL}/api/chats/${id}/mark-as-read`, {
         method: 'POST'
       });
       
       if (response.ok) {
-        // Update local messages state to reflect read status
         setMessages(prevMessages => 
           prevMessages.map(msg => 
-            // Only update messages from the other user
             msg.idUsuario !== currentUserId ? { ...msg, leido: true } : msg
           )
         );
@@ -82,30 +76,27 @@ const markMessagesAsRead = async () => {
     }
   };
 
-  // Add these new hooks to track when the user is actually viewing the chat
-useEffect(() => {
+  // Rastrear visibilidad de la página
+  useEffect(() => {
     let isVisible = true;
     
-    // Función para manejar cuando el usuario cambia de pestaña o minimiza
     const handleVisibilityChange = () => {
       isVisible = document.visibilityState === 'visible';
       
-      // Si el usuario vuelve a la página, marcar mensajes como leídos
       if (isVisible && chatData) {
         markMessagesAsRead();
       }
     };
     
-    // Detectar cuando el usuario está activo en la página
     document.addEventListener('visibilitychange', handleVisibilityChange);
     
-    // Limpiar event listener
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [chatData, id]);
 
-useEffect(() => {
+  // Configurar socket
+  useEffect(() => {
     if (!chatData) return;
   
     const newSocket = io(SOCKET_URL, {
@@ -117,11 +108,9 @@ useEffect(() => {
     
     newSocket.emit('join_chat', id);
     
-    // Escuchar nuevos mensajes
     newSocket.on('new_message', (message) => {
       setMessages(prev => [...prev, message]);
       
-      // Si el mensaje es para el usuario actual Y el documento está visible, marcarlo como leído
       if (message.idUsuario !== currentUserId && document.visibilityState === 'visible') {
         markMessagesAsRead();
       }
@@ -172,127 +161,192 @@ useEffect(() => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
   if (loading) return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <div className="flex items-center justify-center h-screen bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
     </div>
   );
   
   if (error) return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded max-w-md">
-        {error}
+    <div className="flex items-center justify-center h-screen bg-gray-50">
+      <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg shadow-sm max-w-md">
+        <div className="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          {error}
+        </div>
       </div>
     </div>
   );
 
   if (!chatData) return null;
 
+  // Obtener información del interlocutor
+  const isClient = currentUserRole === 'cliente';
+  const contactName = isClient 
+    ? `${chatData.encargado.nombre} ${chatData.encargado.apellido}`
+    : `${chatData.cliente.nombre} ${chatData.cliente.apellido}`;
+  const contactInitials = isClient
+    ? chatData.encargado.nombre.charAt(0) + chatData.encargado.apellido.charAt(0)
+    : chatData.cliente.nombre.charAt(0) + chatData.cliente.apellido.charAt(0);
+  const contactRole = isClient ? "Encargado" : "Cliente";
+
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-        <Sidebar />
-      {/* Header con toda la información */}
-      <div className="bg-blue-600 text-white p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-gray-300 mr-3 flex items-center justify-center text-gray-600">
-              {currentUserRole === 'cliente' 
-                ? chatData.encargado.nombre.charAt(0) + chatData.encargado.apellido.charAt(0)
-                : chatData.cliente.nombre.charAt(0) + chatData.cliente.apellido.charAt(0)}
+    <div className="flex flex-col h-screen bg-[#f5f7f9] md:p-9">
+      <Sidebar />
+      
+      {/* Header fijo */}
+      <div className="sticky top-0 z-10 bg-white shadow-md">
+        {/* Encabezado principal */}
+        <div className="bg-blue-600 text-white px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-medium">
+                {contactInitials}
+              </div>
+              <div className="ml-3">
+                <h2 className="font-semibold text-sm sm:text-base">{contactName}</h2>
+                <p className="text-xs text-blue-100">{contactRole}</p>
+              </div>
             </div>
-            <div>
-              <h2 className="font-semibold">
-                {currentUserRole === 'cliente' 
-                  ? `${chatData.encargado.nombre} ${chatData.encargado.apellido} (Encargado)`
-                  : `${chatData.cliente.nombre} ${chatData.cliente.apellido} (Cliente)`}
-              </h2>
-              <p className="text-xs">Proyecto: {chatData.proyecto.nombre}</p>
+            
+            <Link 
+              to={backUrl}
+              className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+              </svg>
+              <span className="hidden sm:inline">Volver</span>
+            </Link>
+          </div>
+        </div>
+        
+        {/* Información del proyecto */}
+        <div className="bg-white px-4 py-2 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
+              </svg>
+              <span className="text-xs sm:text-sm font-medium truncate max-w-[150px] sm:max-w-xs">
+                {chatData.proyecto.nombre}
+              </span>
+            </div>
+            <div className="text-xs text-gray-500">
+              Creado: {formatDate(chatData.chat.created_at)}
             </div>
           </div>
-          <div className="text-xs text-white">
-            <p>Creado: {new Date(chatData.chat.created_at).toLocaleDateString()}</p>
-          </div>
-          <Link 
-            to={backUrl}
-            className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
-            <span>Volver</span>
-          </Link>
         </div>
       </div>
 
-      {/* Área de mensajes */}
-      <div className="flex-1 p-4 overflow-y-auto bg-gray-100 bg-opacity-50">
-      {messages.map((message) => {
-        // Explicitly determine if this message is from the current user
-        const isCurrentUserMessage = parseInt(message.idUsuario) === parseInt(currentUserId);
-        
-        return (
-            <div 
-            key={message.idMensaje} 
-            className={`flex mb-4 ${
-                isCurrentUserMessage 
-                ? 'justify-end'  // Current user's messages go to the right
-                : 'justify-start' // Other user's messages go to the left
-            }`}
-            >
-            <div 
-                className={`flex max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl p-3 rounded-lg ${
-                isCurrentUserMessage 
-                    ? 'bg-blue-100 rounded-tr-none' 
-                    : 'bg-white rounded-tl-none'
-                }`}
-            >
-                <div>
-                <p className="break-words">{message.contenido}</p>
-                <div className={`flex items-center mt-1 text-xs ${
-                    isCurrentUserMessage ? 'justify-end' : 'justify-start'
-                }`}>
-                    <span className="text-gray-500">{formatTime(message.created_at)}</span>
-                    {isCurrentUserMessage && (
-                    <span className="ml-1">
-                        {message.leido ? (
-                        <span className="text-blue-500">✓✓</span>
-                        ) : (
-                        <span className="text-gray-500">✓</span>
-                        )}
-                    </span>
+      {/* Área de mensajes (scrollable) */}
+      <div 
+        ref={chatContainerRef}
+        className="flex-1 overflow-y-auto p-4 bg-[#f5f7f9]"
+      >
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <p className="text-sm">Inicia la conversación</p>
+          </div>
+        ) : (
+          <>
+            {messages.map((message, index) => {
+              const isCurrentUserMessage = parseInt(message.idUsuario) === parseInt(currentUserId);
+              
+              // Check if we need to display a date separator
+              const showDateSeparator = index === 0 || 
+                new Date(message.created_at).toDateString() !== 
+                new Date(messages[index - 1].created_at).toDateString();
+              
+              return (
+                <React.Fragment key={message.idMensaje}>
+                  {showDateSeparator && (
+                    <div className="flex justify-center my-4">
+                      <div className="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full">
+                        {formatDate(message.created_at)}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div 
+                    className={`flex mb-3 ${
+                      isCurrentUserMessage ? 'justify-end' : 'justify-start'
+                    }`}
+                  >
+                    {!isCurrentUserMessage && (
+                      <div className="h-8 w-8 rounded-full bg-blue-200 flex-shrink-0 flex items-center justify-center text-blue-800 text-xs mr-2">
+                        {contactInitials}
+                      </div>
                     )}
-                </div>
-                </div>
-            </div>
-            </div>
-        );
-        })}
-        <div ref={messagesEndRef} />
+                    
+                    <div 
+                      className={`flex flex-col max-w-[75%] md:max-w-[60%] p-3 rounded-lg ${
+                        isCurrentUserMessage 
+                          ? 'bg-blue-600 text-white rounded-br-none' 
+                          : 'bg-white border border-gray-100 shadow-sm rounded-bl-none'
+                      }`}
+                    >
+                      <p className="break-words text-sm">{message.contenido}</p>
+                      <div className={`flex items-center mt-1 text-xs ${
+                        isCurrentUserMessage ? 'justify-end text-blue-100' : 'justify-start text-gray-400'
+                      }`}>
+                        <span>{formatTime(message.created_at)}</span>
+                        {isCurrentUserMessage && (
+                          <span className="ml-1">
+                            {message.leido ? (
+                              <span className="text-blue-100">✓✓</span>
+                            ) : (
+                              <span className="text-blue-200 opacity-70">✓</span>
+                            )}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })}
+            <div ref={messagesEndRef} />
+          </>
+        )}
       </div>
 
-      {/* Input para enviar mensajes */}
-      <form 
-        className="bg-white p-3 border-t border-gray-200 flex items-center"
-        onSubmit={handleSendMessage}
-      >
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Escribe un mensaje..."
-          className="flex-1 p-2 mx-2 border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500"
-          disabled={!socket}
-        />
-        <button 
-          type="submit" 
-          className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-          disabled={!socket || !newMessage.trim()}
+      {/* Input para enviar mensajes (fijo en la parte inferior) */}
+      <div className="bg-white border-t border-gray-200 p-2 sm:p-3">
+        <form 
+          className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-200"
+          onSubmit={handleSendMessage}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
-        </button>
-      </form>
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Enviar mensaje..."
+            className="flex-1 bg-transparent p-2 text-sm focus:outline-none"
+            disabled={!socket}
+          />
+          <button 
+            type="submit" 
+            className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-300 transition-colors flex-shrink-0"
+            disabled={!socket || !newMessage.trim()}
+            aria-label="Enviar mensaje"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+            </svg>
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -11,7 +11,7 @@ const FileModal = ({ file, onClose }) => {
 
   const handleDownload = async () => {
     try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/files/download/${file.path}`);
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/project/files/download/${file.path}`);
       if (!response.ok) {
         throw new Error("Error en la descarga");
       }
