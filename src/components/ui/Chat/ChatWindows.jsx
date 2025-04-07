@@ -5,6 +5,7 @@ import jwtUtils from '../../../utilities/jwtUtils';
 import io from 'socket.io-client';
 import SOCKET_URL from '../../../js/socketUrl';
 import Sidebar from '../Sidebar';
+import EmojiPicker from 'emoji-picker-react';
 
 const ChatWindow = () => {
   const { id } = useParams();
@@ -14,8 +15,10 @@ const ChatWindow = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
+  const emojiPickerRef = useRef(null);
   
   const token = jwtUtils.getAccessTokenFromCookie();
   const currentUserRole = jwtUtils.getUserRole(token);
@@ -75,6 +78,20 @@ const ChatWindow = () => {
       console.error('Error al marcar mensajes como leídos:', err);
     }
   };
+
+  // Cerrar el emoji picker cuando se hace clic fuera de él
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Rastrear visibilidad de la página
   useEffect(() => {
@@ -147,6 +164,7 @@ const ChatWindow = () => {
       
       if (response.ok) {
         setNewMessage('');
+        setShowEmojiPicker(false);
       } else {
         const data = await response.json();
         setError(data.message || 'Error al enviar mensaje');
@@ -154,6 +172,14 @@ const ChatWindow = () => {
     } catch (err) {
       setError('Error de conexión al enviar mensaje');
     }
+  };
+
+  const onEmojiClick = (emojiObject) => {
+    setNewMessage(prevMessage => prevMessage + emojiObject.emoji);
+  };
+
+  const toggleEmojiPicker = () => {
+    setShowEmojiPicker(prev => !prev);
   };
 
   const formatTime = (dateString) => {
@@ -201,6 +227,15 @@ const ChatWindow = () => {
     <div className="flex flex-col h-screen bg-[#f5f7f9] md:p-9">
       <Sidebar />
       
+      {/* Add global style to hide scrollbar */}
+      <style>
+        {`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
+      
       {/* Header fijo */}
       <div className="sticky top-0 z-10 bg-white shadow-md">
         {/* Encabezado principal */}
@@ -245,11 +280,15 @@ const ChatWindow = () => {
           </div>
         </div>
       </div>
-
-      {/* Área de mensajes (scrollable) */}
+  
+      {/* Área de mensajes (scrollable con scrollbar oculta) */}
       <div 
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto p-4 bg-[#f5f7f9]"
+        className="flex-1 overflow-y-auto p-4 bg-[#f5f7f9] scrollbar-hide"
+        style={{
+          scrollbarWidth: 'none', /* Para Firefox */
+          msOverflowStyle: 'none', /* Para Internet Explorer y Edge */
+        }}
       >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
@@ -320,13 +359,24 @@ const ChatWindow = () => {
           </>
         )}
       </div>
-
+  
       {/* Input para enviar mensajes (fijo en la parte inferior) */}
       <div className="bg-white border-t border-gray-200 p-2 sm:p-3">
         <form 
           className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-200"
           onSubmit={handleSendMessage}
         >
+          <button 
+            type="button"
+            onClick={toggleEmojiPicker}
+            className="p-2 text-gray-500 hover:text-blue-600 transition-colors flex-shrink-0"
+            aria-label="Seleccionar emoji"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z" clipRule="evenodd" />
+            </svg>
+          </button>
+          
           <input
             type="text"
             value={newMessage}
@@ -335,6 +385,7 @@ const ChatWindow = () => {
             className="flex-1 bg-transparent p-2 text-sm focus:outline-none"
             disabled={!socket}
           />
+          
           <button 
             type="submit" 
             className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-300 transition-colors flex-shrink-0"
@@ -346,6 +397,13 @@ const ChatWindow = () => {
             </svg>
           </button>
         </form>
+        
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <div ref={emojiPickerRef} className="absolute bottom-16 left-2 sm:left-3 z-50">
+            <EmojiPicker onEmojiClick={onEmojiClick} />
+          </div>
+        )}
       </div>
     </div>
   );
