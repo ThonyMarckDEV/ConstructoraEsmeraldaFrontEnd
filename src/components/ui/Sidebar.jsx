@@ -7,7 +7,6 @@ import { logout } from '../../js/logout';
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const [userRole, setUserRole] = useState(null);
   const sidebarRef = useRef(null);
   const hoverAreaRef = useRef(null);
   const isMobile = useRef(window.innerWidth < 768);
@@ -20,14 +19,14 @@ const Sidebar = () => {
     logout();
   };
 
-  useEffect(() => {
-    const refresh_token = jwtUtils.getRefreshTokenFromCookie();
-    if (refresh_token) {
-      const username = jwtUtils.getUsername(refresh_token);
-      const role = jwtUtils.getUserRole(refresh_token);
-      setUserRole(role);
-    }
-  }, []);
+  const refresh_token = jwtUtils.getRefreshTokenFromCookie();
+  const role = jwtUtils.getUserRole(refresh_token);
+  // useEffect(() => {
+  //   const refresh_token = jwtUtils.getRefreshTokenFromCookie();
+  //   if (refresh_token) {
+  //     const username = jwtUtils.getUsername(refresh_token);
+  //   }
+  // }, []);
 
   // Definir los menús primero
   const menuItemsCliente = [
@@ -49,7 +48,7 @@ const Sidebar = () => {
   ];
 
   const getMenuItems = () => {
-    switch(userRole?.toLowerCase()) { // Usar toLowerCase para hacer coincidir sin importar mayúsculas
+    switch(role) { // Usar toLowerCase para hacer coincidir sin importar mayúsculas
       case 'cliente':
         return menuItemsCliente;
       case 'manager':
@@ -62,7 +61,7 @@ const Sidebar = () => {
   };
 
   const getRoleText = () => {
-    switch(userRole?.toUpperCase()) {
+    switch(role) {
       case 'cliente':
         return "Cliente";
       case 'manager':
@@ -74,7 +73,6 @@ const Sidebar = () => {
     }
   };
 
-    const refresh_token = jwtUtils.getRefreshTokenFromCookie();
     const username = jwtUtils.getUsername(refresh_token);
     const menuItems = getMenuItems(); // Definir menuItems aquí, después de todas las dependencias
 

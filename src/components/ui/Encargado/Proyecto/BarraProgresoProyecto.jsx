@@ -150,7 +150,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
             {/* AR and Chat Buttons - only visible on desktop */}
             <div className="hidden md:flex space-x-2">
               <Link 
-                to={`/cliente/proyecto/chat/${proyectoId}`} 
+                to={`/encargado/proyecto/chat/${proyectoId}`} 
                 className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
               >
                 <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -193,7 +193,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
       {/* Mobile version of the AR and Chat buttons - fixed at bottom of screen */}
       <div className="fixed bottom-4 right-4 md:hidden z-10 flex flex-col space-y-2">
         <Link 
-          to={`/cliente/proyecto/chat/${proyectoId}`} 
+          to={`/encargado/proyecto/chat/${proyectoId}`} 
           className="flex items-center justify-center bg-blue-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-blue-600"
         >
           <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
