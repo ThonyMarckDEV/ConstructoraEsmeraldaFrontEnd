@@ -1,14 +1,15 @@
-// export default FileCard;
 import React, { useState } from "react";
 import FileIcon from "./FileIcon";
 import FileMenu from "./FileMenu";
 
 const FileCard = ({ file, onView, onDownload, onDelete }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const fileTypeInfo = FileIcon.getFileIcon(file.fileType);
 
-  const toggleMenu = () => {
+  const toggleMenu = (e) => {
+    e.stopPropagation();
     setIsMenuOpen(!isMenuOpen);
   };
 
@@ -42,58 +43,77 @@ const FileCard = ({ file, onView, onDownload, onDelete }) => {
   };
 
   return (
-    <div className="border rounded-md mb-3">
-      <div className="p-4">
-        <div className="flex items-start sm:items-center justify-between gap-2">
-          <div className="flex items-start sm:items-center gap-3 flex-1 min-w-0">
-            <div className="text-gray-700 pt-1 sm:pt-0">
-              {fileTypeInfo.icon}
+    <div className="col-span-1">
+      <div 
+        className="relative w-full bg-white rounded-lg shadow-sm border border-gray-200 p-3 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="flex items-center">
+          <div className="w-10 h-10 flex items-center justify-center text-2xl mr-3 text-gray-600">
+            {fileTypeInfo.icon || fileTypeInfo.emoji}
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <div className="font-medium text-sm text-gray-800 truncate" title={file.fileName}>
+              {file.fileName}
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0 flex-1">
-              <span className={`${fileTypeInfo.color} mb-1 sm:mb-0 flex-shrink-0`}>{fileTypeInfo.emoji}</span>
-              <span className="font-medium truncate min-w-0">
-                {file.fileName}
-              </span>
+            <div className="flex text-xs text-gray-500 mt-0.5">
+              <span className="uppercase mr-1.5">{file.fileType}</span>
             </div>
           </div>
-          <div className="relative flex-shrink-0 ">
-            <button
-              className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-full hover:bg-gray-100"
+          
+          {(isHovered || isMenuOpen) && (
+            <button 
+              className="p-1 rounded text-gray-500 hover:bg-gray-100 hover:text-gray-700"
               onClick={toggleMenu}
+              aria-label="File options"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <circle cx="12" cy="6" r="1.5" />
+                <circle cx="12" cy="12" r="1.5" />
+                <circle cx="12" cy="18" r="1.5" />
               </svg>
             </button>
-            
-            {/* Submenu */}
-            {isMenuOpen && (
-              <>
-               <FileMenu 
-                onView={handleView} 
-                onDownload={handleDownload} 
-                onDelete={handleDelete}
-                isDeleting={isDeleting}
-                fileType={file.fileType.toLowerCase()}
-                />
-                <div
-                  className="fixed inset-0 z-0"
-                  onClick={closeMenu}
-                ></div>
-              </>
-            )}
+          )}
+        </div>
+        
+        {isMenuOpen && (
+          <FileMenu 
+            onView={handleView}
+            onDownload={handleDownload}
+            onDelete={handleDelete}
+            isDeleting={isDeleting}
+            fileType={file.fileType}
+            onClose={closeMenu}
+          />
+        )}
+        
+        {file.description && (
+          <div className="text-xs text-gray-600 mt-2 pt-2 border-t border-dashed border-gray-200">
+            {file.description}
           </div>
-        </div>
+        )}
       </div>
-      {file.description && (
-        <div className="px-4 pb-4 pt-0">
-          <p className="text-sm">{file.description}</p>
-        </div>
-      )}
     </div>
   );
 };
 
+// Componente contenedor del grid
+export const FileGrid = ({ files, onView, onDownload, onDelete }) => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
+      {files.map((file) => (
+        <FileCard
+          key={file.id}
+          file={file}
+          onView={onView}
+          onDownload={onDownload}
+          onDelete={onDelete}
+        />
+      ))}
+    </div>
+  );
+};
 
 export { FileCard };
-

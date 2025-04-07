@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FileCard } from "./FileCard";
+import { FileCard , FileGrid } from "./FileCard";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
@@ -447,7 +447,7 @@ const Modulo = ({ proyectoId }) => {
                 </div>
               </div>
 
-              {/* Lista de archivos */}
+{/* 
               <div className="space-y-4 pb-10">
                 {allFiles.length > 0 ? (
                   allFiles.map((file) => (
@@ -464,7 +464,25 @@ const Modulo = ({ proyectoId }) => {
                     No hay archivos disponibles para esta fase
                   </div>
                 )}
+              </div> */}
+
+              <div className="container mx-auto">
+                {allFiles.length > 0 ? (
+                 // allFiles.map((file) => (
+                    <FileGrid 
+                      files={allFiles}
+                      onView={handleViewFile}
+                      onDownload={handleDownloadFile}
+                      onDelete={handleDeleteFile}
+                    />
+                 // ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No hay archivos disponibles para esta fase
+                  </div>
+                )}
               </div>
+
             </div>
           );
         })}
