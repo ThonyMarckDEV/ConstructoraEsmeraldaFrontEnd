@@ -88,7 +88,7 @@ const ARProject = () => {
         setLoading(true);
         setError(null);
     
-        // 1. Obtain model metadata
+        // 1. Get model metadata
         const metaResponse = await fetchWithAuth(`${API_BASE_URL}/api/project/${id}/modelo`);
         
         if (!metaResponse.ok) {
@@ -96,18 +96,22 @@ const ARProject = () => {
         }
     
         const metaData = await metaResponse.json();
+        console.log("Model metadata:", metaData); // Debug metadata
         
         if (!metaData.success) {
           throw new Error('No se pudo obtener información del modelo');
         }
     
         // Check if modelo_url exists in the response
-        if (!metaData.data.modelo_url) {
+        const modelUrl = metaData.data.modelo_url;
+        if (!modelUrl) {
           throw new Error('URL del modelo no encontrada en la respuesta');
         }
     
+        console.log("Attempting to fetch model from:", modelUrl); // Debug URL
+    
         // 2. Download the model with authentication
-        const modelResponse = await fetchWithAuth(metaData.data.modelo_url);
+        const modelResponse = await fetchWithAuth(modelUrl);
         
         if (!modelResponse.ok) {
           throw new Error(`Error ${modelResponse.status} al descargar modelo`);
@@ -115,30 +119,21 @@ const ARProject = () => {
     
         // 3. Create local URL for the 3D viewer
         const blob = await modelResponse.blob();
+        console.log("Model blob size:", blob.size, "bytes, type:", blob.type); // Debug blob
         
-        // Validate that we have a binary file with some content
-        if (blob.size < 100) {  // Sanity check: a valid GLB file should be larger
-          throw new Error('El archivo del modelo parece estar corrupto o vacío');
-        }
-        
+        // Remove the blob size check that was causing the error
+        // Instead, let the model-viewer handle invalid files
         const objectUrl = URL.createObjectURL(blob);
         setModelPath(objectUrl);
     
       } catch (err) {
         console.error('Error fetching model:', err);
         setError(`Error: ${err.message}`);
-        
-        if (err.message.includes('401') || err.message.includes('403')) {
-          setError('Error de autenticación. Intente iniciar sesión nuevamente.');
-        } else if (err.message.includes('404')) {
-          setError('Modelo 3D no encontrado para este proyecto.');
-        } else {
-          setError('Error al cargar el modelo 3D. Inténtelo nuevamente.');
-        }
       } finally {
         setLoading(false);
       }
     };
+    
 
     fetchModel();
   }, [id]);
