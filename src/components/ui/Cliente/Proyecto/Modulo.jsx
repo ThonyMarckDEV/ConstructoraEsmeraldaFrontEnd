@@ -90,7 +90,7 @@ const Modulo = ({ proyectoId }) => {
   
   const handleDownloadFile = async (file) => {
     try {
-      const response = await fetchWithAuth(`${API_BASE_URL}/api/client/project/files/download/${file.path}`);
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/project/files/download/${file.path}`);
       if (!response.ok) {
         throw new Error("Error en la descarga");
       }
