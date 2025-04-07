@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FilesSection } from "./FileCard";
+import { FileCard } from "./FileCard";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
@@ -235,18 +235,23 @@ const Modulo = ({ proyectoId }) => {
                 </div>
               </div>
 
-              {/* Lista de archivos - CORREGIDO: No mapear el componente FilesSection */}
-              {allFiles.length > 0 ? (
-                <FilesSection 
-                  allFiles={allFiles}
-                  handleViewFile={handleViewFile}
-                  handleDownloadFile={handleDownloadFile}
-                />
-              ) : (
-                <div className="text-center py-8 text-gray-500 border rounded-lg bg-white shadow">
-                  No hay archivos disponibles para esta fase
-                </div>
-              )}
+            {/* Lista de archivos */}
+            <div className="space-y-4 pb-10">
+                  {allFiles.length > 0 ? (
+                    allFiles.map((file) => (
+                      <FileCard 
+                        key={file.id}
+                        file={file} 
+                        onView={handleViewFile} 
+                        onDownload={handleDownloadFile} 
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      No hay archivos disponibles para esta fase
+                    </div>
+                  )}
+              </div>
             </div>
           );
         })}

@@ -1,30 +1,32 @@
+// export default FileCard;
 import React, { useState } from "react";
 import FileIcon from "./FileIcon";
 import FileMenu from "./FileMenu";
 
-// Individual FileCard component
-const FileCard = ({ file, onView, onDownload }) => {
+const FileCard = ({ file, onView, onDownload, onDelete }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const fileTypeInfo = FileIcon.getFileIcon(file.fileType);
-  
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  
+
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
-  
+
   const handleView = () => {
     onView(file);
     closeMenu();
   };
-  
+
   const handleDownload = () => {
     onDownload(file);
     closeMenu();
   };
-  
+
+
   return (
     <div className="border rounded-md mb-3">
       <div className="p-4">
@@ -40,7 +42,7 @@ const FileCard = ({ file, onView, onDownload }) => {
               </span>
             </div>
           </div>
-          <div className="relative flex-shrink-0">
+          <div className="relative flex-shrink-0 ">
             <button
               className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-full hover:bg-gray-100"
               onClick={toggleMenu}
@@ -53,10 +55,10 @@ const FileCard = ({ file, onView, onDownload }) => {
             {/* Submenu */}
             {isMenuOpen && (
               <>
-                <FileMenu
-                  onView={handleView}
-                  onDownload={handleDownload}
-                  fileType={file.fileType.toLowerCase()}
+               <FileMenu 
+                onView={handleView} 
+                onDownload={handleDownload} 
+                fileType={file.fileType.toLowerCase()}
                 />
                 <div
                   className="fixed inset-0 z-0"
@@ -76,34 +78,6 @@ const FileCard = ({ file, onView, onDownload }) => {
   );
 };
 
-// Componente padre con la lista de archivos
-const FilesSection = ({ allFiles, handleViewFile, handleDownloadFile }) => {
-  return (
-    <div className="rounded-lg bg-white shadow">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-medium">Archivos</h2>
-        <p className="text-sm text-gray-500">{allFiles.length} elementos</p>
-      </div>
-      
-      {/* Lista de archivos con scroll vertical */}
-      <div className="max-h-64 overflow-y-auto p-4">
-        {allFiles.length > 0 ? (
-          allFiles.map((file) => (
-            <FileCard
-              key={file.id}
-              file={file}
-              onView={handleViewFile}
-              onDownload={handleDownloadFile}
-            />
-          ))
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            No hay archivos disponibles para esta fase
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
-export { FileCard, FilesSection };
+export { FileCard };
+

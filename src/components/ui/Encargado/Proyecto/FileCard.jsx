@@ -56,7 +56,7 @@ const FileCard = ({ file, onView, onDownload, onDelete }) => {
               </span>
             </div>
           </div>
-          <div className="relative flex-shrink-0">
+          <div className="relative flex-shrink-0 ">
             <button
               className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-full hover:bg-gray-100"
               onClick={toggleMenu}
@@ -94,32 +94,6 @@ const FileCard = ({ file, onView, onDownload, onDelete }) => {
   );
 };
 
-// Componente padre con la lista de archivos
-const FilesSection = ({ allFiles, handleViewFile, handleDownloadFile  , handleDelete}) => {
-  return (
-    <div className="rounded-lg bg-white shadow">
 
-      {/* Lista de archivos con scroll vertical */}
-      <div className="max-h-64 overflow-y-auto p-4">
-        {allFiles.length > 0 ? (
-          allFiles.map((file) => (
-            <FileCard
-              key={file.id}
-              file={file}
-              onView={handleViewFile}
-              onDownload={handleDownloadFile}
-              onDelete={handleDelete}
-            />
-          ))
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            No hay archivos disponibles para esta fase
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export { FileCard, FilesSection };
+export { FileCard };
 
