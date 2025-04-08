@@ -96,33 +96,46 @@ const ARProject = () => {
         }
     
         const metaData = await metaResponse.json();
-        console.log("Model metadata:", metaData); // Debug metadata
+        console.log("Model metadata:", metaData);
         
         if (!metaData.success) {
           throw new Error('No se pudo obtener información del modelo');
         }
     
-        // Check if modelo_url exists in the response
         const modelUrl = metaData.data.modelo_url;
         if (!modelUrl) {
           throw new Error('URL del modelo no encontrada en la respuesta');
         }
     
-        console.log("Attempting to fetch model from:", modelUrl); // Debug URL
+        console.log("Attempting to fetch model from:", modelUrl);
     
-        // 2. Download the model with authentication
-        const modelResponse = await fetchWithAuth(modelUrl);
+        // 2. Download the model with authentication - include credentials explicitly
+        const modelResponse = await fetchWithAuth(modelUrl, {
+          credentials: 'include',
+          headers: {
+            'Accept': 'model/gltf-binary'
+          }
+        });
         
         if (!modelResponse.ok) {
+          const errorText = await modelResponse.text();
+          console.error("Server error response:", errorText);
           throw new Error(`Error ${modelResponse.status} al descargar modelo`);
         }
     
+        // Check content-type and content-length
+        const contentType = modelResponse.headers.get('content-type');
+        const contentLength = modelResponse.headers.get('content-length');
+        console.log("Response headers:", {contentType, contentLength});
+    
         // 3. Create local URL for the 3D viewer
         const blob = await modelResponse.blob();
-        console.log("Model blob size:", blob.size, "bytes, type:", blob.type); // Debug blob
+        console.log("Model blob size:", blob.size, "bytes, type:", blob.type);
         
-        // Remove the blob size check that was causing the error
-        // Instead, let the model-viewer handle invalid files
+        if (blob.size === 0) {
+          throw new Error('El archivo recibido está vacío');
+        }
+    
         const objectUrl = URL.createObjectURL(blob);
         setModelPath(objectUrl);
     
