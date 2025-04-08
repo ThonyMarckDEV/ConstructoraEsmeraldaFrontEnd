@@ -32,55 +32,6 @@ const ARProject = () => {
   // Fetch del modelo 3D
   useEffect(() => {
 
-    // const fetchModel = async () => {
-    //   if (!id) return;
-      
-    //   try {
-    //     setLoading(true);
-    //     setError(null);
-    
-    //     // 1. Obtener metadatos del modelo
-    //     const metaResponse = await fetchWithAuth(`${API_BASE_URL}/api/project/${id}/modelo`);
-        
-    //     if (!metaResponse.ok) {
-    //       throw new Error(`Error ${metaResponse.status} al obtener modelo`);
-    //     }
-    
-    //     const metaData = await metaResponse.json();
-        
-    //     if (!metaData.success || !metaData.data.modelo_url) {
-    //       throw new Error('Datos de modelo incompletos');
-    //     }
-    
-    //     // 2. Descargar el modelo directamente
-    //     // const modelResponse = await fetch(metaData.data.modelo_url, {
-    //     //   credentials: 'include'
-    //     // });
-
-    //     const modelResponse = await fetch(metaData.data.modelo_url);
-        
-    //     if (!modelResponse.ok) {
-    //       throw new Error(`Error ${modelResponse.status} al descargar modelo`);
-    //     }
-    
-    //     // 3. Crear URL local para el visor 3D
-    //     const blob = await modelResponse.blob();
-    //     const objectUrl = URL.createObjectURL(blob);
-    //     setModelPath(objectUrl);
-    
-    //   } catch (err) {
-    //     setError(`Error: ${err.message}`);
-    //     console.error('Error:', err);
-        
-    //     // Sugerencia para errores CORS
-    //     if (err.message.includes('CORS') || err.message.includes('403')) {
-    //       setError(prev => `${prev} - Verifica la configuración del servidor`);
-    //     }
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-
     const fetchModel = async () => {
       if (!id) return;
       
@@ -111,7 +62,7 @@ const ARProject = () => {
     
         // 2. Download the model with authentication - include credentials explicitly
         const modelResponse = await fetchWithAuth(modelUrl, {
-          credentials: 'include',
+         // credentials: 'include',
           headers: {
             'Accept': 'model/gltf-binary'
           }
