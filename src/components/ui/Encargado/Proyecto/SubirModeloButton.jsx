@@ -10,6 +10,11 @@ const SubirModeloButton = ({ proyectoId, onSuccess = () => {}, onError = () => {
     const file = e.target.files[0];
   
     if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.glb')) {
+      alert('Solo se permiten archivos con extensión .glb');
+      return;
+    }    
   
     // Create FormData
     const formData = new FormData();
