@@ -87,7 +87,7 @@ const SubirModeloButton = ({ proyectoId, onSuccess = () => {}, onError = () => {
       <div className="flex items-center space-x-2">
         <label 
           className={`relative flex items-center justify-center px-4 py-2 rounded-lg border ${
-            loading ? 'bg-gray-100 cursor-wait' : 'bg-blue-600 hover:bg-blue-700'
+            loading ? 'bg-gray-100 cursor-wait' : 'bg-green-600 hover:bg-green-700'
           } text-white font-medium transition-all cursor-pointer`}
         >
           <input

@@ -116,14 +116,14 @@ const ProyectoEncargado = () => {
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                 />
                 {proyecto.fase && (
-                  <div className="absolute top-4 right-4 bg-blue-500 text-white text-xs uppercase tracking-wider py-1 px-2 rounded">
+                  <div className="absolute top-4 right-4 bg-green-600 text-white text-xs uppercase tracking-wider py-1 px-2 rounded">
                     {proyecto.fase}
                   </div>
                 )}
               </div>
               
               <div className="p-5">
-                <h3 className="text-xl font-semibold text-gray-900 font-serif mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-semibold text-gray-900 font-serif mb-2 group-hover:text-green-600 transition-colors">
                   {proyecto.nombre}
                 </h3>
 
@@ -148,7 +148,7 @@ const ProyectoEncargado = () => {
                 {/* Barra de progreso */}
                 <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
                   <div 
-                    className="bg-blue-600 h-2.5 rounded-full" 
+                    className="bg-green-600 h-2.5 rounded-full" 
                     style={{ width: `${progreso}%` }}
                   ></div>
                 </div>

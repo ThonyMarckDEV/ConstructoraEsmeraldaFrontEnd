@@ -125,7 +125,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
   return (
     <div className="w-full bg-white shadow-lg">
       {/* Enhanced Header with background image - full width */}
-      <div className="relative h-40 md:h-48 bg-gradient-to-r from-blue-800 to-blue-600 overflow-hidden w-full">
+      <div className="relative h-40 md:h-48 bg-gradient-to-r from-green-800 to-green-600 overflow-hidden w-full">
         {/* Background Image Placeholder */}
         <div className="absolute inset-0 opacity-20 bg-cover bg-center" 
              style={{backgroundImage: `url('/api/placeholder/1920/300')`}} />
@@ -151,7 +151,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
             <div className="hidden md:flex space-x-2">
               <Link 
                 to={`/encargado/proyecto/chat/${proyectoId}`} 
-                className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
+                className="flex items-center bg-white text-green-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-green-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
               >
                 <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
@@ -161,7 +161,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
               
               <Link 
                 to={`/encargado/proyecto/ar/${proyectoId}`} 
-                className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
+                className="flex items-center bg-white text-green-600 hover:bg-green-50 rounded-lg shadow-lg px-3 py-2 border border-green-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
               >
                 <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -177,7 +177,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
           </div>
           
           <div className="mt-2 md:mt-4 flex items-center">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white text-blue-700 flex items-center justify-center font-bold text-lg md:text-xl border-2 md:border-4 border-blue-300">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white text-green-700 flex items-center justify-center font-bold text-lg md:text-xl border-2 md:border-4 border-green-300">
               {progressPercentage ? Math.round(progressPercentage) : 0}%
             </div>
             <div className="ml-3 md:ml-4">
@@ -194,7 +194,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
       <div className="fixed bottom-4 right-4 md:hidden z-10 flex flex-col space-y-2">
         <Link 
           to={`/encargado/proyecto/chat/${proyectoId}`} 
-          className="flex items-center justify-center bg-blue-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-blue-600"
+          className="flex items-center justify-center bg-green-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-blue-600"
         >
           <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
@@ -203,7 +203,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         
         <Link 
           to={`/encargado/proyecto/ar/${proyectoId}`} 
-          className="flex items-center justify-center bg-blue-600 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-blue-700"
+          className="flex items-center justify-center bg-green-600 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-blue-700"
         >
           <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -237,29 +237,29 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         {/* Main progress bar */}
         <div className="w-full bg-gray-200 rounded-full h-3 md:h-4 mb-4 md:mb-6">
           <div 
-            className="bg-blue-600 h-3 md:h-4 rounded-full transition-all duration-500 ease-out"
+            className="bg-green-600 h-3 md:h-4 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
 
         {/* Current phase highlight box - only shown if we have a phase */}
         {hasFase ? (
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-3 md:p-4 mb-4 md:mb-6">
+          <div className="bg-blue-50 border-l-4 border-green-500 p-3 md:p-4 mb-4 md:mb-6">
             <div className="flex items-center">
               {currentPhase > 0 && (
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold mr-2 md:mr-3 text-sm md:text-base">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold mr-2 md:mr-3 text-sm md:text-base">
                   {currentPhase}
                 </div>
               )}
               <div className="flex-1">
-                <h3 className="text-base md:text-lg font-semibold text-blue-800">Fase actual:</h3>
-                <p className="text-sm md:text-base text-blue-700">
+                <h3 className="text-base md:text-lg font-semibold text-green-800">Fase actual:</h3>
+                <p className="text-sm md:text-base text-green-700">
                   {currentPhaseName || 'No encontrada'}
                 </p>
               </div>
               <button 
                 onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-                className="md:hidden text-blue-600 p-1"
+                className="md:hidden text-green-600 p-1"
               >
                 {isDetailsOpen ? '▲' : '▼'}
               </button>
@@ -294,14 +294,14 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
             {fases.map((fase, index) => (
               <div 
                 key={fase.idFase} 
-                className={`flex flex-col items-center ${hasFase && currentPhase > 0 && index + 1 <= currentPhase ? 'text-blue-600' : 'text-gray-400'}`}
+                className={`flex flex-col items-center ${hasFase && currentPhase > 0 && index + 1 <= currentPhase ? 'text-green-600' : 'text-gray-400'}`}
               >
                 <div 
                   className={`w-8 h-8 rounded-full flex items-center justify-center font-bold z-10 ${
                     hasFase && currentPhase > 0 && index + 1 < currentPhase 
-                      ? 'bg-blue-600 text-white' 
+                      ? 'bg-green-600 text-white' 
                       : hasFase && currentPhase > 0 && index + 1 === currentPhase 
-                        ? 'bg-white border-4 border-blue-600 text-blue-600' 
+                        ? 'bg-white border-4 border-green-600 text-green-600' 
                         : 'bg-white border-2 border-gray-300 text-gray-400'
                   }`}
                 >
@@ -330,14 +330,14 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
                 {fases.map((fase, index) => (
                   <div 
                     key={fase.idFase} 
-                    className={`flex flex-col items-center ${hasFase && currentPhase > 0 && index + 1 <= currentPhase ? 'text-blue-600' : 'text-gray-400'}`}
+                    className={`flex flex-col items-center ${hasFase && currentPhase > 0 && index + 1 <= currentPhase ? 'text-v-600' : 'text-gray-400'}`}
                   >
                     <div 
                       className={`w-8 h-8 rounded-full flex items-center justify-center font-bold z-10 ${
                         hasFase && currentPhase > 0 && index + 1 < currentPhase 
-                          ? 'bg-blue-600 text-white' 
+                          ? 'bg-green-600 text-white' 
                           : hasFase && currentPhase > 0 && index + 1 === currentPhase 
-                            ? 'bg-white border-4 border-blue-600 text-blue-600' 
+                            ? 'bg-white border-4 border-green-600 text-green-600' 
                             : 'bg-white border-2 border-gray-300 text-gray-400'
                       }`}
                     >
