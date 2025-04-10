@@ -16,6 +16,7 @@ const ChatWindow = () => {
   const [error, setError] = useState(null);
   const [socket, setSocket] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isSending, setIsSending] = useState(false); // Estado para controlar si se está enviando un mensaje
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const emojiPickerRef = useRef(null);
@@ -151,9 +152,11 @@ const ChatWindow = () => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || isSending) return;
     
     try {
+      setIsSending(true); // Bloquear el envío mientras se procesa
+      
       const response = await fetchWithAuth(`${SOCKET_URL}/api/chats/${id}/messages`, {
         method: 'POST',
         headers: {
@@ -171,6 +174,8 @@ const ChatWindow = () => {
       }
     } catch (err) {
       setError('Error de conexión al enviar mensaje');
+    } finally {
+      setIsSending(false); // Desbloquear después de procesar
     }
   };
 
@@ -372,6 +377,7 @@ const ChatWindow = () => {
               onClick={toggleEmojiPicker}
               className="p-2 text-gray-500 hover:text-blue-600 transition-colors flex-shrink-0"
               aria-label="Seleccionar emoji"
+              disabled={isSending} // Deshabilitar mientras se envía
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z" clipRule="evenodd" />
@@ -384,18 +390,27 @@ const ChatWindow = () => {
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Enviar mensaje..."
               className="flex-1 bg-transparent p-2 text-sm focus:outline-none"
-              disabled={!socket}
+              disabled={!socket || isSending} // Deshabilitar mientras se envía
             />
             
             <button 
               type="submit" 
-              className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-300 transition-colors flex-shrink-0"
-              disabled={!socket || !newMessage.trim()}
+              className={`p-2 ${isSending ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-full disabled:bg-gray-300 transition-colors flex-shrink-0`}
+              disabled={!socket || !newMessage.trim() || isSending} // Deshabilitar mientras se envía
               aria-label="Enviar mensaje"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-              </svg>
+              {isSending ? (
+                // Icono de carga cuando está enviando
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                // Icono de envío normal
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                </svg>
+              )}
             </button>
           </form>
           
