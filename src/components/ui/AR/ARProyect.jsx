@@ -112,11 +112,11 @@ const ARProject = () => {
     <div className="flex flex-row h-screen bg-gray-50">
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-800 to-blue-600 text-white p-4 shadow-md flex justify-between items-center">
+        <div className="bg-gradient-to-r from-green-800 to-green-600 text-white p-4 shadow-md flex justify-between items-center">
           <h1 className="text-xl font-bold">Visualización AR del Proyecto</h1>
           <Link 
             to={backUrl}
-            className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg shadow px-3 py-2 border border-blue-200 font-medium transition duration-300 ease-in-out"
+            className="flex items-center bg-white text-green-600 hover:bg-blue-50 rounded-lg shadow px-3 py-2 border border-green-200 font-medium transition duration-300 ease-in-out"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
@@ -125,7 +125,7 @@ const ARProject = () => {
           </Link>
         </div>
 
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-3 mx-4 mt-4 text-blue-700">
+        <div className="bg-blue-50 border-l-4 border-green-500 p-3 mx-4 mt-4 text-green-700">
           <p className="font-medium">Instrucciones:</p>
           <ol className="list-decimal pl-5 text-sm mt-1">
             <li>Utiliza los controles para rotar y hacer zoom al modelo</li>
@@ -137,7 +137,7 @@ const ARProject = () => {
         <div className="flex-1 relative overflow-hidden m-4 bg-white rounded-lg shadow-lg">
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">
-              <div className="text-blue-600">
+              <div className="text-green-600">
                 <svg className="animate-spin h-10 w-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -173,7 +173,7 @@ const ARProject = () => {
             >
               <button 
                 slot="ar-button" 
-                className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg shadow-lg border-2 border-white font-medium transition duration-300 ease-in-out flex items-center"
+                className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg shadow-lg border-2 border-white font-medium transition duration-300 ease-in-out flex items-center"
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

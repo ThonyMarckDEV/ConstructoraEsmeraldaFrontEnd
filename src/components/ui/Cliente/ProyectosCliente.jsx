@@ -109,14 +109,14 @@ const ProyectoClientes = () => {
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                 />
                 {proyecto.fase && (
-                  <div className="absolute top-4 right-4 bg-blue-500 text-white text-xs uppercase tracking-wider py-1 px-2 rounded">
+                  <div className="absolute top-4 right-4 bg-green-600 text-white text-xs uppercase tracking-wider py-1 px-2 rounded">
                     {proyecto.fase}
                   </div>
                 )}
               </div>
               
               <div className="p-5">
-                <h3 className="text-xl font-semibold text-gray-900 font-serif mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-semibold text-gray-900 font-serif mb-2 group-hover:text-green-600 transition-colors">
                   {proyecto.nombre}
                 </h3>
 
@@ -141,7 +141,7 @@ const ProyectoClientes = () => {
                 {/* Barra de progreso */}
                 <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
                   <div 
-                    className="bg-blue-600 h-2.5 rounded-full" 
+                    className="bg-green-600 h-2.5 rounded-full" 
                     style={{ width: `${progreso}%` }}
                   ></div>
                 </div>
@@ -157,7 +157,7 @@ const ProyectoClientes = () => {
                 
                 <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                   <span className="text-gray-700 font-medium">Ver detalles</span>
-                  <svg className="w-5 h-5 text-blue-500 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <svg className="w-5 h-5 text-green-500 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
                   </svg>
                 </div>

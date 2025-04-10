@@ -199,7 +199,7 @@ const ChatWindow = () => {
 
   if (loading) return (
     <div className="flex items-center justify-center h-screen bg-gray-50">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"></div>
     </div>
   );
   
@@ -245,10 +245,10 @@ const ChatWindow = () => {
         {/* Header fijo */}
         <div className="sticky top-0 z-10 bg-white shadow-md">
           {/* Encabezado principal */}
-          <div className="bg-blue-600 text-white px-4 py-3">
+          <div className="bg-green-600 text-white px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-medium">
+                <div className="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center text-green-800 font-medium">
                   {contactInitials}
                 </div>
                 <div className="ml-3">
@@ -259,7 +259,7 @@ const ChatWindow = () => {
               
               <Link 
                 to={backUrl}
-                className="flex items-center bg-white text-blue-600 hover:bg-blue-50 rounded-lg px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium transition-colors"
+                className="flex items-center bg-white text-green-600 hover:bg-blue-50 rounded-lg px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
@@ -329,7 +329,7 @@ const ChatWindow = () => {
                       }`}
                     >
                       {!isCurrentUserMessage && (
-                        <div className="h-8 w-8 rounded-full bg-blue-200 flex-shrink-0 flex items-center justify-center text-blue-800 text-xs mr-2">
+                        <div className="h-8 w-8 rounded-full bg-green-200 flex-shrink-0 flex items-center justify-center text-green-800 text-xs mr-2">
                           {contactInitials}
                         </div>
                       )}
@@ -337,21 +337,21 @@ const ChatWindow = () => {
                       <div 
                         className={`flex flex-col max-w-[75%] md:max-w-[60%] p-3 rounded-lg ${
                           isCurrentUserMessage 
-                            ? 'bg-blue-600 text-white rounded-br-none' 
+                            ? 'bg-green-600 text-white rounded-br-none' 
                             : 'bg-white border border-gray-100 shadow-sm rounded-bl-none'
                         }`}
                       >
                         <p className="break-words text-sm">{message.contenido}</p>
                         <div className={`flex items-center mt-1 text-xs ${
-                          isCurrentUserMessage ? 'justify-end text-blue-100' : 'justify-start text-gray-400'
+                          isCurrentUserMessage ? 'justify-end text-green-100' : 'justify-start text-gray-400'
                         }`}>
                           <span>{formatTime(message.created_at)}</span>
                           {isCurrentUserMessage && (
                             <span className="ml-1">
                               {message.leido ? (
-                                <span className="text-blue-100">✓✓</span>
+                                <span className="text-green-100">✓✓</span>
                               ) : (
-                                <span className="text-blue-200 opacity-70">✓</span>
+                                <span className="text-green-200 opacity-70">✓</span>
                               )}
                             </span>
                           )}
@@ -375,7 +375,7 @@ const ChatWindow = () => {
             <button 
               type="button"
               onClick={toggleEmojiPicker}
-              className="p-2 text-gray-500 hover:text-blue-600 transition-colors flex-shrink-0"
+              className="p-2 text-gray-500 hover:text-green-600 transition-colors flex-shrink-0"
               aria-label="Seleccionar emoji"
               disabled={isSending} // Deshabilitar mientras se envía
             >
@@ -395,7 +395,7 @@ const ChatWindow = () => {
             
             <button 
               type="submit" 
-              className={`p-2 ${isSending ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-full disabled:bg-gray-300 transition-colors flex-shrink-0`}
+              className={`p-2 ${isSending ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'} text-white rounded-full disabled:bg-gray-300 transition-colors flex-shrink-0`}
               disabled={!socket || !newMessage.trim() || isSending} // Deshabilitar mientras se envía
               aria-label="Enviar mensaje"
             >
