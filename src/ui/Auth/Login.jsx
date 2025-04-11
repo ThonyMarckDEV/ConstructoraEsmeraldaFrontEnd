@@ -70,7 +70,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen w-full overflow-auto bg-gradient-to-b from-black via-gray-900 to-purple-900 flex items-center justify-center relative py-6">
+    <div className="min-h-screen w-full overflow-auto bg-gradient-to-b from-white to-green-900 flex items-center justify-center relative py-6">
       {loading && <LoadingScreen />}
 
       <LoginForm 
