@@ -1,6 +1,7 @@
 import React from 'react';
 import Sidebar from '../../components/ui/Sidebar';
 import ProyectoClientes from '../../components/ui/Cliente/ProyectosCliente';
+import Header from '../../components/Header';
 
 const Proyectos = () => {
   return (
@@ -9,10 +10,11 @@ const Proyectos = () => {
       
       {/* Contenido principal con margen izquierdo para compensar la sidebar fija */}
       <div className="flex-1 p-9 md:ml-84">
-        <div className="p-4 bg-white rounded-lg shadow mb-6">
-          <h1 className="text-2xl font-bold mb-4 font-serif text-gray-800">Dashboard</h1>
-          <p className="text-gray-600">Bienvenido a tu panel de control de proyectos.</p>
-        </div>
+
+        <Header 
+          title="Proyectos" 
+          description="Bienvenido a tu panel de control de proyectos." 
+        />
         
         {/* Componente de proyectos */}
         <div className="p-4 bg-white rounded-lg shadow">

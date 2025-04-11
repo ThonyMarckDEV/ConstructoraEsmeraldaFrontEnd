@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Sidebar from '../../components/ui/Sidebar';
+import Header from '../../components/Header';
 
 const Cliente = () => {
     
@@ -9,12 +10,12 @@ const Cliente = () => {
       
       {/* Contenido principal con margen izquierdo para compensar la sidebar fija */}
       <div className="flex-1 p-9 md:ml-84">
-        <div className="p-4 bg-white rounded-lg shadow">
-          <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-          <p>Bienvenido a tu panel de control</p>
-          
-          {/* Aquí puedes añadir el resto del contenido */}
-        </div>
+
+        <Header 
+          title="Dashboard" 
+          description="Bienvenido a tu panel de control." 
+        />
+
       </div>
     </div>
   );
