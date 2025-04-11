@@ -1,34 +1,13 @@
 // jwtUtils.jsx
-import API_BASE_URL from '../js/urlHelper';
 import { jwtDecode } from "jwt-decode";
 
-
-
-// Función para obtener si el correo está verificado
-export const getEmailVerified = (refresh_token) => {
-  const decodedToken = jwtDecode(refresh_token);
-  
-  // Imprimir el valor de emailVerified
-  if (decodedToken) {
-   // console.log("emailVerified:", decodedToken.emailVerified);
-  }
-
-  // Devolver el valor tal cual está en el token
-  return decodedToken ? decodedToken.emailVerified : 0; // Devuelve 0 si no está definido
-};
-
-// Otras funciones (como getPerfil, getIdUsuario, etc.)
-export const getPerfil = (refresh_token) => {
-  const decodedToken = jwtDecode(refresh_token);
-  return decodedToken?.profilePictureUrl ? `${decodedToken.profilePictureUrl}` : '';
-};
 
 // Función para obtener el ID del usuario
 //export const getIdUsuario = (token) => decodeToken(token)?.idUsuario ?? null;
 
-export const getClaims = (refresh_token) => {
+export const getClaims = (token) => {
   try {
-    return jwtDecode(refresh_token) ?? null;
+    return jwtDecode(token) ?? null;
   } catch (error) {
     console.error("Error decoding token:", error);
     return null;
@@ -38,24 +17,24 @@ export const getClaims = (refresh_token) => {
 // Función para obtener el username de usuario
 //export const getUsername = (token) => decodeToken(token)?.sub ?? null;
 
-export const getUsername = (refresh_token) => jwtDecode(refresh_token)?.username ?? null;
+export const getUsername = (token) => jwtDecode(token)?.username ?? null;
 
 // Función para obtener el nombre de usuario
-export const getFullName = (refresh_token) => jwtDecode(refresh_token)?.fullName ?? null;
+export const getFullName = (token) => jwtDecode(token)?.fullName ?? null;
 
 // Función para obtener el rol del usuario
-export const getUserRole = (refresh_token) => jwtDecode(refresh_token)?.rol ?? null;
+export const getUserRole = (token) => jwtDecode(token)?.rol ?? null;
 
 // Función para obtener el rol del usuario
-export const getEmail= (refresh_token) => jwtDecode(refresh_token)?.email ?? null;
+export const getEmail= (token) => jwtDecode(token)?.email ?? null;
 
 // Función para obtener el rol del usuario
-export const getUserID = (refresh_token) => jwtDecode(refresh_token)?.sub ?? null;
+export const getUserID = (token) => jwtDecode(token)?.sub ?? null;
 
 
 // // Función para verificar si el token está expirado
-export const isTokenExpired = (refresh_token) => {
-  const decodedToken = jwtDecode(refresh_token);
+export const isTokenExpired = (token) => {
+  const decodedToken = jwtDecode(token);
   if (decodedToken?.exp) {
     const currentTime = Date.now() / 1000; // Tiempo actual en segundos
     return decodedToken.exp < currentTime;
@@ -65,18 +44,18 @@ export const isTokenExpired = (refresh_token) => {
 
 
 // Función para obtener la fecha de expiración
-export const getTokenExpirationDate = (refresh_token) => {
-  const exp = jwtDecode(refresh_token)?.exp;
+export const getTokenExpirationDate = (token) => {
+  const exp = jwtDecode(token)?.exp;
   return exp ? new Date(exp * 1000) : null;
 };
 
 // Función para verificar el token de manera general
-export const verifyToken = (refresh_token) => {
-  if (!refresh_token) {
+export const verifyToken = (token) => {
+  if (!token) {
     return { valid: false, message: "Token no proporcionado" };
   }
   
-  if (isTokenExpired(refresh_token)) {
+  if (isTokenExpired(token)) {
     return { valid: false, message: "Token expirado" };
   }
   
@@ -121,9 +100,9 @@ export const removeTokensFromCookie = () => {
 
 
 // New function to get the created at date
-export const getCreatedAt = (refresh_token) => {
+export const getCreatedAt = (token) => {
   try {
-    const decodedToken = jwtDecode(refresh_token);
+    const decodedToken = jwtDecode(token);
     return decodedToken?.createdAt 
       ? new Date(decodedToken.createdAt).toLocaleDateString('es', { 
           year: 'numeric', 
@@ -137,20 +116,18 @@ export const getCreatedAt = (refresh_token) => {
   }
 };
 
-export const setAccessTokenInCookie = (accessToken) => {
-  if (!accessToken) return;
+export const setAccessTokenInCookie = (token) => {
+  if (!token) return;
 
   // Configurar opciones de cookies según "Recordarme"
   const cookieOptions = '; Path=/; Secure; SameSite=Strict'; // 5 minutos
 
   // Establecer la cookie con el token
-  document.cookie = `access_token=${accessToken}${cookieOptions}`;
+  document.cookie = `access_token=${token}${cookieOptions}`;
 };
 
 
 export default {
-  getEmailVerified,
-  getPerfil,
   getUsername,
   getFullName,
   getUserRole,

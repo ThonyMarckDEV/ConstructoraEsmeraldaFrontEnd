@@ -21,7 +21,7 @@ const ChatWindow = () => {
   const chatContainerRef = useRef(null);
   const emojiPickerRef = useRef(null);
   
-  const token = jwtUtils.getAccessTokenFromCookie();
+  const token = jwtUtils.getRefreshTokenFromCookie();
   const currentUserRole = jwtUtils.getUserRole(token);
   const currentUserId = jwtUtils.getUserID(token);
 
