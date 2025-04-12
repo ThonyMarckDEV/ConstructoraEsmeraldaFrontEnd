@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { fetchWithAuth } from '../../js/authToken';
-import jwtUtils from '../../utilities/jwtUtils';
+import { fetchWithAuth } from '../../../js/authToken';
+import jwtUtils from '../../../utilities/jwtUtils';
 import io from 'socket.io-client';
-import SOCKET_URL from '../../js/socketUrl';
-import Sidebar from '../../components//ui/Sidebar';
+import SOCKET_URL from '../../../js/socketUrl';
+import Sidebar from '../Sidebar';
 import EmojiPicker from 'emoji-picker-react';
 
 const ChatWindow = () => {
@@ -17,14 +17,50 @@ const ChatWindow = () => {
   const [socket, setSocket] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [isActive, setIsActive] = useState(true); // Estado para rastrear si el usuario está viendo activamente el chat
+  const [isActive, setIsActive] = useState(true);
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const emojiPickerRef = useRef(null);
+  const prevMessagesLengthRef = useRef(0);
   
   const token = jwtUtils.getRefreshTokenFromCookie();
   const currentUserRole = jwtUtils.getUserRole(token);
   const currentUserId = jwtUtils.getUserID(token);
+
+
+  // Auto-scroll al final de los mensajes solo cuando sea necesario
+  useEffect(() => {
+    if (shouldScrollToBottom || messages.length > prevMessagesLengthRef.current) {
+      scrollToBottom();
+      // Reset el flag después de scrollear
+      if (shouldScrollToBottom) {
+        setShouldScrollToBottom(false);
+      }
+    }
+    prevMessagesLengthRef.current = messages.length;
+  }, [messages, shouldScrollToBottom]);
+  
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Detectar cuando el usuario está scrolleando manualmente
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!chatContainerRef.current) return;
+      
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      // Si está cerca del fondo (menos de 20px de diferencia), establecer scrollToBottom en true
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 20;
+      setShouldScrollToBottom(isNearBottom);
+    };
+
+    chatContainerRef.current?.addEventListener('scroll', handleScroll);
+    return () => {
+      chatContainerRef.current?.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Obtener y normalizar el rol del usuario
   const getUserRoleNormalized = () => {
@@ -118,7 +154,6 @@ const ChatWindow = () => {
     };
   }, []);
 
-  
   useEffect(() => {
     const handleVisibilityChange = () => {
       const isVisible = document.visibilityState === 'visible';
@@ -166,15 +201,6 @@ const ChatWindow = () => {
     
     newSocket.emit('join_chat', id);
     
-    // newSocket.on('new_message', (message) => {
-    //   setMessages(prev => [...prev, message]);
-      
-    //   // Solo marcar como leído si el usuario está activo en el chat
-    //   if (message.idUsuario !== currentUserId && 
-    //       isActive && document.visibilityState === 'visible') {
-    //     markMessagesAsRead();
-    //   }
-    // });
 
     newSocket.on('new_message', (message) => {
       setMessages(prev => [...prev, message]);
@@ -210,14 +236,6 @@ const ChatWindow = () => {
     };
   }, [chatData, id, currentUserId, isActive]);
 
-  // Auto-scroll al final de los mensajes
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -504,3 +522,4 @@ const ChatWindow = () => {
 };
 
 export default ChatWindow;
+
