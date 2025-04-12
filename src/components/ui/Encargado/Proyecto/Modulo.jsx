@@ -413,7 +413,7 @@ const Modulo = ({ proyectoId }) => {
                         {/* Botón para subir foto */}
                         <div className="relative">
                           <label htmlFor={`upload-photo-${fase.faseId}`} className="cursor-pointer">
-                            <div className="flex items-center justify-center w-12 h-12 bg-v-500 text-white rounded-full hover:bg-green-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-6 active:scale-95 active:rotate-0">
+                            <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full hover:bg-green-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-6 active:scale-95 active:rotate-0">
                               {uploadingPhoto ? (
                                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                               ) : (
