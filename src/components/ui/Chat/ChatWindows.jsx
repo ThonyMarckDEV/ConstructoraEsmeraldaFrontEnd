@@ -28,6 +28,8 @@ const ChatWindow = () => {
   const currentUserRole = jwtUtils.getUserRole(token);
   const currentUserId = jwtUtils.getUserID(token);
 
+  // Add a reference for the input element
+  const inputRef = useRef(null);
 
   // Auto-scroll al final de los mensajes solo cuando sea necesario
   useEffect(() => {
@@ -256,6 +258,13 @@ const ChatWindow = () => {
       if (response.ok) {
         setNewMessage('');
         setShowEmojiPicker(false);
+        // Forzar scroll al fondo al enviar un mensaje
+        setShouldScrollToBottom(true);
+        
+        // Retornar el foco al input después de enviar un mensaje
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 0);
       } else {
         const data = await response.json();
         setError(data.message || 'Error al enviar mensaje');
@@ -482,6 +491,7 @@ const ChatWindow = () => {
             </button>
             
             <input
+              ref={inputRef}
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
