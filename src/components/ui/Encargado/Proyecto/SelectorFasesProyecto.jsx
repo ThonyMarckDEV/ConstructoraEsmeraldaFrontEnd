@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from '../../../../js/urlHelper';
+import { toast } from 'react-toastify';
 
 const SelectorFasesProyecto = ({ proyectoId, fase, fases, onFaseChange }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -35,12 +36,16 @@ const SelectorFasesProyecto = ({ proyectoId, fase, fases, onFaseChange }) => {
       
       if (!response.ok) {
         throw new Error(data.message || 'Error al actualizar la fase del proyecto');
+        toast.error(data.message || 'Error al actualizar la fase del proyecto');
       }
-      
       window.location.reload(); // Recarga la página para reflejar el cambio de fase
+      // setTimeout(() => {
+      //   toast.success('Fase del proyecto actualizada correctamente');
+      // }, 1500);
     } catch (error) {
       console.error("Error updating project phase:", error);
       setError(error.message);
+      toast.error(error.message || 'Error al actualizar la fase del proyecto');
     } finally {
       setIsLoading(false);
       setIsOpen(false);

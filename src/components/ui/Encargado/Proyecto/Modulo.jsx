@@ -17,6 +17,7 @@ import installationsImg from '../../../../img/Fases/installations.jpg';
 import finishesImg from '../../../../img/Fases/finishes.jpg';
 import inspectionImg from '../../../../img/Fases/inspection.jpg';
 import deliveryImg from '../../../../img/Fases/delivery.jpg';
+import { toast } from "react-toastify";
 
 const Modulo = ({ proyectoId }) => {
   const [projectData, setProjectData] = useState(null);
@@ -85,13 +86,13 @@ const Modulo = ({ proyectoId }) => {
     const allowedExtensions = ['pdf', 'xls', 'xlsx', 'doc', 'docx', 'dwg'];
     
     if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
-      alert('Tipo de archivo no permitido. Se permiten: PDF, XLS, DOCX, DWG');
+      toast.error('Tipo de archivo no permitido. Se permiten: PDF, XLS, DOCX, DWG');
       return;
     }
     
     // Verificar tamaño (20MB máximo)
     if (file.size > 20 * 1024 * 1024) {
-      alert('El archivo es demasiado grande. El tamaño máximo es 20MB');
+      toast.error('El archivo es demasiado grande. El tamaño máximo es 20MB');
       return;
     }
     
@@ -112,6 +113,7 @@ const Modulo = ({ proyectoId }) => {
       
       if (!response.ok) {
         throw new Error('Error al subir el archivo');
+        toast.error('Error al subir el archivo');
       }
       
       // Recargar los datos del proyecto para mostrar el nuevo archivo
@@ -120,10 +122,10 @@ const Modulo = ({ proyectoId }) => {
       const data = await projectResponse.json();
       setProjectData(data);
       
-      alert('Archivo subido correctamente');
+      toast.success('Archivo subido correctamente');
     } catch (err) {
       console.error("Error uploading file:", err);
-      alert('Error al subir el archivo: ' + err.message);
+      toast.error('Error al subir el archivo: ' + err.message);
     } finally {
       setUploadingFile(false);
       // Resetear el input de archivo
@@ -141,13 +143,13 @@ const Modulo = ({ proyectoId }) => {
     const allowedExtensions = ['jpg', 'jpeg', 'png', 'avif', 'webp'];
     
     if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
-      alert('Tipo de imagen no permitido. Se permiten: JPG, JPEG, PNG, AVIF, WEBP');
+      toast.error('Tipo de imagen no permitido. Se permiten: JPG, JPEG, PNG, AVIF, WEBP');
       return;
     }
     
     // Verificar tamaño (5MB máximo para imágenes)
     if (file.size > 5 * 1024 * 1024) {
-      alert('La imagen es demasiado grande. El tamaño máximo es 5MB');
+      toast.error('La imagen es demasiado grande. El tamaño máximo es 5MB');
       return;
     }
     
@@ -168,6 +170,7 @@ const Modulo = ({ proyectoId }) => {
       
       if (!response.ok) {
         throw new Error('Error al subir la imagen');
+        toast.error('Error al subir la imagen');
       }
       
       // Recargar los datos del proyecto para mostrar la nueva foto
@@ -176,10 +179,10 @@ const Modulo = ({ proyectoId }) => {
       const data = await projectResponse.json();
       setProjectData(data);
       
-      alert('Imagen subida correctamente');
+      toast.success('Imagen subida correctamente');
     } catch (err) {
       console.error("Error uploading photo:", err);
-      alert('Error al subir la imagen: ' + err.message);
+      toast.error('Error al subir la imagen: ' + err.message);
     } finally {
       setUploadingPhoto(false);
       // Resetear el input de archivo

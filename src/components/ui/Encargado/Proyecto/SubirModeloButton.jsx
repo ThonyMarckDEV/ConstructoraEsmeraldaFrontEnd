@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import API_BASE_URL from '../../../../js/urlHelper';
 import { fetchWithAuth } from '../../../../js/authToken';
+import { toast } from 'react-toastify';
 
 const SubirModeloButton = ({ proyectoId, onSuccess = () => {}, onError = () => {} }) => {
   const [loading, setLoading] = useState(false);
@@ -50,8 +51,10 @@ const SubirModeloButton = ({ proyectoId, onSuccess = () => {}, onError = () => {
         try {
           const errorData = JSON.parse(responseText);
           throw new Error(errorData.message || 'Error al subir el modelo');
+          toast.error(errorData.message || 'Error al subir el modelo');
         } catch (e) {
           throw new Error('Error al subir el modelo');
+          toast.error('Error al subir el modelo');
         }
       }
   
@@ -65,7 +68,7 @@ const SubirModeloButton = ({ proyectoId, onSuccess = () => {}, onError = () => {
   
       setLoading(false);
       onSuccess(data);
-      alert('Modelo 3D subido correctamente');
+      toast.success('Modelo 3D subido correctamente');
       e.target.value = '';
     } catch (error) {
       console.error("Error al subir el modelo:", error);
