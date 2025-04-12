@@ -1,6 +1,8 @@
 //import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import './index.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 //Contextos
 
@@ -73,6 +75,8 @@ function App() {
   return (
     <Router>
       <AppContent />
+      {/* ToastContainer global */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );
 }

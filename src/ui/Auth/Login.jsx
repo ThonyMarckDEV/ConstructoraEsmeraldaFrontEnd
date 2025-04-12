@@ -19,7 +19,11 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/login`, { username, password }, {
+      const response = await axios.post(`${API_BASE_URL}/api/login`, 
+        { username, 
+          password,
+          remember_me: rememberMe  // Si pide recordar
+        }, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -43,10 +47,12 @@ const Login = () => {
       const rol = jwtUtils.getUserRole(access_token);
 
       if (rol === 'cliente') {
+        toast.success(`Login exitoso!!`);
         setTimeout(() => {
           window.location.href = '/cliente';
         }, 1500);
       } else if (rol === 'manager') {
+        toast.success(`Login exitoso!!`);
         setTimeout(() => {
           window.location.href = '/encargado';
         }, 1500);
@@ -81,19 +87,6 @@ const Login = () => {
         handleLogin={handleLogin}
         rememberMe={rememberMe}
         setRememberMe={setRememberMe}
-      />
-
-      <ToastContainer 
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
       />
     </div>
   );
