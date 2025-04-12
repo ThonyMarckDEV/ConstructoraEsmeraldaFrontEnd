@@ -79,7 +79,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
   const progressPercentage = hasFase && fases.length > 0 && currentPhase > 0 ? (currentPhase / fases.length) * 100 : 0;
 
   const handleUploadSuccess = (response) => {
-    console.log('Modelo subido exitosamente:', response);
+    // console.log('Modelo subido exitosamente:', response);
     // Podrías recargar datos del proyecto aquí o mostrar un mensaje de éxito
   };
   

@@ -47,7 +47,7 @@ const ARProject = () => {
         }
     
         const metaData = await metaResponse.json();
-        console.log("Model metadata:", metaData);
+        // console.log("Model metadata:", metaData);
         
         if (!metaData.success) {
           throw new Error('No se pudo obtener información del modelo');
@@ -58,7 +58,7 @@ const ARProject = () => {
           throw new Error('URL del modelo no encontrada en la respuesta');
         }
     
-        console.log("Attempting to fetch model from:", modelUrl);
+        // console.log("Attempting to fetch model from:", modelUrl);
     
         // 2. Download the model with authentication - include credentials explicitly
         const modelResponse = await fetchWithAuth(modelUrl, {
@@ -77,11 +77,11 @@ const ARProject = () => {
         // Check content-type and content-length
         const contentType = modelResponse.headers.get('content-type');
         const contentLength = modelResponse.headers.get('content-length');
-        console.log("Response headers:", {contentType, contentLength});
+        // console.log("Response headers:", {contentType, contentLength});
     
         // 3. Create local URL for the 3D viewer
         const blob = await modelResponse.blob();
-        console.log("Model blob size:", blob.size, "bytes, type:", blob.type);
+        // console.log("Model blob size:", blob.size, "bytes, type:", blob.type);
         
         if (blob.size === 0) {
           throw new Error('El archivo recibido está vacío');
