@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Calendar, Building, Users, MessageCircle, Star, Shield, Compass, Phone, Mail, MapPin, CheckCircle, ChevronRight, Menu, X } from 'lucide-react';
+import video3dhouse from '../img/3dmodernhouse.mp4';
 
 const Landing = () => {
   const [isVisible, setIsVisible] = useState({
@@ -87,12 +88,13 @@ const Landing = () => {
         
         {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden">
-          <button 
+          <a 
+            href="/login"
             className="bg-black hover:bg-gray-900 px-3 py-1 rounded-md transition-colors mr-2"
             aria-label="Área de Clientes"
           >
-            Clientes
-          </button>
+            Intranet
+          </a>
           <button 
             onClick={toggleMobileMenu} 
             className="text-white p-2" 
@@ -107,7 +109,7 @@ const Landing = () => {
           href="/login"
           className="hidden md:block bg-black hover:bg-gray-900 px-4 py-2 rounded-md transition-colors text-white text-center"
         >
-          Área de Clientes
+          Intranet
         </a>
 
       </nav>
@@ -298,61 +300,72 @@ const Landing = () => {
               </div>
             </div>
             
-            <div className="w-full md:w-1/2">
-              <div className="bg-white rounded-lg shadow-xl p-4 md:p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-lg md:text-xl">Edificio Moderno</h3>
-                  <span className="bg-green-100 text-green-800 py-1 px-2 rounded-full text-xs md:text-sm font-medium">En Progreso</span>
+
+          <div className="w-full md:w-1/2">
+            <div className="bg-white rounded-lg shadow-xl p-4 md:p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-lg md:text-xl">Edificio Moderno</h3>
+                <span className="bg-green-100 text-green-800 py-1 px-2 rounded-full text-xs md:text-sm font-medium">En Progreso</span>
+              </div>
+              
+              <div className="mb-4">
+                <div className="relative w-full rounded-lg overflow-hidden mb-2">
+                  <video 
+                    autoPlay 
+                    loop 
+                    muted 
+                    className="w-full rounded-lg object-cover"
+                    style={{ height: '250px' }}
+                  >
+                    <source src={video3dhouse} type="video/mp4" />
+                    Su navegador no soporta videos HTML5.
+                  </video>
                 </div>
-                
-                <div className="mb-4">
-                  <img 
-                    src="/api/placeholder/500/300" 
-                    alt="Vista 3D del proyecto" 
-                    className="w-full rounded-lg mb-2"
+              </div>
+              
+              <div className="mb-4">
+                <h4 className="font-bold text-sm md:text-base mb-2">Fase Actual: Preparación del Terreno</h4>
+                <div className="flex mb-4 overflow-x-auto pb-2 space-x-2">
+                  {projectPhases.map((phase, index) => (
+                    <div
+                      key={index}
+                      className={`px-2 py-1 rounded-full text-xs whitespace-nowrap ${
+                        index <= 1 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {phase}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="border-t border-gray-200 pt-4 mb-4">
+                <h4 className="font-bold text-sm md:text-base mb-3">Chat con Encargado del Proyecto</h4>
+                <div className="bg-gray-50 p-2 md:p-3 rounded-lg mb-2">
+                  <p className="text-xs md:text-sm mb-1 font-semibold text-green-800">Juan Pérez - Encargado</p>
+                  <p className="text-xs md:text-sm">Buen día, esta semana completamos la nivelación del terreno y comenzaremos con las excavaciones.</p>
+                </div>
+                <div className="bg-green-50 p-2 md:p-3 rounded-lg mb-3 ml-4 md:ml-8">
+                  <p className="text-xs md:text-sm mb-1 font-semibold text-green-800">Cliente</p>
+                  <p className="text-xs md:text-sm">Excelente, ¿cuándo podremos ver los avances?</p>
+                </div>
+                <div className="flex">
+                  <input
+                    type="text"
+                    placeholder="Escribe un mensaje..."
+                    className="flex-1 border border-gray-300 rounded-l-lg px-2 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-600"
                   />
-                  <p className="text-center text-xs md:text-sm text-gray-500">Vista 3D - Toca para ver en Realidad Aumentada</p>
-                </div>
-                
-                <div className="mb-4">
-                  <h4 className="font-bold text-sm md:text-base mb-2">Fase Actual: Preparación del Terreno</h4>
-                  <div className="flex mb-4 overflow-x-auto pb-2 space-x-2">
-                    {projectPhases.map((phase, index) => (
-                      <div 
-                        key={index} 
-                        className={`px-2 py-1 rounded-full text-xs whitespace-nowrap ${
-                          index <= 1 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'
-                        }`}
-                      >
-                        {phase}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="border-t border-gray-200 pt-4 mb-4">
-                  <h4 className="font-bold text-sm md:text-base mb-3">Chat con Encargado del Proyecto</h4>
-                  <div className="bg-gray-50 p-2 md:p-3 rounded-lg mb-2">
-                    <p className="text-xs md:text-sm mb-1 font-semibold text-green-800">Juan Pérez - Encargado</p>
-                    <p className="text-xs md:text-sm">Buen día, esta semana completamos la nivelación del terreno y comenzaremos con las excavaciones.</p>
-                  </div>
-                  <div className="bg-green-50 p-2 md:p-3 rounded-lg mb-3 ml-4 md:ml-8">
-                    <p className="text-xs md:text-sm mb-1 font-semibold text-green-800">Cliente</p>
-                    <p className="text-xs md:text-sm">Excelente, ¿cuándo podremos ver los avances?</p>
-                  </div>
-                  <div className="flex">
-                    <input 
-                      type="text" 
-                      placeholder="Escribe un mensaje..." 
-                      className="flex-1 border border-gray-300 rounded-l-lg px-2 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-600"
-                    />
-                    <button className="bg-green-600 text-white px-3 py-2 rounded-r-lg hover:bg-green-700">
-                      <MessageCircle size={18} />
-                    </button>
-                  </div>
+                  <button className="bg-green-600 text-white px-3 py-2 rounded-r-lg hover:bg-green-700">
+                    <MessageCircle size={18} />
+                  </button>
                 </div>
               </div>
             </div>
+          </div>
+
+
+
+            
           </div>
         </div>
       </section>
