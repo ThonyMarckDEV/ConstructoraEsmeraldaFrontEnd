@@ -37,8 +37,8 @@ const Login = () => {
       // Configurar opciones de cookies según "Recordarme"
       const accessTokenExpiration = '; path=/; Secure; SameSite=Strict'; // Sesión (5 min se maneja en backend)
       const refreshTokenExpiration = rememberMe
-        ? `; expires=${new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toUTCString()}; path=/; Secure; SameSite=Strict`
-        : '; path=/; Secure; SameSite=Strict'; //15 dias igual que el refresh
+        ? `; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}; path=/; Secure; SameSite=Strict`
+        : '; path=/; Secure; SameSite=Strict'; //7 dias igual que el refresh
 
       // Establecer cookies
       document.cookie = `access_token=${access_token}${accessTokenExpiration}`;
