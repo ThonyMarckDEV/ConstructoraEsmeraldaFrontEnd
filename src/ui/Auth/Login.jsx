@@ -7,12 +7,14 @@ import LoginForm from '../../components/Auth/Login/LoginForm';
 import ErrorsUtility from '../../utilities/ErrorsUtility';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -49,12 +51,12 @@ const Login = () => {
       if (rol === 'cliente') {
         toast.success(`Login exitoso!!`);
         setTimeout(() => {
-          window.location.href = '/cliente';
+          navigate('/cliente');
         }, 1500);
       } else if (rol === 'manager') {
         toast.success(`Login exitoso!!`);
         setTimeout(() => {
-          window.location.href = '/encargado';
+          navigate('/encargado');
         }, 1500);
       }else{
         console.error('Rol no reconocido:', rol);
