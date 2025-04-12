@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { fetchWithAuth } from '../../../js/authToken';
-import jwtUtils from '../../../utilities/jwtUtils';
+import { fetchWithAuth } from '../../js/authToken';
+import jwtUtils from '../../utilities/jwtUtils';
 import io from 'socket.io-client';
-import SOCKET_URL from '../../../js/socketUrl';
-import Sidebar from '../Sidebar';
+import SOCKET_URL from '../../js/socketUrl';
+import Sidebar from '../../components//ui/Sidebar';
 import EmojiPicker from 'emoji-picker-react';
 
 const ChatWindow = () => {
@@ -16,7 +16,8 @@ const ChatWindow = () => {
   const [error, setError] = useState(null);
   const [socket, setSocket] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isSending, setIsSending] = useState(false); // Estado para controlar si se está enviando un mensaje
+  const [isSending, setIsSending] = useState(false);
+  const [isActive, setIsActive] = useState(true); // Estado para rastrear si el usuario está viendo activamente el chat
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const emojiPickerRef = useRef(null);
@@ -48,7 +49,11 @@ const ChatWindow = () => {
         if (response.ok) {
           setChatData(data);
           setMessages(data.messages);
-          markMessagesAsRead();
+          
+          // Sólo marcar mensajes como leídos si el usuario está activo
+          if (isActive && document.visibilityState === 'visible') {
+            markMessagesAsRead();
+          }
         } else {
           setError(data.message || 'Error al cargar el chat');
         }
@@ -60,12 +65,26 @@ const ChatWindow = () => {
     };
     
     fetchChatData();
-  }, [id]);
+  }, [id, isActive]);
+
+
 
   const markMessagesAsRead = async () => {
+    // Solo marcar como leídos si el usuario está visualizando el chat activamente
+    if (!isActive || document.visibilityState !== 'visible') {
+      return;
+    }
+    
     try {
       const response = await fetchWithAuth(`${SOCKET_URL}/api/chats/${id}/mark-as-read`, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          isActive: true,
+          inView: document.visibilityState === 'visible'
+        }),
       });
       
       if (response.ok) {
@@ -74,6 +93,11 @@ const ChatWindow = () => {
             msg.idUsuario !== currentUserId ? { ...msg, leido: true } : msg
           )
         );
+        
+        // Notificar al remitente que sus mensajes han sido leídos
+        if (socket) {
+          socket.emit('messages_read', id);
+        }
       }
     } catch (err) {
       console.error('Error al marcar mensajes como leídos:', err);
@@ -94,22 +118,38 @@ const ChatWindow = () => {
     };
   }, []);
 
-  // Rastrear visibilidad de la página
+  
   useEffect(() => {
-    let isVisible = true;
-    
     const handleVisibilityChange = () => {
-      isVisible = document.visibilityState === 'visible';
+      const isVisible = document.visibilityState === 'visible';
+      setIsActive(isVisible);
       
       if (isVisible && chatData) {
         markMessagesAsRead();
       }
     };
     
+    // Definir eventos para rastrear si el usuario está activo
+    const handleActivity = () => {
+      setIsActive(true);
+      if (document.visibilityState === 'visible' && chatData) {
+        markMessagesAsRead();
+      }
+    };
+    
+    // Registrar eventos para detectar actividad del usuario
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleActivity);
+    chatContainerRef.current?.addEventListener('scroll', handleActivity);
+    document.addEventListener('click', handleActivity);
+    document.addEventListener('keydown', handleActivity);
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleActivity);
+      chatContainerRef.current?.removeEventListener('scroll', handleActivity);
+      document.removeEventListener('click', handleActivity);
+      document.removeEventListener('keydown', handleActivity);
     };
   }, [chatData, id]);
 
@@ -126,19 +166,49 @@ const ChatWindow = () => {
     
     newSocket.emit('join_chat', id);
     
+    // newSocket.on('new_message', (message) => {
+    //   setMessages(prev => [...prev, message]);
+      
+    //   // Solo marcar como leído si el usuario está activo en el chat
+    //   if (message.idUsuario !== currentUserId && 
+    //       isActive && document.visibilityState === 'visible') {
+    //     markMessagesAsRead();
+    //   }
+    // });
+
     newSocket.on('new_message', (message) => {
       setMessages(prev => [...prev, message]);
       
-      if (message.idUsuario !== currentUserId && document.visibilityState === 'visible') {
+      // Solo marcar como leído si el usuario está activo en el chat
+      if (message.idUsuario !== currentUserId && 
+          isActive && document.visibilityState === 'visible') {
         markMessagesAsRead();
       }
     });
     
+    // Manejar notificación de mensajes leídos
+    newSocket.on('messages_read_status', (data) => {
+      if (data.chatId === id) {
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.idUsuario === currentUserId ? { ...msg, leido: true } : msg
+          )
+        );
+      }
+    });
+    
+    // Informar al servidor cuando el usuario está activo
+    if (isActive && document.visibilityState === 'visible') {
+      newSocket.emit('user_active', { chatId: id });
+    }
+    
     return () => {
+      newSocket.emit('leave_chat', id);
       newSocket.off('new_message');
+      newSocket.off('messages_read_status');
       newSocket.disconnect();
     };
-  }, [chatData, id, currentUserId]);
+  }, [chatData, id, currentUserId, isActive]);
 
   // Auto-scroll al final de los mensajes
   useEffect(() => {
@@ -155,7 +225,7 @@ const ChatWindow = () => {
     if (!newMessage.trim() || isSending) return;
     
     try {
-      setIsSending(true); // Bloquear el envío mientras se procesa
+      setIsSending(true);
       
       const response = await fetchWithAuth(`${SOCKET_URL}/api/chats/${id}/messages`, {
         method: 'POST',
@@ -175,7 +245,7 @@ const ChatWindow = () => {
     } catch (err) {
       setError('Error de conexión al enviar mensaje');
     } finally {
-      setIsSending(false); // Desbloquear después de procesar
+      setIsSending(false);
     }
   };
 
@@ -346,6 +416,15 @@ const ChatWindow = () => {
                           isCurrentUserMessage ? 'justify-end text-green-100' : 'justify-start text-gray-400'
                         }`}>
                           <span>{formatTime(message.created_at)}</span>
+                          {/* {isCurrentUserMessage && (
+                            <span className="ml-1">
+                              {message.leido ? (
+                                <span className="text-green-100">✓✓</span>
+                              ) : (
+                                <span className="text-green-200 opacity-70">✓</span>
+                              )}
+                            </span>
+                          )} */}
                           {isCurrentUserMessage && (
                             <span className="ml-1">
                               {message.leido ? (
@@ -377,7 +456,7 @@ const ChatWindow = () => {
               onClick={toggleEmojiPicker}
               className="p-2 text-gray-500 hover:text-green-600 transition-colors flex-shrink-0"
               aria-label="Seleccionar emoji"
-              disabled={isSending} // Deshabilitar mientras se envía
+              disabled={isSending}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z" clipRule="evenodd" />
@@ -390,23 +469,21 @@ const ChatWindow = () => {
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Enviar mensaje..."
               className="flex-1 bg-transparent p-2 text-sm focus:outline-none"
-              disabled={!socket || isSending} // Deshabilitar mientras se envía
+              disabled={!socket || isSending}
             />
             
             <button 
               type="submit" 
               className={`p-2 ${isSending ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'} text-white rounded-full disabled:bg-gray-300 transition-colors flex-shrink-0`}
-              disabled={!socket || !newMessage.trim() || isSending} // Deshabilitar mientras se envía
+              disabled={!socket || !newMessage.trim() || isSending}
               aria-label="Enviar mensaje"
             >
               {isSending ? (
-                // Icono de carga cuando está enviando
                 <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               ) : (
-                // Icono de envío normal
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                 </svg>
