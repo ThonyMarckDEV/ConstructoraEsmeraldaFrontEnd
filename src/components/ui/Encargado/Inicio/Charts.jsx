@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, 
 import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from '../../../../js/urlHelper';
 import jwtUtils from '../../../../utilities/jwtUtils';
+import LoadingSkeleton from './LoadingSkeleton';
 
 const Charts = () => {
   const [projectData, setProjectData] = useState([]);
@@ -31,7 +32,7 @@ const Charts = () => {
         
         // Parse the response as JSON
         const jsonData = await response.json();
-        console.log("API Response:", jsonData);
+        // console.log("API Response:", jsonData);
         
         // Check if response is successful and contains data
         if (jsonData && jsonData.success === true && jsonData.data) {
@@ -60,7 +61,7 @@ const Charts = () => {
     fetchProjectData();
   }, []);
 
-  if (loading) return <div className="text-center p-10">Loading analytics...</div>;
+  if (loading) return <LoadingSkeleton />;
   if (error) return <div className="text-center p-10 text-red-500">{error}</div>;
   
   // Transform phase data for chart
@@ -90,9 +91,9 @@ const Charts = () => {
     <div className="p-4">
 
       <div className="mb-6 bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold mb-2">Summary</h3>
+        <h3 className="text-lg font-semibold mb-2">Resumen</h3>
         <div className="text-xl font-bold">
-          Total Projects: {projectStats.total_proyectos}
+          Total Proyectos Encargados: {projectStats.total_proyectos}
         </div>
       </div>
       
