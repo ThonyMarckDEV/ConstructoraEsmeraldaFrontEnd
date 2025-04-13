@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import BarraProgresoProyecto from '../../components/ui/Encargado/Proyecto/BarraProgresoProyecto';
-import Modulo from '../../components/ui/Encargado/Proyecto/Modulo';
-import Sidebar from '../../components/ui/Sidebar';
+import BarraProgresoProyecto from '../../../components/ui/Encargado/Proyecto/BarraProgresoProyecto';
+import Modulo from '../../../components/ui/Encargado/Proyecto/Modulo';
+import Sidebar from '../../../components/ui/Sidebar';
 
 // Componente Proyecto principal
 const Proyecto = () => {

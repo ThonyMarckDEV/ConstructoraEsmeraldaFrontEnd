@@ -1,7 +1,7 @@
 import React from 'react';
-import Sidebar from '../../components/ui/Sidebar';
-import ProyectoClientes from '../../components/ui/Cliente/ProyectosCliente';
-import Header from '../../components/Header';
+import Sidebar from '../../../components/ui/Sidebar';
+import ProyectosEncargado from '../../../components/ui/Encargado/ProyectosEncargado';
+import Header from '../../../components/Header';
 
 const Proyectos = () => {
   return (
@@ -13,12 +13,12 @@ const Proyectos = () => {
 
         <Header 
           title="Proyectos" 
-          description="Bienvenido a tu panel de control de proyectos." 
+          description="Bienvenido a tu panel de control de proyectos encargados." 
         />
         
         {/* Componente de proyectos */}
         <div className="p-4 bg-white rounded-lg shadow">
-          <ProyectoClientes />
+          <ProyectosEncargado />
         </div>
       </div>
     </div>

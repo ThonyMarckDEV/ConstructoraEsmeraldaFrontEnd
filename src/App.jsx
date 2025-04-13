@@ -18,17 +18,17 @@ import ErrorPage401 from './components/ErrorPage401';
 import Login from './ui/Auth/Login';
 
 // UIS Cliente
-import Cliente from './ui/Cliente/Cliente';
-import ProyectosCliente from './ui/Cliente/Proyectos';
-import ProyectoCliente from './ui/Cliente/Proyecto';
+import Cliente from './ui/Cliente/Inicio/Cliente';
+import ProyectosCliente from './ui/Cliente/Proyecto/Proyectos';
+import ProyectoCliente from './ui/Cliente/Proyecto/Proyecto';
 
 //UI Chat
 import ChatWindows from './components/ui/Chat/ChatWindows'; 
 
 // UIS Encargado
-import Encargado from './ui/Encargado/Encargado';
-import ProyectosEncargado from './ui/Encargado/Proyectos';
-import ProyectoEncargado from './ui/Encargado/Proyecto';
+import Encargado from './ui/Encargado/Inicio/Encargado';
+import ProyectosEncargado from './ui/Encargado/Proyecto/Proyectos';
+import ProyectoEncargado from './ui/Encargado/Proyecto/Proyecto';
 
 
 // Utilities

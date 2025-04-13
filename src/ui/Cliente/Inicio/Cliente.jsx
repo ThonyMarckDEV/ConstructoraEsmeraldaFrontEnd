@@ -1,6 +1,6 @@
 import React from 'react';
-import Sidebar from '../../components/ui/Sidebar';
-import Header from '../../components/Header';
+import Sidebar from '../../../components/ui/Sidebar';
+import Header from '../../../components/Header';
 
 const Cliente = () => {
     
