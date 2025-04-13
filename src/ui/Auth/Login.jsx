@@ -35,16 +35,22 @@ const Login = () => {
 
       const access_token = result.access_token;
       const refresh_token = result.refresh_token;
+      const refresh_token_id = result.idRefreshToken;
 
       // Configurar opciones de cookies según "Recordarme"
       const accessTokenExpiration = '; path=/; Secure; SameSite=Strict'; // Sesión (5 min se maneja en backend)
       const refreshTokenExpiration = rememberMe
         ? `; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}; path=/; Secure; SameSite=Strict`
         : '; path=/; Secure; SameSite=Strict'; //7 dias igual que el refresh
+        
+      const refreshTokenIDExpiration = rememberMe
+        ? `; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}; path=/; Secure; SameSite=Strict`
+        : '; path=/; Secure; SameSite=Strict'; //7 dias igual que el refresh
 
       // Establecer cookies
       document.cookie = `access_token=${access_token}${accessTokenExpiration}`;
       document.cookie = `refresh_token=${refresh_token}${refreshTokenExpiration}`;
+      document.cookie = `refresh_token_id=${refresh_token_id}${refreshTokenIDExpiration}`;
 
       const rol = jwtUtils.getUserRole(access_token);
 
