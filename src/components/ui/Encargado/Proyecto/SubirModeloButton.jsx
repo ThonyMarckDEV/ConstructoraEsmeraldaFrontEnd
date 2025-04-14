@@ -23,13 +23,13 @@ const SubirModeloButton = ({ proyectoId, onSuccess = () => {}, onError = () => {
     // Add file with explicit name and filename parameters
     formData.append('modelo', file, file.name);
     formData.append('idProyecto', proyectoId);
-    
+      
     // Debug FormData content
-    // console.log("FormData entries:");
-    // for (let [key, value] of formData.entries()) {
-    //   console.log(key, value instanceof File ? 
-    //     `File: ${value.name}, ${value.size} bytes` : value);
-    // }
+      console.log("FormData entries:");
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value instanceof File ? 
+          `File: ${value.name}, ${value.size} bytes` : value);
+      }
   
     try {
       setLoading(true);
@@ -42,9 +42,9 @@ const SubirModeloButton = ({ proyectoId, onSuccess = () => {}, onError = () => {
         body: formData
       });
   
-      // console.log("Response status:", response.status);
+       console.log("Response status:", response.status);
       const responseText = await response.text();
-      // console.log("Response body:", responseText);
+       console.log("Response body:", responseText);
       
       // Process response as before...
       if (!response.ok) {
