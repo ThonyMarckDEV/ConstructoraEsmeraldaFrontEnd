@@ -20,8 +20,8 @@ const Charts = () => {
   useEffect(() => {
     const fetchProjectData = async () => {
       try {
-        const access_token = jwtUtils.getAccessTokenFromCookie();
-        const userId = jwtUtils.getUserID(access_token);
+        const refresh_token = jwtUtils.getRefreshTokenFromCookie();
+        const userId = jwtUtils.getUserID(refresh_token);
 
         if (!userId) {
           throw new Error('User ID not found');
