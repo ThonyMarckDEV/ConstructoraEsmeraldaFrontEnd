@@ -23,7 +23,7 @@ import ProyectosCliente from './ui/Cliente/Proyecto/Proyectos';
 import ProyectoCliente from './ui/Cliente/Proyecto/Proyecto';
 
 //UI Chat
-import ChatWindows from './components/ui/Chat/ChatWindows'; 
+import ChatWindows from './ui/Chat/ChatWindows'; 
 
 // UIS Encargado
 import Encargado from './ui/Encargado/Inicio/Encargado';
