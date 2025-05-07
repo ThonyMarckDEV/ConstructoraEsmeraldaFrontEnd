@@ -21,6 +21,7 @@ import Login from './ui/Auth/Login';
 // UIS ADMIN=
 import Admin from './ui/Admin/Inicio/Admin';
 import ClienteUI from './ui/Admin/ClienteUI/ClienteUI';
+import EncargadoUI from './ui/Admin/EncargadoUI/EncargadoUI';
 
 // UIS Cliente
 import Cliente from './ui/Cliente/Inicio/Cliente';
@@ -42,6 +43,7 @@ import ProtectedRouteCliente from './utilities/ProtectedRouteCliente';
 import ProtectedRouteManager from './utilities/ProtectedRouteManager';
 import ProtectedRouteAdmin from './utilities/ProtectedRouteAdmin';
 
+
 //import ProtectedRouteToken from './utilities/ProtectedRouteToken';
 
 
@@ -58,7 +60,7 @@ function AppContent() {
       
       <Route path="/admin" element={<ProtectedRouteAdmin element={<Admin />} />} />
       <Route path="/admin/clientes" element={<ProtectedRouteAdmin element={<ClienteUI />} />} />
-
+      <Route path="/admin/encargados" element={<ProtectedRouteAdmin element={<EncargadoUI />} />} />
 
       {/* Rutas cliente */}
       

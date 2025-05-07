@@ -1,14 +1,14 @@
-import React from 'react';
+import React from 'react'; 
 import Swal from 'sweetalert2';
 
-// Función para mostrar una alerta básica
+// Función para mostrar una alerta básica 
 const showBasicAlert = () => {
-  Swal.fire('Hello world!');
+  return Swal.fire('Hello world!');
 };
 
-// Función para mostrar una alerta con título y mensaje
+// Función para mostrar una alerta con título y mensaje 
 const showMessageAlert = (title, message, icon = 'info') => {
-  Swal.fire({
+  return Swal.fire({
     title: title,
     text: message,
     icon: icon,
@@ -16,9 +16,9 @@ const showMessageAlert = (title, message, icon = 'info') => {
   });
 };
 
-// Función para mostrar una alerta de éxito
+// Función para mostrar una alerta de éxito 
 const showSuccessAlert = (title, message) => {
-  Swal.fire({
+  return Swal.fire({
     title: title,
     text: message,
     icon: 'success',
@@ -26,9 +26,9 @@ const showSuccessAlert = (title, message) => {
   });
 };
 
-// Función para mostrar una alerta de error
+// Función para mostrar una alerta de error 
 const showErrorAlert = (title, message) => {
-  Swal.fire({
+  return Swal.fire({
     title: title,
     text: message,
     icon: 'error',
@@ -36,24 +36,20 @@ const showErrorAlert = (title, message) => {
   });
 };
 
-// Función para mostrar una alerta con input
+// Función para mostrar una alerta con input 
 const showInputAlert = (title, inputPlaceholder) => {
-  Swal.fire({
+  return Swal.fire({
     title: title,
     input: 'text',
     inputLabel: 'Por favor, ingresa algo:',
     inputPlaceholder: inputPlaceholder,
     showCancelButton: true,
-  }).then((result) => {
-    if (result.isConfirmed) {
-      Swal.fire(`¡Hola, ${result.value}!`);
-    }
   });
 };
 
-// Función para mostrar una alerta con temporizador
+// Función para mostrar una alerta con temporizador 
 const showTimerAlert = (title, message, timer = 2000) => {
-  Swal.fire({
+  return Swal.fire({
     title: title,
     text: message,
     icon: 'info',
@@ -62,21 +58,15 @@ const showTimerAlert = (title, message, timer = 2000) => {
   });
 };
 
-// Función para mostrar una alerta con confirmación (sí/no)
+// Función para mostrar una alerta con confirmación (sí/no) 
 const showConfirmationAlert = (title, message) => {
-  Swal.fire({
+  return Swal.fire({
     title: title,
     text: message,
     icon: 'warning',
     showCancelButton: true,
     confirmButtonText: 'Sí, eliminar',
     cancelButtonText: 'Cancelar',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      Swal.fire('Eliminado', 'El ítem fue eliminado correctamente.', 'success');
-    } else {
-      Swal.fire('Cancelado', 'No se realizó ninguna acción.', 'info');
-    }
   });
 };
 

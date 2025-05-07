@@ -6,11 +6,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import LoadingScreen from '../../../../components/LoadingScreen';
 import SweetAlert from '../../../../components/SweetAlert';
 
-const Cliente = () => {
+const Encargado = () => {
   const [activeTab, setActiveTab] = useState('gestionar');
-  const [clientes, setClientes] = useState([]);
+  const [encargados, setEncargados] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -31,29 +30,29 @@ const Cliente = () => {
 
   useEffect(() => {
     isMounted.current = true;
-    fetchClientes();
+    fetchEncargados();
     return () => {
       isMounted.current = false;
     };
   }, []);
 
-  const fetchClientes = async () => {
+  const fetchEncargados = async () => {
     try {
       setLoading(true);
-      const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/clientes`);
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/encargados`);
       if (!response.ok) {
         throw new Error('Error en la respuesta del servidor');
       }
       const data = await response.json();
       if (isMounted.current) {
-        setClientes(data);
+        setEncargados(data);
         setLoading(false);
       }
     } catch (error) {
       if (isMounted.current) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar encargados:', error);
         toast.dismiss();
-        toast.error('Error al cargar clientes', { toastId: 'fetch-error' });
+        toast.error('Error al cargar encargados', { toastId: 'fetch-error' });
         setLoading(false);
       }
     }
@@ -87,32 +86,32 @@ const Cliente = () => {
     try {
       setLoading(true);
       if (editMode) {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/clientes/${editId}`, {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/encargados/${editId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Error al actualizar cliente');
+          throw new Error(errorData.message || 'Error al actualizar encargado');
         }
         if (isMounted.current) {
           toast.dismiss();
-          toast.success('Cliente actualizado exitosamente', { toastId: 'update-success' });
+          toast.success('Encargado actualizado exitosamente', { toastId: 'update-success' });
         }
       } else {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/clientes`, {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/encargados`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Error al crear cliente');
+          throw new Error(errorData.message || 'Error al crear encargado');
         }
         if (isMounted.current) {
           toast.dismiss();
-          toast.success('Cliente creado exitosamente', { toastId: 'create-success' });
+          toast.success('Encargado creado exitosamente', { toastId: 'create-success' });
         }
       }
       if (isMounted.current) {
@@ -128,7 +127,7 @@ const Cliente = () => {
           password: '',
           estado: 'activo'
         });
-        fetchClientes();
+        fetchEncargados();
         setEditMode(false);
         setEditId(null);
         setActiveTab('gestionar');
@@ -139,86 +138,89 @@ const Cliente = () => {
         if (error.response && error.response.data.errors) {
           setErrors(error.response.data.errors);
         } else {
-          console.error('Error al guardar cliente:', error);
+          console.error('Error al guardar encargado:', error);
           toast.dismiss();
-          toast.error(error.message || 'Error al guardar cliente', { toastId: 'save-error' });
+          toast.error(error.message || 'Error al guardar encargado', { toastId: 'save-error' });
         }
         setLoading(false);
       }
     }
   };
 
-  const handleEdit = (cliente) => {
+  const handleEdit = (encargado) => {
     setFormData({
-      nombre: cliente.datos.nombre || '',
-      apellido: cliente.datos.apellido || '',
-      email: cliente.datos.email || '',
-      direccion: cliente.datos.direccion || '',
-      dni: cliente.datos.dni || '',
-      ruc: cliente.datos.ruc || '',
-      telefono: cliente.datos.telefono || '',
-      username: cliente.username || '',
+      nombre: encargado.datos.nombre || '',
+      apellido: encargado.datos.apellido || '',
+      email: encargado.datos.email || '',
+      direccion: encargado.datos.direccion || '',
+      dni: encargado.datos.dni || '',
+      ruc: encargado.datos.ruc || '',
+      telefono: encargado.datos.telefono || '',
+      username: encargado.username || '',
       password: '',
-      estado: cliente.estado || 'activo'
+      estado: encargado.estado || 'activo'
     });
     setEditMode(true);
-    setEditId(cliente.idUsuario);
+    setEditId(encargado.idUsuario);
     setActiveTab('agregar');
   };
 
-  const handleDelete = async (id) => {
-    const result = await SweetAlert.showConfirmationAlert(
-      '¿Estás seguro de eliminarlo?',
-      'Esta acción es irreversible'
-    );
-    if (result.isConfirmed) {
-      try {
-        setIsDeleting(true);
-        setLoading(true);
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/clientes/${id}`, {
-          method: 'DELETE'
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Error al eliminar cliente');
+    const handleDelete = async (id) => {
+        try {
+        const result = await SweetAlert.showConfirmationAlert(
+            "¿Estás seguro de eliminarlo?",
+            "Esta acción es irreversible"
+        );
+        
+        // El objeto result tiene la propiedad isConfirmed que indica si el usuario confirmó
+        if (result.isConfirmed) {
+            setLoading(true);
+            
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/encargados/${id}`, {
+            method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al eliminar encargado');
+            }
+            
+            if (isMounted.current) {
+            toast.dismiss();
+            toast.success('Encargado desactivado exitosamente', { toastId: 'delete-success' });
+            fetchEncargados();
+            }
         }
+        } catch (error) {
         if (isMounted.current) {
-          toast.dismiss();
-          toast.success('Cliente desactivado exitosamente', { toastId: 'delete-success' });
-          fetchClientes();
+            console.error('Error al eliminar encargado:', error);
+            toast.dismiss();
+            toast.error(error.message || 'Error al eliminar encargado', { toastId: 'delete-error' });
         }
-      } catch (error) {
+        } finally {
         if (isMounted.current) {
-          console.error('Error al eliminar cliente:', error);
-          toast.dismiss();
-          toast.error(error.message || 'Error al eliminar cliente', { toastId: 'delete-error' });
+            setLoading(false);
         }
-      } finally {
-        if (isMounted.current) {
-          setLoading(false);
-          setIsDeleting(false);
         }
-      }
-    }
-  };
+    };
 
-  const filteredClientes = clientes.filter(cliente => 
-    (cliente.datos.nombre && cliente.datos.nombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (cliente.datos.apellido && cliente.datos.apellido.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (cliente.datos.email && cliente.datos.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (cliente.username && cliente.username.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredEncargados = encargados.filter(encargado => 
+    (encargado.datos.nombre && encargado.datos.nombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (encargado.datos.apellido && encargado.datos.apellido.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (encargado.datos.email && encargado.datos.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (encargado.username && encargado.username.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
     <div className="relative p-6 bg-white min-h-screen font-sans">
-      {loading && (activeTab === 'agregar' || isDeleting) && (
+      {loading && activeTab === 'agregar' && (
         <div className="absolute inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-50">
           <LoadingScreen />
         </div>
       )}
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 tracking-tight">
-          Gestión de Clientes
+          Gestión de Encargados
         </h1>
         <div className="flex space-x-8 border-b border-gray-200 mb-8">
           <button
@@ -264,7 +266,7 @@ const Cliente = () => {
             <div className="mb-6 max-w-md relative">
               <input
                 type="text"
-                placeholder="Buscar clientes..."
+                placeholder="Buscar encargados..."
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 placeholder-gray-400"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -318,47 +320,47 @@ const Cliente = () => {
                         </div>
                       </td>
                     </tr>
-                  ) : filteredClientes.length === 0 ? (
+                  ) : filteredEncargados.length === 0 ? (
                     <tr>
                       <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                        No hay clientes disponibles
+                        No hay encargados disponibles
                       </td>
                     </tr>
                   ) : (
-                    filteredClientes.map((cliente) => (
-                      <tr key={cliente.idUsuario} className="hover:bg-gray-50 transition-colors">
+                    filteredEncargados.map((encargado) => (
+                      <tr key={encargado.idUsuario} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4 text-gray-900">
-                          {cliente.datos.nombre} {cliente.datos.apellido}
+                          {encargado.datos.nombre} {encargado.datos.apellido}
                         </td>
                         <td className="px-6 py-4 text-gray-900">
-                          {cliente.datos.email}
+                          {encargado.datos.email}
                         </td>
                         <td className="px-6 py-4 text-gray-900">
-                          {cliente.datos.telefono}
+                          {encargado.datos.telefono}
                         </td>
                         <td className="px-6 py-4 text-gray-900">
-                          {cliente.username}
+                          {encargado.username}
                         </td>
                         <td className="px-6 py-4">
                           <span
                             className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                              cliente.estado === 'activo'
+                              encargado.estado === 'activo'
                                 ? 'bg-green-100 text-green-800'
                                 : 'bg-red-100 text-red-800'
                             }`}
                           >
-                            {cliente.estado}
+                            {encargado.estado}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-sm">
                           <button
-                            onClick={() => handleEdit(cliente)}
+                            onClick={() => handleEdit(encargado)}
                             className="text-green-600 hover:text-green-800 mr-4 transition-colors"
                           >
                             Editar
                           </button>
                           <button
-                            onClick={() => handleDelete(cliente.idUsuario)}
+                            onClick={() => handleDelete(encargado.idUsuario)}
                             className="text-red-500 hover:text-red-700 transition-colors"
                           >
                             Eliminar
@@ -374,7 +376,7 @@ const Cliente = () => {
         ) : (
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-8 max-w-4xl mx-auto">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-              {editMode ? 'Editar Cliente' : 'Agregar Nuevo Cliente'}
+              {editMode ? 'Editar Encargado' : 'Agregar Nuevo Encargado'}
             </h2>
             <div className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -605,4 +607,4 @@ const Cliente = () => {
   );
 };
 
-export default Cliente;
+export default Encargado;

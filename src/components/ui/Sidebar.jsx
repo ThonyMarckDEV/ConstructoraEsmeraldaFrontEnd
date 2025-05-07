@@ -39,7 +39,7 @@ const Sidebar = () => {
   const menuItemsAdmin = [
     { name: "Inicio", icon: <Home size={20} />, path: "/admin" },
     { name: "Clientes", icon: <User size={20} />, path: "/admin/clientes" },
-    { name: "ASesores", icon: <UserCircle2 size={20} />, path: "/admin/asesores" },
+    { name: "Encargados", icon: <UserCircle2 size={20} />, path: "/admin/encargados" },
     { name: "Configuración", icon: <Settings size={20} />, path: "/admin/configuracion" }
   ];
 
