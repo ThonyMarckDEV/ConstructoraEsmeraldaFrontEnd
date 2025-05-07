@@ -8,6 +8,7 @@ import API_BASE_URL from "../../../../js/urlHelper";
 import { FileText, Image } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from "react-toastify";
+import SubirModeloButton from './SubirModeloButton';
 
 // Para fases
 import defaultImage from '../../../../img/default.jpg';
@@ -101,7 +102,7 @@ const Modulo = ({ proyectoId }) => {
       setUploadingFile(true);
       
       const formData = new FormData();
-      formData.append('archivo<Void>archivo', file);
+      formData.append('archivo', file);
       formData.append('descripcion', 'Archivo subido: ' + file.name);
       formData.append('idFase', faseId);
       formData.append('idProyecto', proyectoId);
@@ -191,7 +192,7 @@ const Modulo = ({ proyectoId }) => {
       const realId = fileId.replace(isPhoto ? 'photo-' : 'file-', '');
   
       const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/files/delete`, {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -217,9 +218,10 @@ const Modulo = ({ proyectoId }) => {
         return { ...prevData, fases: updatedFases };
       });
   
+      toast.success('Archivo eliminado correctamente');
     } catch (err) {
       console.error("Error deleting file:", err);
-      alert('Error al eliminar el archivo: ' + err.message);
+      toast.error('Error al eliminar el archivo: ' + err.message);
     }
   };
 
@@ -252,6 +254,34 @@ const Modulo = ({ proyectoId }) => {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error descargando el archivo", err);
+      toast.error('Error al descargar el archivo: ' + err.message);
+    }
+  };
+
+  const handleUploadSuccess = (response) => {
+    toast.success('Modelo subido correctamente');
+    // Recargar los datos del proyecto para reflejar el nuevo modelo
+    fetchProjectDetails();
+  };
+
+  const handleUploadError = (error) => {
+    console.error('Error al subir modelo:', error);
+    toast.error('Error al subir el modelo: ' + error.message);
+  };
+
+  const fetchProjectDetails = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/${proyectoId}/details`);
+      if (!response.ok) throw new Error('Error al cargar los detalles del proyecto');
+      const data = await response.json();
+      
+      setProjectData(data);
+      setIsLoading(false);
+    } catch (err) {
+      console.error("Error fetching project details:", err);
+      setError(err.message);
+      setIsLoading(false);
     }
   };
 
@@ -414,13 +444,19 @@ const Modulo = ({ proyectoId }) => {
                             disabled={uploadingPhoto}
                           />
                         </div>
+                        <SubirModeloButton
+                          proyectoId={proyectoId}
+                          idFase={fase.idFase}
+                          onSuccess={handleUploadSuccess}
+                          onError={handleUploadError}
+                        />
                         <Link 
                           to={`/encargado/proyecto/ar/${proyectoId}/${fase.idFase}`} 
                           className="flex items-center justify-center w-12 h-12 bg-green-600 text-white rounded-full hover:bg-green-700 transform transition-all duration-300 hover:scale-110 hover:shadow-lg"
                         >
                           <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M5.59961 5.60001L18.3996 18.4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M5.9386 5.60001L18.3996 18.4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M12 2V4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M12 20V22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M20 12H22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

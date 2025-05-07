@@ -4,7 +4,6 @@ import API_BASE_URL from '../../../../js/urlHelper';
 import { Link } from 'react-router-dom';
 import LoadingBarraProgresoProyecto from './LoadingBarraProgresoProyecto';
 import SelectorFasesProyecto from './SelectorFasesProyecto';
-import SubirModeloButton from './SubirModeloButton';
 
 const BarraProgresoProyecto = ({ proyectoId }) => {
   const [proyecto, setProyecto] = useState(null);
@@ -78,17 +77,6 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
   // Calculate progress percentage - if no phase is defined, progress is 0
   const progressPercentage = hasFase && fases.length > 0 && currentPhase > 0 ? (currentPhase / fases.length) * 100 : 0;
 
-  const handleUploadSuccess = (response) => {
-    // console.log('Modelo subido exitosamente:', response);
-    // Podrías recargar datos del proyecto aquí o mostrar un mensaje de éxito
-  };
-  
-  // Función para manejar errores
-  const handleUploadError = (error) => {
-    console.error('Error al subir modelo:', error);
-    // Mostrar notificación de error
-  };
-  
   
   // Use the separated loading component
   if (loading) {
@@ -190,13 +178,6 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
 
       {/* Progress section */}
       <div className="p-4 md:p-6">
-
-        {/* Componente de subida de modelo */}
-        <SubirModeloButton 
-          proyectoId={proyectoId} 
-          onSuccess={handleUploadSuccess}
-          onError={handleUploadError}
-        />
 
         {/* Selector de Fases */}
         <SelectorFasesProyecto 

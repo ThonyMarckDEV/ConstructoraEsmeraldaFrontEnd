@@ -93,7 +93,7 @@ const ARProject = () => {
     <div className="flex flex-row h-screen bg-gray-50">
       <div className="flex-1 flex flex-col">
         <div className="bg-gradient-to-r from-green-800 to-green-600 text-white p-4 shadow-md flex justify-between items-center">
-          <h1 className="text-xl font-bold">Visualización AR del Proyecto</h1>
+          <h1 className="text-xl font-bold">Visualización AR de la fase</h1>
           <Link 
             to={backUrl}
             className="flex items-center bg-white text-green-600 hover:bg-blue-50 rounded-lg shadow px-3 py-2 border border-green-200 font-medium transition duration-300 ease-in-out"
