@@ -64,6 +64,11 @@ const Login = () => {
         setTimeout(() => {
           navigate('/encargado');
         }, 1500);
+      }else if (rol === 'admin') {
+        toast.success(`Login exitoso!!`);
+        setTimeout(() => {
+          navigate('/admin');
+        }, 1500);
       }else{
         console.error('Rol no reconocido:', rol);
         toast.error(`Rol no reconocido: ${rol}`);

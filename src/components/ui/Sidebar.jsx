@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Home, FileText, ChartBarIcon, Settings, LogOut } from 'lucide-react';
+import { Menu, X, Home, FileText, User, Settings, LogOut , UserCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import jwtUtils from '../../utilities/jwtUtils';
 import { logout } from '../../js/logout';
@@ -38,7 +38,8 @@ const Sidebar = () => {
 
   const menuItemsAdmin = [
     { name: "Inicio", icon: <Home size={20} />, path: "/admin" },
-    { name: "Usuarios", icon: <FileText size={20} />, path: "/admin/usuarios" },
+    { name: "Clientes", icon: <User size={20} />, path: "/admin/clientes" },
+    { name: "ASesores", icon: <UserCircle2 size={20} />, path: "/admin/asesores" },
     { name: "Configuración", icon: <Settings size={20} />, path: "/admin/configuracion" }
   ];
 

@@ -12,10 +12,15 @@ import Home from './ui/Home';
 
 import AR from './components/ui/AR/ARProyect';
 
+
 // UIS AUTH
 import ErrorPage from './components/ErrorPage';
 import ErrorPage401 from './components/ErrorPage401';
 import Login from './ui/Auth/Login';
+
+// UIS ADMIN=
+import Admin from './ui/Admin/Inicio/Admin';
+import ClienteUI from './ui/Admin/ClienteUI/ClienteUI';
 
 // UIS Cliente
 import Cliente from './ui/Cliente/Inicio/Cliente';
@@ -35,6 +40,7 @@ import ProyectoEncargado from './ui/Encargado/Proyecto/Proyecto';
 import ProtectedRouteHome from './utilities/ProtectedRouteHome';
 import ProtectedRouteCliente from './utilities/ProtectedRouteCliente';
 import ProtectedRouteManager from './utilities/ProtectedRouteManager';
+import ProtectedRouteAdmin from './utilities/ProtectedRouteAdmin';
 
 //import ProtectedRouteToken from './utilities/ProtectedRouteToken';
 
@@ -50,10 +56,16 @@ function AppContent() {
 
       {/* Rutas cliente */}
       
+      <Route path="/admin" element={<ProtectedRouteAdmin element={<Admin />} />} />
+      <Route path="/admin/clientes" element={<ProtectedRouteAdmin element={<ClienteUI />} />} />
+
+
+      {/* Rutas cliente */}
+      
       <Route path="/cliente" element={<ProtectedRouteCliente element={<Cliente />} />} />
       <Route path="/cliente/proyectos" element={<ProtectedRouteCliente element={<ProyectosCliente />} />} />
       <Route path="/cliente/proyecto/:id" element={<ProtectedRouteCliente element={<ProyectoCliente />} />} />
-      <Route path="/cliente/proyecto/ar/:id"  element={<ProtectedRouteCliente element={<AR />} />} />
+      <Route path="/cliente/proyecto/ar/:id/:idFase"  element={<ProtectedRouteCliente element={<AR />} />} />
       <Route path="/cliente/proyecto/chat/:id"  element={<ChatWindows />} />
 
       {/* Rutas Managaer / encargado */}
@@ -61,7 +73,7 @@ function AppContent() {
       <Route path="/encargado"  element={<ProtectedRouteManager element={<Encargado />}  />} />
       <Route path="/encargado/proyectos"  element={<ProtectedRouteManager element={<ProyectosEncargado />} />} />
       <Route path="/encargado/proyecto/:id"   element={<ProtectedRouteManager element={<ProyectoEncargado />}  />} />
-      <Route path="/encargado/proyecto/ar/:id"    element={<ProtectedRouteManager element={<AR />} />} />
+      <Route path="/encargado/proyecto/ar/:id/:idFase"    element={<ProtectedRouteManager element={<AR />} />} />
       <Route path="/encargado/proyecto/chat/:id"   element={<ProtectedRouteManager element={<ChatWindows />} />} />
 
       {/* Ruta de error */}

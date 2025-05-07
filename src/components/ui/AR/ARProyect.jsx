@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import jwtUtils from '../../../utilities/jwtUtils';
 import { fetchWithAuth } from '../../../js/authToken';
 import API_BASE_URL from '../../../js/urlHelper';
 
 const ARProject = () => {
-  const { id } = useParams();
+  const { id, idFase } = useParams();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [modelPath, setModelPath] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -13,41 +13,35 @@ const ARProject = () => {
 
   const token = jwtUtils.getRefreshTokenFromCookie();
 
-  // Obtener y normalizar el rol del usuario
   const getUserRoleNormalized = () => {
     const role = jwtUtils.getUserRole(token);
-    
-    // Mapear roles equivalentes (manager -> encargado)
     if (role === 'manager') return 'encargado';
-    if (role === 'admin') return 'admin'; // Opcional: si admins deben ver vista encargado
-    
-    return role || 'cliente'; // Default a cliente si no hay rol
+    if (role === 'admin') return 'admin';
+    return role || 'cliente';
   };
 
   const role = getUserRoleNormalized();
-
-  // Construir URL de retorno basada en el rol normalizado
   const backUrl = id ? `/${role}/proyecto/${id}` : `/${role}/proyectos`;
 
-  // Fetch del modelo 3D
   useEffect(() => {
-
     const fetchModel = async () => {
-      if (!id) return;
+      if (!id || !idFase) {
+        setError('ID de proyecto o fase no proporcionado');
+        setLoading(false);
+        return;
+      }
       
       try {
         setLoading(true);
         setError(null);
     
-        // 1. Get model metadata
-        const metaResponse = await fetchWithAuth(`${API_BASE_URL}/api/project/${id}/modelo`);
+        const metaResponse = await fetchWithAuth(`${API_BASE_URL}/api/project/${id}/${idFase}/modelo`);
         
         if (!metaResponse.ok) {
           throw new Error(`Error ${metaResponse.status} al obtener metadatos del modelo`);
         }
     
         const metaData = await metaResponse.json();
-        // console.log("Model metadata:", metaData);
         
         if (!metaData.success) {
           throw new Error('No se pudo obtener información del modelo');
@@ -58,11 +52,7 @@ const ARProject = () => {
           throw new Error('URL del modelo no encontrada en la respuesta');
         }
     
-        // console.log("Attempting to fetch model from:", modelUrl);
-    
-        // 2. Download the model with authentication - include credentials explicitly
         const modelResponse = await fetchWithAuth(modelUrl, {
-         // credentials: 'include',
           headers: {
             'Accept': 'model/gltf-binary'
           }
@@ -70,18 +60,10 @@ const ARProject = () => {
         
         if (!modelResponse.ok) {
           const errorText = await modelResponse.text();
-          console.error("Server error response:", errorText);
-          throw new Error(`Error ${modelResponse.status} al descargar modelo`);
+          throw new Error(`Error ${modelResponse.status} al descargar modelo: ${errorText}`);
         }
     
-        // Check content-type and content-length
-        const contentType = modelResponse.headers.get('content-type');
-        const contentLength = modelResponse.headers.get('content-length');
-        // console.log("Response headers:", {contentType, contentLength});
-    
-        // 3. Create local URL for the 3D viewer
         const blob = await modelResponse.blob();
-        // console.log("Model blob size:", blob.size, "bytes, type:", blob.type);
         
         if (blob.size === 0) {
           throw new Error('El archivo recibido está vacío');
@@ -98,9 +80,8 @@ const ARProject = () => {
       }
     };
     
-
     fetchModel();
-  }, [id]);
+  }, [id, idFase]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -111,7 +92,6 @@ const ARProject = () => {
   return (
     <div className="flex flex-row h-screen bg-gray-50">
       <div className="flex-1 flex flex-col">
-        {/* Header */}
         <div className="bg-gradient-to-r from-green-800 to-green-600 text-white p-4 shadow-md flex justify-between items-center">
           <h1 className="text-xl font-bold">Visualización AR del Proyecto</h1>
           <Link 

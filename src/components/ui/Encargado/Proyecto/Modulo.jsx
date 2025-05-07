@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { FileCard , FileGrid } from "./FileCard";
+import { FileCard, FileGrid } from "./FileCard";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
 import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from "../../../../js/urlHelper";
 import { FileText, Image } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { toast } from "react-toastify";
 
-//Para fases
+// Para fases
 import defaultImage from '../../../../img/default.jpg';
 import planningImg from '../../../../img/Fases/planning.jpg';
 import terrainPrepImg from '../../../../img/Fases/terrainPrep.jpg';
@@ -17,7 +19,6 @@ import installationsImg from '../../../../img/Fases/installations.jpg';
 import finishesImg from '../../../../img/Fases/finishes.jpg';
 import inspectionImg from '../../../../img/Fases/inspection.jpg';
 import deliveryImg from '../../../../img/Fases/delivery.jpg';
-import { toast } from "react-toastify";
 
 const Modulo = ({ proyectoId }) => {
   const [projectData, setProjectData] = useState(null);
@@ -100,7 +101,7 @@ const Modulo = ({ proyectoId }) => {
       setUploadingFile(true);
       
       const formData = new FormData();
-      formData.append('archivo', file);
+      formData.append('archivo<Void>archivo', file);
       formData.append('descripcion', 'Archivo subido: ' + file.name);
       formData.append('idFase', faseId);
       formData.append('idProyecto', proyectoId);
@@ -108,12 +109,10 @@ const Modulo = ({ proyectoId }) => {
       const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/fase/upload-file`, {
         method: 'POST',
         body: formData,
-        // No se establece Content-Type para que el navegador establezca automáticamente el boundary correcto
       });
       
       if (!response.ok) {
         throw new Error('Error al subir el archivo');
-        toast.error('Error al subir el archivo');
       }
       
       // Recargar los datos del proyecto para mostrar el nuevo archivo
@@ -128,7 +127,6 @@ const Modulo = ({ proyectoId }) => {
       toast.error('Error al subir el archivo: ' + err.message);
     } finally {
       setUploadingFile(false);
-      // Resetear el input de archivo
       event.target.value = '';
     }
   };
@@ -165,12 +163,10 @@ const Modulo = ({ proyectoId }) => {
       const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/fase/upload-photo`, {
         method: 'POST',
         body: formData,
-        // No se establece Content-Type para que el navegador establezca automáticamente el boundary correcto
       });
       
       if (!response.ok) {
         throw new Error('Error al subir la imagen');
-        toast.error('Error al subir la imagen');
       }
       
       // Recargar los datos del proyecto para mostrar la nueva foto
@@ -185,18 +181,15 @@ const Modulo = ({ proyectoId }) => {
       toast.error('Error al subir la imagen: ' + err.message);
     } finally {
       setUploadingPhoto(false);
-      // Resetear el input de archivo
       event.target.value = '';
     }
   };
 
   const handleDeleteFile = async (fileId) => {
     try {
-      // Determinar si es un archivo o foto (basado en el prefijo del ID)
       const isPhoto = fileId.startsWith('photo-');
       const realId = fileId.replace(isPhoto ? 'photo-' : 'file-', '');
   
-      // Hacer la llamada API para eliminar
       const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/files/delete`, {
         method: 'DELETE',
         headers: {
@@ -210,7 +203,6 @@ const Modulo = ({ proyectoId }) => {
   
       if (!response.ok) throw new Error('Error al eliminar el archivo');
   
-      // Actualizar el estado local
       setProjectData(prevData => {
         const updatedFases = prevData.fases.map(fase => {
           if (isPhoto) {
@@ -232,15 +224,13 @@ const Modulo = ({ proyectoId }) => {
   };
 
   const handleViewFile = (file) => {
-    // Verificar si es una imagen o un PDF para mostrar vista previa
     const isImage = ['jpg', 'jpeg', 'png', 'avif', 'webp'].includes(file.fileType.toLowerCase());
     const isPDF = file.fileType.toLowerCase() === 'pdf';
   
     if (isImage || isPDF) {
       setSelectedFile(file);
-      setModalOpen(true); // Abrir el modal para vista previa
+      setModalOpen(true);
     } else {
-      // Para otros tipos de archivo, directamente descargar
       handleDownloadFile(file);
     }
   };
@@ -251,7 +241,6 @@ const Modulo = ({ proyectoId }) => {
       if (!response.ok) {
         throw new Error("Error en la descarga");
       }
-      // Convierte la respuesta a blob para generar un URL de descarga
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -271,7 +260,6 @@ const Modulo = ({ proyectoId }) => {
 
   return (
     <div className="w-full flex flex-col lg:flex-row">
-      {/* Sidebar de módulos */}
       <div className="w-full lg:w-1/4 pr-0 lg:pr-4 bg-white z-10">
         <div className="lg:sticky lg:top-4 space-y-4">
           <h2 className="text-xl font-bold mb-4">Fases del Proyecto</h2>
@@ -337,10 +325,8 @@ const Modulo = ({ proyectoId }) => {
         </div>
       </div>
 
-      {/* Contenido principal */}
       <div className="w-full lg:w-3/4 mt-6 lg:mt-0">
         {projectData.fases.map((fase) => {
-          // Combinar archivos y fotos con IDs únicos
           const allFiles = [
             ...(fase.archivos || []).map(archivo => ({
               id: `file-${archivo.idArchivo}`,
@@ -369,7 +355,6 @@ const Modulo = ({ proyectoId }) => {
                   : "hidden"
               }`}
             >
-              {/* Cabecera del módulo con botones de subida */}
               <div className="border rounded-md mb-4">
                 <div className="flex flex-col sm:flex-row items-start p-4 gap-4">
                   <div className="bg-gray-100 p-2 rounded-md min-w-[120px] w-[120px] h-[120px] flex items-center justify-center mx-auto sm:mx-0 overflow-hidden">
@@ -390,11 +375,9 @@ const Modulo = ({ proyectoId }) => {
                           </span>
                         )}
                       </div>
-                      
-                      <div className="flex gap-4">
-                        {/* Botón para subir archivo */}
+                      <div className="flex gap-4 mt-4 sm:mt-0">
                         <div className="relative">
-                          <label htmlFor={`upload-file-${fase.faseId}`} className="cursor-pointer">
+                          <label htmlFor={`upload-file-${fase.idFase}`} className="cursor-pointer">
                             <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full hover:bg-green-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-6 active:scale-95 active:rotate-0">
                               {uploadingFile ? (
                                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -405,17 +388,15 @@ const Modulo = ({ proyectoId }) => {
                           </label>
                           <input
                             type="file"
-                            id={`upload-file-${fase.faseId}`}
+                            id={`upload-file-${fase.idFase}`}
                             className="hidden"
                             onChange={(e) => handleFileUpload(fase.idFase, e)}
                             accept=".pdf,.xls,.xlsx,.doc,.docx,.dwg"
                             disabled={uploadingFile}
                           />
                         </div>
-                        
-                        {/* Botón para subir foto */}
                         <div className="relative">
-                          <label htmlFor={`upload-photo-${fase.faseId}`} className="cursor-pointer">
+                          <label htmlFor={`upload-photo-${fase.idFase}`} className="cursor-pointer">
                             <div className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full hover:bg-green-600 disabled:bg-gray-400 transform transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-6 active:scale-95 active:rotate-0">
                               {uploadingPhoto ? (
                                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -426,63 +407,50 @@ const Modulo = ({ proyectoId }) => {
                           </label>
                           <input
                             type="file"
-                            id={`upload-photo-${fase.faseId}`}
+                            id={`upload-photo-${fase.idFase}`}
                             className="hidden"
-                            onChange={(e) => handlePhotoUpload(fase.idFase, e)}  // <-- Fix here
+                            onChange={(e) => handlePhotoUpload(fase.idFase, e)}
                             accept=".jpg,.jpeg,.png,.avif,.webp"
                             disabled={uploadingPhoto}
                           />
                         </div>
+                        <Link 
+                          to={`/encargado/proyecto/ar/${proyectoId}/${fase.idFase}`} 
+                          className="flex items-center justify-center w-12 h-12 bg-green-600 text-white rounded-full hover:bg-green-700 transform transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                        >
+                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M5.59961 5.60001L18.3996 18.4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M12 2V4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M12 20V22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M20 12H22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M2 12H4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </Link>
                       </div>
-
-              
-
                     </div>
                   </div>
                 </div>
               </div>
 
-{/* 
-              <div className="space-y-4 pb-10">
-                {allFiles.length > 0 ? (
-                  allFiles.map((file) => (
-                    <FileCard 
-                      key={file.id}
-                      file={file} 
-                      onView={handleViewFile} 
-                      onDownload={handleDownloadFile} 
-                      onDelete={handleDeleteFile}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    No hay archivos disponibles para esta fase
-                  </div>
-                )}
-              </div> */}
-
               <div className="container mx-auto">
                 {allFiles.length > 0 ? (
-                 // allFiles.map((file) => (
-                    <FileGrid 
-                      files={allFiles}
-                      onView={handleViewFile}
-                      onDownload={handleDownloadFile}
-                      onDelete={handleDeleteFile}
-                    />
-                 // ))
+                  <FileGrid 
+                    files={allFiles}
+                    onView={handleViewFile}
+                    onDownload={handleDownloadFile}
+                    onDelete={handleDeleteFile}
+                  />
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     No hay archivos disponibles para esta fase
                   </div>
                 )}
               </div>
-
             </div>
           );
         })}
         
-        {/* Mensaje sin selección */}
         {expandedModuleId === null && (
           <div className="flex flex-col items-center justify-center h-64 border rounded-lg bg-gray-50">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 mb-4">
@@ -499,7 +467,6 @@ const Modulo = ({ proyectoId }) => {
         )}
       </div>
 
-      {/* Modal de archivo */}
       {modalOpen && selectedFile && (
         <FileModal 
           file={selectedFile} 
