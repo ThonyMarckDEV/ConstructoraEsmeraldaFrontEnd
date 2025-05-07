@@ -5,6 +5,7 @@ import ErrorState from "./ErrorState";
 import FileModal from "./FileModal";
 import { fetchWithAuth } from '../../../../js/authToken';
 import API_BASE_URL from "../../../../js/urlHelper";
+import { Link } from 'react-router-dom';
 
 //Para fases
 import defaultImage from '../../../../img/default.jpg';
@@ -213,8 +214,8 @@ const Modulo = ({ proyectoId }) => {
                   : "hidden"
               }`}
             >
-              {/* Cabecera del módulo */}
-              <div className="border rounded-md mb-4">
+              {/* Cabecera del módulo con botón AR en la esquina */}
+              <div className="border rounded-md mb-4 relative">
                 <div className="flex flex-col sm:flex-row items-start p-4 gap-4">
                   <div className="bg-gray-100 p-2 rounded-md min-w-[120px] w-[120px] h-[120px] flex items-center justify-center mx-auto sm:mx-0 overflow-hidden">
                     <img
@@ -232,43 +233,37 @@ const Modulo = ({ proyectoId }) => {
                       </span>
                     )}
                   </div>
+                  {/* Botón AR en la esquina superior derecha */}
+                  <Link 
+                    to={`/cliente/proyecto/ar/${proyectoId}/${fase.idFase}`} 
+                    className="absolute top-2 right-2 flex items-center justify-center w-10 h-10 bg-green-600 text-white rounded-full hover:bg-green-700 transform transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                    title="Ver en Realidad Aumentada"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M5.9386 5.60001L18.3996 18.4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M12 2V4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M12 20V22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M20 12H22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M2 12H4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </Link>
                 </div>
               </div>
 
-            {/* Lista de archivos */}
-            {/* <div className="space-y-4 pb-10">
-                  {allFiles.length > 0 ? (
-                    allFiles.map((file) => (
-                      <FileCard 
-                        key={file.id}
-                        file={file} 
-                        onView={handleViewFile} 
-                        onDownload={handleDownloadFile} 
-                      />
-                    ))
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      No hay archivos disponibles para esta fase
-                    </div>
-                  )}
-              </div> */}
-
-                <div className="container mx-auto">
-                  {allFiles.length > 0 ? (
-                    // allFiles.map((file) => (
-                      <FileGrid 
-                        files={allFiles}
-                        onView={handleViewFile}
-                        onDownload={handleDownloadFile}
-                      />
-                    // ))
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      No hay archivos disponibles para esta fase
-                    </div>
-                  )}
-                </div>
-              
+              <div className="container mx-auto">
+                {allFiles.length > 0 ? (
+                  <FileGrid 
+                    files={allFiles}
+                    onView={handleViewFile}
+                    onDownload={handleDownloadFile}
+                  />
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No hay archivos disponibles para esta fase
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
