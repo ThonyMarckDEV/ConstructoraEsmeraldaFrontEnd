@@ -20,6 +20,8 @@ const Proyecto = () => {
     fecha_fin_estimada: '',
     estado: 'En Progreso',
     fase: 'Planificación',
+    idEncargado: '',
+    idCliente: '',
     fases: [
       { nombreFase: 'Planificación', fecha_inicio: '', fecha_fin: '', descripcion: '' },
       { nombreFase: 'Preparación del Terreno', fecha_inicio: '', fecha_fin: '', descripcion: '' },
@@ -30,11 +32,6 @@ const Proyecto = () => {
       { nombreFase: 'Inspección y Pruebas', fecha_inicio: '', fecha_fin: '', descripcion: '' },
       { nombreFase: 'Entrega', fecha_inicio: '', fecha_fin: '', descripcion: '' },
     ],
-  });
-  const [assignData, setAssignData] = useState({
-    idEncargado: '',
-    idCliente: '',
-    idProyecto: '',
   });
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -120,16 +117,13 @@ const Proyecto = () => {
     setFormData({ ...formData, fases: updatedFases });
   };
 
-  const handleAssignChange = (e) => {
-    const { name, value } = e.target;
-    setAssignData({ ...assignData, [name]: value });
-  };
-
   const validateForm = () => {
     const newErrors = {};
     if (!formData.nombre.trim()) newErrors.nombre = 'El nombre es obligatorio';
     if (!formData.fecha_inicio) newErrors.fecha_inicio = 'La fecha de inicio es obligatoria';
     if (!formData.fecha_fin_estimada) newErrors.fecha_fin_estimada = 'La fecha de fin estimada es obligatoria';
+    if (!formData.idEncargado) newErrors.idEncargado = 'Seleccione un encargado';
+    if (!formData.idCliente) newErrors.idCliente = 'Seleccione un cliente';
     formData.fases.forEach((fase, index) => {
       if (fase.fecha_inicio && !fase.fecha_fin) {
         newErrors[`fase_${index}_fecha_fin`] = `Fecha de fin requerida para ${fase.nombreFase}`;
@@ -138,15 +132,6 @@ const Proyecto = () => {
         newErrors[`fase_${index}_fecha_inicio`] = `Fecha de inicio requerida para ${fase.nombreFase}`;
       }
     });
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateAssignForm = () => {
-    const newErrors = {};
-    if (!assignData.idEncargado) newErrors.idEncargado = 'Seleccione un encargado';
-    if (!assignData.idCliente) newErrors.idCliente = 'Seleccione un cliente';
-    if (!assignData.idProyecto) newErrors.idProyecto = 'Seleccione un proyecto';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -188,6 +173,8 @@ const Proyecto = () => {
           fecha_fin_estimada: '',
           estado: 'En Progreso',
           fase: 'Planificación',
+          idEncargado: '',
+          idCliente: '',
           fases: [
             { nombreFase: 'Planificación', fecha_inicio: '', fecha_fin: '', descripcion: '' },
             { nombreFase: 'Preparación del Terreno', fecha_inicio: '', fecha_fin: '', descripcion: '' },
@@ -209,36 +196,6 @@ const Proyecto = () => {
       if (isMounted.current) {
         console.error('Error al guardar proyecto:', error);
         toast.error(error.message || 'Error al guardar proyecto', { toastId: 'save-error' });
-        setLoadingAction(false);
-      }
-    }
-  };
-
-  const handleAssignSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateAssignForm()) return;
-    try {
-      setLoadingAction(true);
-      const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/proyectos/asignar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(assignData),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al asignar proyecto');
-      }
-      if (isMounted.current) {
-        toast.success('Proyecto asignado exitosamente', { toastId: 'assign-success' });
-        setAssignData({ idEncargado: '', idCliente: '', idProyecto: '' });
-        fetchProyectos();
-        setActiveTab('gestionar');
-        setLoadingAction(false);
-      }
-    } catch (error) {
-      if (isMounted.current) {
-        console.error('Error al asignar proyecto:', error);
-        toast.error(error.message || 'Error al asignar proyecto', { toastId: 'assign-error' });
         setLoadingAction(false);
       }
     }
@@ -270,6 +227,8 @@ const Proyecto = () => {
       fecha_fin_estimada: proyecto.fecha_fin_estimada || '',
       estado: proyecto.estado || 'En Progreso',
       fase: proyecto.fase || 'Planificación',
+      idEncargado: proyecto.idEncargado || '',
+      idCliente: proyecto.idCliente || '',
       fases,
     });
     setEditMode(true);
@@ -323,7 +282,7 @@ const Proyecto = () => {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 tracking-tight">Gestión de Proyectos</h1>
         <div className="flex space-x-8 border-b border-gray-200 mb-8">
-          {['gestionar', 'agregar', 'asignar'].map((tab) => (
+          {['gestionar', 'agregar'].map((tab) => (
             <button
               key={tab}
               className={`pb-3 font-medium text-lg transition-colors ${
@@ -341,6 +300,8 @@ const Proyecto = () => {
                     fecha_fin_estimada: '',
                     estado: 'En Progreso',
                     fase: 'Planificación',
+                    idEncargado: '',
+                    idCliente: '',
                     fases: [
                       { nombreFase: 'Planificación', fecha_inicio: '', fecha_fin: '', descripcion: '' },
                       { nombreFase: 'Preparación del Terreno', fecha_inicio: '', fecha_fin: '', descripcion: '' },
@@ -352,8 +313,6 @@ const Proyecto = () => {
                       { nombreFase: 'Entrega', fecha_inicio: '', fecha_fin: '', descripcion: '' },
                     ],
                   });
-                } else if (tab === 'asignar') {
-                  setAssignData({ idEncargado: '', idCliente: '', idProyecto: '' });
                 }
               }}
             >
@@ -424,7 +383,7 @@ const Proyecto = () => {
               </table>
             </div>
           </div>
-        ) : activeTab === 'agregar' ? (
+        ) : (
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-8 max-w-6xl mx-auto">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">{editMode ? 'Editar Proyecto' : 'Agregar Nuevo Proyecto'}</h2>
             <div className="space-y-8">
@@ -439,6 +398,7 @@ const Proyecto = () => {
                       value={formData.nombre}
                       onChange={handleChange}
                       className={`w-full px-4 py-2 bg-gray-50 border ${errors.nombre ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
+                      disabled={loadingAction}
                     />
                     {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
                   </div>
@@ -450,6 +410,7 @@ const Proyecto = () => {
                       onChange={handleChange}
                       className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                       rows="3"
+                      disabled={loadingAction}
                     />
                   </div>
                   <div>
@@ -460,6 +421,7 @@ const Proyecto = () => {
                       value={formData.fecha_inicio}
                       onChange={handleChange}
                       className={`w-full px-4 py-2 bg-gray-50 border ${errors.fecha_inicio ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
+                      disabled={loadingAction}
                     />
                     {errors.fecha_inicio && <p className="text-red-500 text-xs mt-1">{errors.fecha_inicio}</p>}
                   </div>
@@ -471,8 +433,57 @@ const Proyecto = () => {
                       value={formData.fecha_fin_estimada}
                       onChange={handleChange}
                       className={`w-full px-4 py-2 bg-gray-50 border ${errors.fecha_fin_estimada ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
+                      disabled={loadingAction}
                     />
                     {errors.fecha_fin_estimada && <p className="text-red-500 text-xs mt-1">{errors.fecha_fin_estimada}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Encargado *</label>
+                    <select
+                      name="idEncargado"
+                      value={formData.idEncargado}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-2 bg-gray-50 border ${errors.idEncargado ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
+                      disabled={loadingAction}
+                    >
+                      {loadingFetch ? (
+                        <option value="">Cargando...</option>
+                      ) : (
+                        <>
+                          <option value="">Seleccione un encargado</option>
+                          {encargados.map((encargado) => (
+                            <option key={encargado.idUsuario} value={encargado.idUsuario}>
+                              {encargado.datos?.nombre || 'Sin nombre'} {encargado.datos?.apellido || ''}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                    {errors.idEncargado && <p className="text-red-500 text-xs mt-1">{errors.idEncargado}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Cliente *</label>
+                    <select
+                      name="idCliente"
+                      value={formData.idCliente}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-2 bg-gray-50 border ${errors.idCliente ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
+                      disabled={loadingAction}
+                    >
+                      {loadingFetch ? (
+                        <option value="">Cargando...</option>
+                      ) : (
+                        <>
+                          <option value="">Seleccione un cliente</option>
+                          {clientes.map((cliente) => (
+                            <option key={cliente.idUsuario} value={cliente.idUsuario}>
+                              {cliente.datos?.nombre || 'Sin nombre'} {cliente.datos?.apellido || ''}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                    {errors.idCliente && <p className="text-red-500 text-xs mt-1">{errors.idCliente}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
@@ -481,6 +492,7 @@ const Proyecto = () => {
                       value={formData.estado}
                       onChange={handleChange}
                       className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      disabled={loadingAction}
                     >
                       <option value="En Progreso">En Progreso</option>
                       <option value="Finalizado">Finalizado</option>
@@ -493,6 +505,7 @@ const Proyecto = () => {
                       value={formData.fase}
                       onChange={handleChange}
                       className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      disabled={loadingAction}
                     >
                       {[
                         'Planificación',
@@ -531,6 +544,7 @@ const Proyecto = () => {
                                 value={fase.fecha_inicio}
                                 onChange={(e) => handlePhaseChange(index, 'fecha_inicio', e.target.value)}
                                 className={`w-full px-2 py-1 bg-gray-50 border ${errors[`fase_${index}_fecha_inicio`] ? 'border-red-500' : 'border-gray-200'} rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm`}
+                                disabled={loadingAction}
                               />
                               {errors[`fase_${index}_fecha_inicio`] && (
                                 <p className="text-red-500 text-xs mt-1">{errors[`fase_${index}_fecha_inicio`]}</p>
@@ -542,6 +556,7 @@ const Proyecto = () => {
                                 value={fase.fecha_fin}
                                 onChange={(e) => handlePhaseChange(index, 'fecha_fin', e.target.value)}
                                 className={`w-full px-2 py-1 bg-gray-50 border ${errors[`fase_${index}_fecha_fin`] ? 'border-red-500' : 'border-gray-200'} rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm`}
+                                disabled={loadingAction}
                               />
                               {errors[`fase_${index}_fecha_fin`] && (
                                 <p className="text-red-500 text-xs mt-1">{errors[`fase_${index}_fecha_fin`]}</p>
@@ -553,6 +568,7 @@ const Proyecto = () => {
                                 onChange={(e) => handlePhaseChange(index, 'descripcion', e.target.value)}
                                 className="w-full px-2 py-1 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                                 rows="2"
+                                disabled={loadingAction}
                               />
                             </td>
                           </tr>
@@ -567,6 +583,7 @@ const Proyecto = () => {
                   type="button"
                   onClick={() => setActiveTab('gestionar')}
                   className="px-6 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition-colors"
+                  disabled={loadingAction}
                 >
                   Cancelar
                 </button>
@@ -585,101 +602,6 @@ const Proyecto = () => {
                     </span>
                   ) : (
                     'Guardar'
-                  )}
-                </button>
-              </div>
-            </div>
-          </form>
-        ) : (
-          <form onSubmit={handleAssignSubmit} className="bg-white rounded-lg shadow-sm p-8 max-w-4xl mx-auto">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Asignar Proyecto</h2>
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Proyecto *</label>
-                <select
-                  name="idProyecto"
-                  value={assignData.idProyecto}
-                  onChange={handleAssignChange}
-                  className={`w-full px-4 py-2 bg-gray-50 border ${errors.idProyecto ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                >
-                  {loadingFetch ? (
-                    <option value="">Cargando...</option>
-                  ) : (
-                    <>
-                      <option value="">Seleccione un proyecto</option>
-                      {proyectos.map((proyecto) => (
-                        <option key={proyecto.idProyecto} value={proyecto.idProyecto}>{proyecto.nombre}</option>
-                      ))}
-                    </>
-                  )}
-                </select>
-                {errors.idProyecto && <p className="text-red-500 text-xs mt-1">{errors.idProyecto}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Encargado *</label>
-                <select
-                  name="idEncargado"
-                  value={assignData.idEncargado}
-                  onChange={handleAssignChange}
-                  className={`w-full px-4 py-2 bg-gray-50 border ${errors.idEncargado ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                >
-                  {loadingFetch ? (
-                    <option value="">Cargando...</option>
-                  ) : (
-                    <>
-                      <option value="">Seleccione un encargado</option>
-                      {encargados.map((encargado) => (
-                        <option key={encargado.idUsuario} value={encargado.idUsuario}>{encargado.datos?.nombre || 'Sin nombre'} {encargado.datos?.apellido || ''}</option>
-                      ))}
-                    </>
-                  )}
-                </select>
-                {errors.idEncargado && <p className="text-red-500 text-xs mt-1">{errors.idEncargado}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Cliente *</label>
-                <select
-                  name="idCliente"
-                  value={assignData.idCliente}
-                  onChange={handleAssignChange}
-                  className={`w-full px-4 py-2 bg-gray-50 border ${errors.idCliente ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                >
-                  {loadingFetch ? (
-                    <option value="">Cargando...</option>
-                  ) : (
-                    <>
-                      <option value="">Seleccione un cliente</option>
-                      {clientes.map((cliente) => (
-                        <option key={cliente.idUsuario} value={cliente.idUsuario}>{cliente.datos?.nombre || 'Sin nombre'} {cliente.datos?.apellido || ''}</option>
-                      ))}
-                    </>
-                  )}
-                </select>
-                {errors.idCliente && <p className="text-red-500 text-xs mt-1">{errors.idCliente}</p>}
-              </div>
-              <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('gestionar')}
-                  className="px-6 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
-                  disabled={loadingAction}
-                >
-                  {loadingAction ? (
-                    <span className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy deshabilita los select cuando este en true loadingAction="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Asignando...
-                    </span>
-                  ) : (
-                    'Asignar'
                   )}
                 </button>
               </div>
