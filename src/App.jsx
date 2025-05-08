@@ -22,6 +22,7 @@ import Login from './ui/Auth/Login';
 import Admin from './ui/Admin/Inicio/Admin';
 import ClienteUI from './ui/Admin/ClienteUI/ClienteUI';
 import EncargadoUI from './ui/Admin/EncargadoUI/EncargadoUI';
+import ProyectoUI from './ui/Admin/ProyectoUI/ProyectoUI';
 
 // UIS Cliente
 import Cliente from './ui/Cliente/Inicio/Cliente';
@@ -61,6 +62,7 @@ function AppContent() {
       <Route path="/admin" element={<ProtectedRouteAdmin element={<Admin />} />} />
       <Route path="/admin/clientes" element={<ProtectedRouteAdmin element={<ClienteUI />} />} />
       <Route path="/admin/encargados" element={<ProtectedRouteAdmin element={<EncargadoUI />} />} />
+      <Route path="/admin/proyectos" element={<ProtectedRouteAdmin element={<ProyectoUI />} />} />
 
       {/* Rutas cliente */}
       
