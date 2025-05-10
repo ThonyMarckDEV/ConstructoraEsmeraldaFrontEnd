@@ -10,7 +10,7 @@ import API_BASE_URL from '../../../../js/urlHelper';
 import jwtUtils from '../../../../utilities/jwtUtils';
 import LoadingSkeleton from './LoadingSkeleton';
 
-const Charts = () => {
+const ClientCharts = () => {
   const [projectData, setProjectData] = useState([]);
   const [projectStats, setProjectStats] = useState({
     total_proyectos: 0,
@@ -52,18 +52,15 @@ const Charts = () => {
           throw new Error('User ID not found');
         }
 
-        // Get the response from the API
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/encargados/${userId}/projects/analytics`);
+        // Fetch analytics for client's projects
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/client/projects/analytics`);
         
         // Parse the response as JSON
         const jsonData = await response.json();
         
         // Check if response is successful and contains data
         if (jsonData && jsonData.success === true && jsonData.data) {
-          // Set projects data for the timeline chart
           setProjectData(jsonData.data.data || []);
-          
-          // Set statistics data for other charts
           setProjectStats({
             total_proyectos: jsonData.data.total_proyectos || 0,
             proyectos_por_estado: jsonData.data.proyectos_por_estado || {},
@@ -76,7 +73,7 @@ const Charts = () => {
           });
         } else {
           console.error("Invalid response format:", jsonData);
-          setError('Received invalid data format from server');
+          setError(jsonData.message || 'Received invalid data format from server');
         }
         
         setLoading(false);
@@ -184,7 +181,7 @@ const Charts = () => {
   return (
     <div className="p-4">
       <div className="mb-6 bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold mb-2">Resumen de Proyectos</h3>
+        <h3 className="text-lg font-semibold mb-2">Resumen de Tus Proyectos</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-blue-50 p-3 rounded-lg text-center">
             <div className="text-sm font-medium text-gray-500">Total Proyectos</div>
@@ -219,14 +216,14 @@ const Charts = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Radar Chart for Project Health */}
         <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4">Salud General de Proyectos</h3>
+          <h3 className="text-lg font-semibold mb-4">Estado General de Tus Proyectos</h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart outerRadius={90} data={radarData}>
                 <PolarGrid />
                 <PolarAngleAxis dataKey="subject" />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                <Radar name="Salud %" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                <Radar name="Estado %" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
                 <Legend />
                 <Tooltip />
               </RadarChart>
@@ -237,7 +234,7 @@ const Charts = () => {
         {/* Projects By Status */}
         {hasStatusData ? (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Proyectos por Estado</h3>
+            <h3 className="text-lg font-semibold mb-4">Tus Proyectos por Estado</h3>
             <div className="w-full h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -263,7 +260,7 @@ const Charts = () => {
           </div>
         ) : (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Proyectos por Estado</h3>
+            <h3 className="text-lg font-semibold mb-4">Tus Proyectos por Estado</h3>
             <div className="flex items-center justify-center h-64">No hay datos de estado</div>
           </div>
         )}
@@ -273,7 +270,7 @@ const Charts = () => {
         {/* Projects By Phase */}
         {hasPhaseData ? (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Proyectos por Fase</h3>
+            <h3 className="text-lg font-semibold mb-4">Tus Proyectos por Fase</h3>
             <div className="w-full h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={phaseChartData}>
@@ -289,7 +286,7 @@ const Charts = () => {
           </div>
         ) : (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Proyectos por Fase</h3>
+            <h3 className="text-lg font-semibold mb-4">Tus Proyectos por Fase</h3>
             <div className="flex items-center justify-center h-64">No hay datos de fase</div>
           </div>
         )}
@@ -325,7 +322,7 @@ const Charts = () => {
         {/* Phase Completion Percentage */}
         {hasCompletionData ? (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Porcentaje de Finalización por Fase</h3>
+            <h3 className="text-lg font-semibold mb-4">Progreso de Fases</h3>
             <div className="w-full h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={phaseCompletionData}>
@@ -341,7 +338,7 @@ const Charts = () => {
           </div>
         ) : (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Porcentaje de Finalización por Fase</h3>
+            <h3 className="text-lg font-semibold mb-4">Progreso de Fases</h3>
             <div className="flex items-center justify-center h-64">No hay datos disponibles</div>
           </div>
         )}
@@ -375,7 +372,7 @@ const Charts = () => {
         {/* Project Completion Trend */}
         {hasTrendData ? (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Tendencia de Finalización de Proyectos</h3>
+            <h3 className="text-lg font-semibold mb-4">Historial de Finalización</h3>
             <div className="w-full h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={completionTrendData}>
@@ -393,7 +390,7 @@ const Charts = () => {
           </div>
         ) : (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Tendencia de Finalización de Proyectos</h3>
+            <h3 className="text-lg font-semibold mb-4">Historial de Finalización</h3>
             <div className="flex items-center justify-center h-64">No hay datos de tendencia disponibles</div>
           </div>
         )}
@@ -401,7 +398,7 @@ const Charts = () => {
         {/* Projects Near Deadline */}
         {hasDeadlineData ? (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Proyectos Cercanos a Fecha Límite</h3>
+            <h3 className="text-lg font-semibold mb-4">Proyectos Próximos a Entrega</h3>
             <div className="w-full h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={projectsNearDeadline}>
@@ -417,7 +414,7 @@ const Charts = () => {
           </div>
         ) : (
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Proyectos Cercanos a Fecha Límite</h3>
+            <h3 className="text-lg font-semibold mb-4">Proyectos Próximos a Entrega</h3>
             <div className="flex items-center justify-center h-64">No hay proyectos próximos a vencer</div>
           </div>
         )}
@@ -426,7 +423,7 @@ const Charts = () => {
       {/* Project Duration Timeline */}
       {hasTimelineData ? (
         <div className="bg-white p-4 rounded-lg shadow md:col-span-1 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Duración de Proyectos (Meses)</h3>
+          <h3 className="text-lg font-semibold mb-4">Duración de Tus Proyectos (Meses)</h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={timelineData} layout="vertical">
@@ -442,7 +439,7 @@ const Charts = () => {
         </div>
       ) : (
         <div className="bg-white p-4 rounded-lg shadow md:col-span-1 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Duración de Proyectos (Meses)</h3>
+          <h3 className="text-lg font-semibold mb-4">Duración de Tus Proyectos (Meses)</h3>
           <div className="flex items-center justify-center h-64">No hay datos de duración disponibles</div>
         </div>
       )}
@@ -489,7 +486,7 @@ const Charts = () => {
       
       {/* Project Progress Dashboard */}
       <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <h3 className="text-lg font-semibold mb-4">Panel de Progreso de Proyectos</h3>
+        <h3 className="text-lg font-semibold mb-4">Progreso de Tus Proyectos</h3>
         {projectData && projectData.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white">
@@ -544,15 +541,15 @@ const Charts = () => {
             </table>
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">No hay datos de progreso disponibles</div>
+          <div className="text-center py-8 text-gray-500">No tienes proyectos en progreso</div>
         )}
       </div>
       
       {/* Project Timeline Distribution Analysis */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold mb-4">Distribución de Tiempo en Fases del Proyecto</h3>
+        <h3 className="text-lg font-semibold mb-4">Distribución de Tiempo en Fases</h3>
         <div className="text-sm text-gray-500 mb-4">
-          Este gráfico muestra la distribución promedio del tiempo en las diferentes fases de los proyectos.
+          Este gráfico muestra cuánto tiempo promedio se dedica a cada fase en tus proyectos.
         </div>
         {hasTimeData ? (
           <div className="w-full h-64">
@@ -580,7 +577,7 @@ const Charts = () => {
           </div>
         ) : (
           <div className="flex items-center justify-center h-64 text-gray-500">
-            No hay suficientes datos de fases completadas para mostrar la distribución
+            No hay datos suficientes para mostrar la distribución de tiempo
           </div>
         )}
       </div>
@@ -588,4 +585,4 @@ const Charts = () => {
   );
 };
 
-export default Charts;
+export default ClientCharts;

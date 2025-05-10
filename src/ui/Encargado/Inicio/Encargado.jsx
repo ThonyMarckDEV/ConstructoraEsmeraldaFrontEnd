@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import Sidebar from '../../../components/ui/Sidebar';
 import Header from '../../../components/Header';
 import Charts from '../../../components/ui/Encargado/Inicio/Charts';

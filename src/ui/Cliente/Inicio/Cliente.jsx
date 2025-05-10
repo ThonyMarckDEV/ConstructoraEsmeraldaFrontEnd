@@ -1,6 +1,7 @@
-import React from 'react';
 import Sidebar from '../../../components/ui/Sidebar';
 import Header from '../../../components/Header';
+import Charts from '../../../components/ui/Cliente/Inicio/Charts';
+import { ResponsiveContainer } from 'recharts';
 
 const Cliente = () => {
     
@@ -15,6 +16,12 @@ const Cliente = () => {
           title="Dashboard" 
           description="Bienvenido a tu panel de control." 
         />
+        
+        <div className="w-full h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <Charts />
+          </ResponsiveContainer>
+        </div>
 
       </div>
     </div>
