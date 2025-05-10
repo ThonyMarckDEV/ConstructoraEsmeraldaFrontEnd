@@ -192,7 +192,7 @@ const Modulo = ({ proyectoId }) => {
       const realId = fileId.replace(isPhoto ? 'photo-' : 'file-', '');
   
       const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/files/delete`, {
-        method: 'POST',
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
