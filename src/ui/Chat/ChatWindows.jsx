@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../../js/authToken';
 import jwtUtils from '../../utilities/jwtUtils';
 import io from 'socket.io-client';
 import SOCKET_URL from '../../js/socketUrl';
 import Sidebar from '../../components/ui/Sidebar';
-
-// Imported components
 import ChatHeader from '../../components/ui/Chat/ChatHeader';
 import ChatMessages from '../../components/ui/Chat/ChatMessages';
 import ChatInput from '../../components/ui/Chat/ChatInput';
@@ -42,7 +40,6 @@ const ChatWindow = () => {
   };
 
   const role = getUserRoleNormalized();
-  const backUrl = id ? `/${role}/proyecto/${id}` : `/${role}/proyectos`;
 
   // Auto-scroll to bottom when needed
   useEffect(() => {
@@ -288,7 +285,6 @@ const ChatWindow = () => {
           contactName={contactName} 
           contactInitials={contactInitials} 
           contactRole={contactRole}
-          backUrl={backUrl}
           projectName={chatData.proyecto.nombre}
           createdAt={chatData.chat.created_at}
           formatDate={formatDate}

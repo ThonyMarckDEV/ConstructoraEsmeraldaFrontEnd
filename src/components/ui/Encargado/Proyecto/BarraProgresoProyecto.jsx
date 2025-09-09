@@ -4,6 +4,7 @@ import API_BASE_URL from '../../../../js/urlHelper';
 import { Link } from 'react-router-dom';
 import LoadingBarraProgresoProyecto from './LoadingBarraProgresoProyecto';
 import SelectorFasesProyecto from './SelectorFasesProyecto';
+import getChatIdByProyecto from './getChatIdByProyecto';
 
 const BarraProgresoProyecto = ({ proyectoId }) => {
   const [proyecto, setProyecto] = useState(null);
@@ -11,58 +12,62 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-
+  const [chatId, setChatId] = useState(null);
 
   useEffect(() => {
-    const fetchProjectData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        
-        // Fetch combined project and phases data with a single API call
+
+        // Fetch combined project and phases data
         const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/${proyectoId}/with-phases`);
         const data = await response.json();
-        
+
         if (!response.ok) {
           throw new Error(data.message || 'Error al obtener datos del proyecto');
         }
-        
-        // Set state with the combined data
+
+        // Set project and phases state
         setProyecto(data.proyecto);
         setFases(data.fases);
-        
+
+        // Fetch chat ID
+        const chatId = await getChatIdByProyecto(proyectoId);
+        setChatId(chatId);
+
       } catch (error) {
-        console.error("Error fetching project data:", error);
+        console.error('Error fetching data:', error);
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
-    
+
     if (proyectoId) {
-      fetchProjectData();
+      fetchData();
     }
   }, [proyectoId]);
-  
+
   // Find current phase index by name or by number
   const getCurrentPhaseIndex = () => {
-    if (!proyecto?.fase || proyecto.fase.trim() === "") {
+    if (!proyecto?.fase || proyecto.fase.trim() === '') {
       return 0; // No phase defined
     }
-    
+
     // If fase is a number, parse it directly
     if (!isNaN(parseInt(proyecto.fase))) {
       return parseInt(proyecto.fase);
     }
-    
+
     // If fase is a string, find the corresponding phase by name
     const phaseIndex = fases.findIndex(
       fase => fase.nombreFase.toLowerCase() === proyecto.fase.toLowerCase()
     );
-    
+
     // If found, return 1-based index (to match existing logic), otherwise return 0
     return phaseIndex !== -1 ? phaseIndex + 1 : 0;
   };
-  
+
   const handleFaseChange = (nuevaFase) => {
     // Actualizar el estado local del proyecto con la nueva fase
     setProyecto({
@@ -70,19 +75,24 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
       fase: nuevaFase
     });
   };
-  
-  const hasFase = proyecto?.fase && proyecto.fase.trim() !== "";
+
+  const hasFase = proyecto?.fase && proyecto.fase.trim() !== '';
   const currentPhase = getCurrentPhaseIndex();
-  
+
   // Calculate progress percentage - if no phase is defined, progress is 0
   const progressPercentage = hasFase && fases.length > 0 && currentPhase > 0 ? (currentPhase / fases.length) * 100 : 0;
 
-  
-  // Use the separated loading component
+  // Get current phase name
+  const currentPhaseName = hasFase ? (
+    currentPhase > 0 && currentPhase <= fases.length
+      ? fases[currentPhase - 1]?.nombreFase
+      : proyecto.fase // Use the original phase name from API if no match found
+  ) : '';
+
   if (loading) {
     return <LoadingBarraProgresoProyecto />;
   }
-  
+
   if (error) {
     return (
       <div className="w-full bg-white shadow-lg p-6">
@@ -92,7 +102,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
       </div>
     );
   }
-  
+
   if (!proyecto || fases.length === 0) {
     return (
       <div className="w-full bg-white shadow-lg p-6">
@@ -103,19 +113,12 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
     );
   }
 
-  // Get current phase name
-  const currentPhaseName = hasFase ? (
-    currentPhase > 0 && currentPhase <= fases.length 
-      ? fases[currentPhase - 1]?.nombreFase 
-      : proyecto.fase // Use the original phase name from API if no match found
-  ) : '';
-
   return (
     <div className="w-full bg-white shadow-lg">
       {/* Enhanced Header with background image - full width */}
       <div className="relative h-40 md:h-48 bg-gradient-to-r from-green-800 to-green-600 overflow-hidden w-full">
         {/* Background Image Placeholder */}
-        <div className="absolute inset-0 opacity-20 bg-cover bg-center" 
+        <div className="absolute inset-0 opacity-20 bg-cover bg-center"
              style={{backgroundImage: `url('/api/placeholder/1920/300')`}} />
         
         {/* Overlay with construction icons - hidden on mobile */}
@@ -135,18 +138,18 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
               <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Proyecto: {proyecto.nombre}</h1>
             </div>
             
-            {/* AR and Chat Buttons - only visible on desktop */}
+            {/* Chat Button - only visible on desktop */}
             <div className="hidden md:flex space-x-2">
-              <Link 
-                to={`/encargado/proyecto/chat/${proyectoId}`} 
-                className="flex items-center bg-white text-green-600 hover:bg-blue-50 rounded-lg shadow-lg px-3 py-2 border border-green-200 font-medium transition duration-300 ease-in-out transform hover:scale-105"
+              <Link
+                to={chatId ? `/encargado/proyecto/chat/${chatId}` : '#'}
+                className={`flex items-center bg-white text-green-600 hover:bg-green-50 rounded-lg shadow-lg px-3 py-2 border border-green-200 font-medium transition duration-300 ease-in-out transform hover:scale-105 ${!chatId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={(e) => !chatId && e.preventDefault()}
               >
                 <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                 </svg>
                 <span>Chat</span>
               </Link>
-              
             </div>
           </div>
           
@@ -164,11 +167,12 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         </div>
       </div>
 
-      {/* Mobile version of the AR and Chat buttons - fixed at bottom of screen */}
+      {/* Mobile version of the Chat button - fixed at bottom of screen */}
       <div className="fixed bottom-4 right-4 md:hidden z-10 flex flex-col space-y-2">
-        <Link 
-          to={`/encargado/proyecto/chat/${proyectoId}`} 
-          className="flex items-center justify-center bg-green-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-green-600"
+        <Link
+          to={chatId ? `/encargado/proyecto/chat/${chatId}` : '#'}
+          className={`flex items-center justify-center bg-green-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-green-600 ${!chatId ? 'opacity-50 cursor-not-allowed' : ''}`}
+          onClick={(e) => !chatId && e.preventDefault()}
         >
           <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
@@ -178,9 +182,8 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
 
       {/* Progress section */}
       <div className="p-4 md:p-6">
-
         {/* Selector de Fases */}
-        <SelectorFasesProyecto 
+        <SelectorFasesProyecto
           proyectoId={proyectoId}
           fase={proyecto.fase}
           fases={fases}
@@ -189,7 +192,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
       
         {/* Main progress bar */}
         <div className="w-full bg-gray-200 rounded-full h-3 md:h-4 mb-4 md:mb-6">
-          <div 
+          <div
             className="bg-green-600 h-3 md:h-4 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
@@ -210,7 +213,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
                   {currentPhaseName || 'No encontrada'}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => setIsDetailsOpen(!isDetailsOpen)}
                 className="md:hidden text-green-600 p-1"
               >
@@ -227,7 +230,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
                   No definida
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => setIsDetailsOpen(!isDetailsOpen)}
                 className="md:hidden text-gray-600 p-1"
               >
@@ -245,24 +248,24 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
           {/* Phase points and titles */}
           <div className="flex justify-between relative">
             {fases.map((fase, index) => (
-              <div 
-                key={fase.idFase} 
+              <div
+                key={fase.idFase}
                 className={`flex flex-col items-center ${hasFase && currentPhase > 0 && index + 1 <= currentPhase ? 'text-green-600' : 'text-gray-400'}`}
               >
-                <div 
+                <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center font-bold z-10 ${
-                    hasFase && currentPhase > 0 && index + 1 < currentPhase 
-                      ? 'bg-green-600 text-white' 
-                      : hasFase && currentPhase > 0 && index + 1 === currentPhase 
-                        ? 'bg-white border-4 border-green-600 text-green-600' 
+                    hasFase && currentPhase > 0 && index + 1 < currentPhase
+                      ? 'bg-green-600 text-white'
+                      : hasFase && currentPhase > 0 && index + 1 === currentPhase
+                        ? 'bg-white border-4 border-green-600 text-green-600'
                         : 'bg-white border-2 border-gray-300 text-gray-400'
                   }`}
                 >
                   {index + 1}
                 </div>
                 <div className="mt-2 text-xs font-medium text-center max-w-16 whitespace-normal">
-                  {hasFase && currentPhase > 0 && index + 1 === currentPhase ? 
-                    <strong>{fase.nombreFase.split(' ')[0]}</strong> : 
+                  {hasFase && currentPhase > 0 && index + 1 === currentPhase ?
+                    <strong>{fase.nombreFase.split(' ')[0]}</strong> :
                     fase.nombreFase.split(' ')[0]
                   }
                 </div>
@@ -281,16 +284,16 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
               {/* Phase points and titles */}
               <div className="flex space-x-12 relative">
                 {fases.map((fase, index) => (
-                  <div 
-                    key={fase.idFase} 
-                    className={`flex flex-col items-center ${hasFase && currentPhase > 0 && index + 1 <= currentPhase ? 'text-v-600' : 'text-gray-400'}`}
+                  <div
+                    key={fase.idFase}
+                    className={`flex flex-col items-center ${hasFase && currentPhase > 0 && index + 1 <= currentPhase ? 'text-green-600' : 'text-gray-400'}`}
                   >
-                    <div 
+                    <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center font-bold z-10 ${
-                        hasFase && currentPhase > 0 && index + 1 < currentPhase 
-                          ? 'bg-green-600 text-white' 
-                          : hasFase && currentPhase > 0 && index + 1 === currentPhase 
-                            ? 'bg-white border-4 border-green-600 text-green-600' 
+                        hasFase && currentPhase > 0 && index + 1 < currentPhase
+                          ? 'bg-green-600 text-white'
+                          : hasFase && currentPhase > 0 && index + 1 === currentPhase
+                            ? 'bg-white border-4 border-green-600 text-green-600'
                             : 'bg-white border-2 border-gray-300 text-gray-400'
                       }`}
                     >
