@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { fetchWithAuth } from '../../../../js/authToken';
-import API_BASE_URL from '../../../../js/urlHelper';
 import { Link } from 'react-router-dom';
 import LoadingBarraProgresoProyecto from './LoadingBarraProgresoProyecto';
-import getChatIdByProyecto from './getChatIdByProyecto';
+import { fetchProjectWithPhases, getChatIdByProyecto } from './utilities/endpoints';
 
 const BarraProgresoProyecto = ({ proyectoId }) => {
   const [proyecto, setProyecto] = useState(null);
@@ -19,12 +17,7 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         setLoading(true);
 
         // Fetch combined project and phases data
-        const projectResponse = await fetchWithAuth(`${API_BASE_URL}/api/client/project/${proyectoId}/with-phases`);
-        const projectData = await projectResponse.json();
-
-        if (!projectResponse.ok) {
-          throw new Error(projectData.message || 'Error al obtener datos del proyecto');
-        }
+        const projectData = await fetchProjectWithPhases(proyectoId);
 
         setProyecto(projectData.proyecto);
         setFases(projectData.fases);

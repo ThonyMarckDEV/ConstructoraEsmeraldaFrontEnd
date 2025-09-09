@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { fetchWithAuth } from '../../../../js/authToken';
-import API_BASE_URL from '../../../../js/urlHelper';
 import { Link } from 'react-router-dom';
 import LoadingBarraProgresoProyecto from './LoadingBarraProgresoProyecto';
 import SelectorFasesProyecto from './SelectorFasesProyecto';
-import getChatIdByProyecto from './getChatIdByProyecto';
+import { fetchProjectWithPhases, getChatIdByProyecto, updateProjectPhase } from './utilities/endpoints';
 
 const BarraProgresoProyecto = ({ proyectoId }) => {
   const [proyecto, setProyecto] = useState(null);
@@ -13,33 +11,34 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
   const [error, setError] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [chatId, setChatId] = useState(null);
+  const [chatLoading, setChatLoading] = useState(true);
+  const [chatError, setChatError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        setChatLoading(true);
 
         // Fetch combined project and phases data
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/manager/project/${proyectoId}/with-phases`);
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Error al obtener datos del proyecto');
-        }
-
-        // Set project and phases state
+        const data = await fetchProjectWithPhases(proyectoId);
         setProyecto(data.proyecto);
         setFases(data.fases);
 
         // Fetch chat ID
-        const chatId = await getChatIdByProyecto(proyectoId);
-        setChatId(chatId);
+        try {
+          const chatId = await getChatIdByProyecto(proyectoId);
+          setChatId(chatId);
+        } catch (chatErr) {
+          setChatError('No se pudo cargar el chat para este proyecto.');
+        }
 
       } catch (error) {
         console.error('Error fetching data:', error);
         setError(error.message);
       } finally {
         setLoading(false);
+        setChatLoading(false);
       }
     };
 
@@ -48,45 +47,39 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
     }
   }, [proyectoId]);
 
-  // Find current phase index by name or by number
   const getCurrentPhaseIndex = () => {
     if (!proyecto?.fase || proyecto.fase.trim() === '') {
-      return 0; // No phase defined
+      return 0;
     }
-
-    // If fase is a number, parse it directly
     if (!isNaN(parseInt(proyecto.fase))) {
       return parseInt(proyecto.fase);
     }
-
-    // If fase is a string, find the corresponding phase by name
     const phaseIndex = fases.findIndex(
       fase => fase.nombreFase.toLowerCase() === proyecto.fase.toLowerCase()
     );
-
-    // If found, return 1-based index (to match existing logic), otherwise return 0
     return phaseIndex !== -1 ? phaseIndex + 1 : 0;
   };
 
-  const handleFaseChange = (nuevaFase) => {
-    // Actualizar el estado local del proyecto con la nueva fase
-    setProyecto({
-      ...proyecto,
-      fase: nuevaFase
-    });
+  const handleFaseChange = async (nuevaFase) => {
+    try {
+      await updateProjectPhase(proyectoId, nuevaFase);
+      setProyecto({
+        ...proyecto,
+        fase: nuevaFase
+      });
+    } catch (error) {
+      console.error('Error updating phase:', error);
+      setError(error.message);
+    }
   };
 
   const hasFase = proyecto?.fase && proyecto.fase.trim() !== '';
   const currentPhase = getCurrentPhaseIndex();
-
-  // Calculate progress percentage - if no phase is defined, progress is 0
   const progressPercentage = hasFase && fases.length > 0 && currentPhase > 0 ? (currentPhase / fases.length) * 100 : 0;
-
-  // Get current phase name
   const currentPhaseName = hasFase ? (
     currentPhase > 0 && currentPhase <= fases.length
       ? fases[currentPhase - 1]?.nombreFase
-      : proyecto.fase // Use the original phase name from API if no match found
+      : proyecto.fase
   ) : '';
 
   if (loading) {
@@ -115,13 +108,9 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
 
   return (
     <div className="w-full bg-white shadow-lg">
-      {/* Enhanced Header with background image - full width */}
       <div className="relative h-40 md:h-48 bg-gradient-to-r from-green-800 to-green-600 overflow-hidden w-full">
-        {/* Background Image Placeholder */}
         <div className="absolute inset-0 opacity-20 bg-cover bg-center"
              style={{backgroundImage: `url('/api/placeholder/1920/300')`}} />
-        
-        {/* Overlay with construction icons - hidden on mobile */}
         <div className="absolute inset-0 hidden md:flex items-center justify-center">
           <div className="grid grid-cols-4 gap-4 opacity-10">
             <span className="text-6xl">🏗️</span>
@@ -130,29 +119,38 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
             <span className="text-6xl">📐</span>
           </div>
         </div>
-        
-        {/* Text content with AR button (only visible on desktop) */}
         <div className="absolute inset-0 flex flex-col justify-center p-4 md:p-6 text-white">
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Proyecto: {proyecto.nombre}</h1>
             </div>
-            
-            {/* Chat Button - only visible on desktop */}
             <div className="hidden md:flex space-x-2">
-              <Link
-                to={chatId ? `/encargado/proyecto/chat/${chatId}` : '#'}
-                className={`flex items-center bg-white text-green-600 hover:bg-green-50 rounded-lg shadow-lg px-3 py-2 border border-green-200 font-medium transition duration-300 ease-in-out transform hover:scale-105 ${!chatId ? 'opacity-50 cursor-not-allowed' : ''}`}
-                onClick={(e) => !chatId && e.preventDefault()}
-              >
-                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                </svg>
-                <span>Chat</span>
-              </Link>
+              {chatLoading ? (
+                <div className="flex items-center bg-white text-green-600 rounded-lg shadow-lg px-3 py-2 border border-green-200 font-medium">
+                  <svg className="animate-spin h-5 w-5 mr-2 text-green-600" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Cargando chat...</span>
+                </div>
+              ) : chatError ? (
+                <div className="flex items-center bg-white text-red-600 rounded-lg shadow-lg px-3 py-2 border border-red-200 font-medium">
+                  <span>{chatError}</span>
+                </div>
+              ) : (
+                <Link
+                  to={chatId ? `/encargado/proyecto/chat/${chatId}` : '#'}
+                  className={`flex items-center bg-white text-green-600 hover:bg-green-50 rounded-lg shadow-lg px-3 py-2 border border-green-200 font-medium transition duration-300 ease-in-out transform hover:scale-105 ${!chatId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onClick={(e) => !chatId && e.preventDefault()}
+                >
+                  <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                  </svg>
+                  <span>Chat</span>
+                </Link>
+              )}
             </div>
           </div>
-          
           <div className="mt-2 md:mt-4 flex items-center">
             <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white text-green-700 flex items-center justify-center font-bold text-lg md:text-xl border-2 md:border-4 border-green-300">
               {progressPercentage ? Math.round(progressPercentage) : 0}%
@@ -167,38 +165,44 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
         </div>
       </div>
 
-      {/* Mobile version of the Chat button - fixed at bottom of screen */}
       <div className="fixed bottom-4 right-4 md:hidden z-10 flex flex-col space-y-2">
-        <Link
-          to={chatId ? `/encargado/proyecto/chat/${chatId}` : '#'}
-          className={`flex items-center justify-center bg-green-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-green-600 ${!chatId ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={(e) => !chatId && e.preventDefault()}
-        >
-          <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-          </svg>
-        </Link>
+        {chatLoading ? (
+          <div className="flex items-center justify-center bg-green-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white">
+            <svg className="animate-spin h-6 w-6 text-white" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+        ) : chatError ? (
+          <div className="flex items-center justify-center bg-red-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white">
+            <span className="text-xs text-center">Chat no disponible</span>
+          </div>
+        ) : (
+          <Link
+            to={chatId ? `/encargado/proyecto/chat/${chatId}` : '#'}
+            className={`flex items-center justify-center bg-green-500 text-white rounded-full w-14 h-14 shadow-lg border-2 border-white transition duration-300 ease-in-out hover:bg-green-600 ${!chatId ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={(e) => !chatId && e.preventDefault()}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+          </Link>
+        )}
       </div>
 
-      {/* Progress section */}
       <div className="p-4 md:p-6">
-        {/* Selector de Fases */}
         <SelectorFasesProyecto
           proyectoId={proyectoId}
           fase={proyecto.fase}
           fases={fases}
           onFaseChange={handleFaseChange}
         />
-      
-        {/* Main progress bar */}
         <div className="w-full bg-gray-200 rounded-full h-3 md:h-4 mb-4 md:mb-6">
           <div
             className="bg-green-600 h-3 md:h-4 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
-
-        {/* Current phase highlight box - only shown if we have a phase */}
         {hasFase ? (
           <div className="bg-blue-50 border-l-4 border-green-500 p-3 md:p-4 mb-4 md:mb-6">
             <div className="flex items-center">
@@ -239,13 +243,8 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
             </div>
           </div>
         )}
-
-        {/* Scrollable phase indicators - For desktop */}
         <div className="relative mt-6 mb-4 hidden md:block">
-          {/* Connecting line */}
           <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-300 -translate-y-1/2" />
-          
-          {/* Phase points and titles */}
           <div className="flex justify-between relative">
             {fases.map((fase, index) => (
               <div
@@ -273,15 +272,10 @@ const BarraProgresoProyecto = ({ proyectoId }) => {
             ))}
           </div>
         </div>
-        
-        {/* Mobile view - Horizontal scrollable timeline */}
         <div className={`md:hidden ${isDetailsOpen ? 'block' : 'hidden'}`}>
           <div className="overflow-x-auto pb-4">
             <div className="relative min-w-max">
-              {/* Connecting line */}
               <div className="absolute top-4 left-0 right-0 h-1 bg-gray-300" />
-              
-              {/* Phase points and titles */}
               <div className="flex space-x-12 relative">
                 {fases.map((fase, index) => (
                   <div
