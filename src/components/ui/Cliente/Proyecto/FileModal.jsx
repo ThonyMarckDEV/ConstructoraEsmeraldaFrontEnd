@@ -38,7 +38,7 @@ const FileModal = ({ file, onClose }) => {
           setContent(
             <div className="flex justify-center items-center w-full h-full">
               <img 
-                src={`${API_BASE_URL}/storage/${file.path}`} 
+                src={`${file.path}`} 
                 alt={file.fileName} 
                 className="max-h-[70vh] max-w-full object-contain rounded-lg shadow-sm"
                 onError={(e) => {
@@ -53,7 +53,7 @@ const FileModal = ({ file, onClose }) => {
           setContent(
             <div className="h-[60vh] md:h-[75vh] w-full bg-gray-50 rounded-lg overflow-hidden">
               <iframe 
-                src={`${API_BASE_URL}/storage/${file.path}#view=fitH`} 
+                src={`${file.path}#view=fitH`} 
                 className="w-full h-full border-0"
                 title={`PDF Viewer - ${file.fileName}`}
                 onLoad={() => setLoading(false)}
