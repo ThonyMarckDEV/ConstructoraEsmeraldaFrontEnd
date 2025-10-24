@@ -27,13 +27,13 @@ const Sidebar = () => {
   const menuItemsCliente = [
     { name: "Inicio", icon: <Home size={20} />, path: "/cliente" },
     { name: "Proyectos", icon: <FileText size={20} />, path: "/cliente/proyectos" },
-    { name: "Configuración", icon: <Settings size={20} />, path: "/cliente/configuracion" }
+    //{ name: "Configuración", icon: <Settings size={20} />, path: "/cliente/configuracion" }
   ];
 
   const menuItemsManager = [
     { name: "Inicio", icon: <Home size={20} />, path: "/encargado" },
     { name: "Proyectos", icon: <FileText size={20} />, path: "/encargado/proyectos" },
-    { name: "Configuración", icon: <Settings size={20} />, path: "/encargado/configuracion" }
+   // { name: "Configuración", icon: <Settings size={20} />, path: "/encargado/configuracion" }
   ];
 
   const menuItemsAdmin = [
@@ -41,7 +41,7 @@ const Sidebar = () => {
     { name: "Clientes", icon: <User size={20} />, path: "/admin/clientes" },
     { name: "Encargados", icon: <UserCircle2 size={20} />, path: "/admin/encargados" },
     { name: "Proyectos", icon: <LucideHouse size={20} />, path: "/admin/proyectos" },
-    { name: "Configuración", icon: <Settings size={20} />, path: "/admin/configuracion" }
+    //{ name: "Configuración", icon: <Settings size={20} />, path: "/admin/configuracion" }
   ];
 
   const getMenuItems = () => {
