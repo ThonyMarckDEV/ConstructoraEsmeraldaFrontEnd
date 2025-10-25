@@ -13,11 +13,6 @@ const Hero = ({ isVisible, fadeInUp }) => {
             <p className="text-base md:text-xl mb-6 text-gray-100">
               En Constructora Esmeralda combinamos innovación, calidad y tecnología para brindar proyectos excepcionales con seguimiento en tiempo real.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="border-2 border-white px-6 py-3 rounded-md font-bold hover:bg-white hover:text-green-800 transition-all w-full sm:w-auto">
-                Contactar
-              </button>
-            </div>
           </div>
           <div className="w-full md:w-1/2 relative mt-4 md:mt-0">
             <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 shadow-xl">

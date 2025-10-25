@@ -17,19 +17,19 @@ const Contact = ({ isVisible, fadeInUp }) => {
                 <div className="bg-green-700 p-2 rounded-full mr-3 flex-shrink-0">
                   <MapPin className="text-white" size={18} />
                 </div>
-                <span className="text-sm md:text-base">Av. Insurgentes Sur 1234, Ciudad de México</span>
+                <span className="text-sm md:text-base">CAL. LIBERTAD NRO. 323 PIURa - SULLANA - BELLAVISTA</span>
               </div>
               <div className="flex items-center">
                 <div className="bg-green-700 p-2 rounded-full mr-3 flex-shrink-0">
                   <Phone className="text-white" size={18} />
                 </div>
-                <span className="text-sm md:text-base">+52 55 1234 5678</span>
+                <span className="text-sm md:text-base">+51 123 456 789</span>
               </div>
               <div className="flex items-center">
                 <div className="bg-green-700 p-2 rounded-full mr-3 flex-shrink-0">
                   <Mail className="text-white" size={18} />
                 </div>
-                <span className="text-sm md:text-base">contacto@constructoraesmeralda.com</span>
+                <span className="text-sm md:text-base">contactoconstructoraesmeralda@gmail.com</span>
               </div>
             </div>
             
@@ -80,7 +80,7 @@ const Contact = ({ isVisible, fadeInUp }) => {
                 <input 
                   type="tel" 
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-600"
-                  placeholder="+52 123 456 7890"
+                  placeholder="+51 123 456 789"
                 />
               </div>
               
