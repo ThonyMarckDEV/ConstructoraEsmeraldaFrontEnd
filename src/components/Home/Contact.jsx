@@ -19,12 +19,12 @@ const Contact = ({ isVisible, fadeInUp }) => {
                 </div>
                 <span className="text-sm md:text-base">CAL. LIBERTAD NRO. 323 PIURa - SULLANA - BELLAVISTA</span>
               </div>
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <div className="bg-green-700 p-2 rounded-full mr-3 flex-shrink-0">
                   <Phone className="text-white" size={18} />
                 </div>
                 <span className="text-sm md:text-base">+51 123 456 789</span>
-              </div>
+              </div> */}
               <div className="flex items-center">
                 <div className="bg-green-700 p-2 rounded-full mr-3 flex-shrink-0">
                   <Mail className="text-white" size={18} />
