@@ -29,7 +29,7 @@ const Contact = ({ isVisible, fadeInUp }) => {
                 <div className="bg-green-700 p-2 rounded-full mr-3 flex-shrink-0">
                   <Mail className="text-white" size={18} />
                 </div>
-                <span className="text-sm md:text-base">contactoconstructoraesmeralda@gmail.com</span>
+                <span className="text-sm md:text-base">constructuraesmeralda@gmail.com</span>
               </div>
             </div>
             
