@@ -19,16 +19,7 @@ const Footer = () => {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8"> 
-            
-            <div>
-              <h3 className="font-bold mb-4 text-lg">Recursos</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Tutoriales</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Soporte</a></li>
-              </ul>
-            </div>
-            
+                
             <div>
               <h3 className="font-bold mb-4 text-lg">Empresa</h3>
               <ul className="space-y-2">
@@ -38,16 +29,13 @@ const Footer = () => {
               </ul>
             </div>
           </div>
+          
         </div>
         
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-500 mb-4 md:mb-0">© 2025 ConstructPro. Todos los derechos reservados.</p>
-          <div className="flex space-x-6">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">Términos</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacidad</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">Cookies</a>
-          </div>
+          <p className="text-gray-500 mb-4 md:mb-0">© 2025 Constructora Esmeralda. Todos los derechos reservados.</p>
         </div>
+
       </div>
     </footer>
   );
