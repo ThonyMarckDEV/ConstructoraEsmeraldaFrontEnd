@@ -1,5 +1,6 @@
 import React from 'react';
 import { Building } from 'lucide-react';
+import edificiomoderno from '../../img/home/edifico_moderno.jpg';
 
 const Hero = ({ isVisible, fadeInUp }) => {
   return (
@@ -17,7 +18,7 @@ const Hero = ({ isVisible, fadeInUp }) => {
           <div className="w-full md:w-1/2 relative mt-4 md:mt-0">
             <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 shadow-xl">
               <img 
-                src="/api/placeholder/600/400" 
+                src={edificiomoderno}
                 alt="Edificio moderno Constructora Esmeralda" 
                 className="rounded-md w-full"
               />

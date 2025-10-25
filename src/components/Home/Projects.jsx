@@ -1,28 +1,35 @@
 import React from 'react';
 
+import imgEdificioModerno from '../../img/home/edificios-grandes-de-oficinas.jpg';
+import imgComplejoVertex from '../../img/home/centro_comercial.jpg'; 
+import imgResidencialPinos from '../../img/home/residencia_pinos.png';
+
 const Projects = ({ isVisible, fadeInUp }) => {
-  // Sample projects
+
   const projects = [
     {
       id: 1,
       name: "Edificio Moderno",
       phase: "Preparación del Terreno",
       description: "Edificio residencial con diseño contemporáneo y amplios espacios.",
-      progress: 25
+      progress: 25,
+      imageUrl: imgEdificioModerno
     },
     {
       id: 2,
       name: "Complejo Comercial Vertex",
       phase: "Estructura y Superestructura",
       description: "Centro comercial con tecnología inteligente y diseño sustentable.",
-      progress: 65
+      progress: 65,
+      imageUrl: imgComplejoVertex
     },
     {
       id: 3,
       name: "Residencial Los Pinos",
       phase: "Acabados",
       description: "Conjunto residencial con áreas verdes y amenidades de lujo.",
-      progress: 85
+      progress: 85,
+      imageUrl: imgResidencialPinos
     }
   ];
 
@@ -46,7 +53,7 @@ const ProjectCard = ({ project }) => {
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all">
       <img 
-        src={`/api/placeholder/400/250`} 
+        src={project.imageUrl} 
         alt={project.name} 
         className="w-full h-48 object-cover"
       />
