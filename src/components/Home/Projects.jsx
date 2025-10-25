@@ -36,8 +36,8 @@ const Projects = ({ isVisible, fadeInUp }) => {
   return (
     <section id="projects" className="py-16 md:py-20 px-4 md:px-12 bg-gray-50">
       <div className={`max-w-6xl mx-auto transition-all duration-1000 ease-out ${fadeInUp(isVisible)}`}>
-        <h2 className="text-2xl md:text-4xl font-bold mb-3 text-center text-green-800">Nuestros Proyectos</h2>
-        <p className="text-base md:text-lg text-gray-600 text-center mb-8 md:mb-12">Descubre algunos de nuestros proyectos destacados</p>
+        <h2 className="text-2xl md:text-4xl font-bold mb-3 text-center text-green-800"> Proyectos</h2>
+        <p className="text-base md:text-lg text-gray-600 text-center mb-8 md:mb-12">Descubre algunos de los proyectos que podemos realizar.</p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {projects.map((project) => (
